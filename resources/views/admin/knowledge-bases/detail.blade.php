@@ -1,0 +1,310 @@
+@extends('admin.layouts.app')
+
+@php
+    $vditorLocaleMap = [
+        'zh_CN' => 'zh_CN',
+        'en' => 'en_US',
+        'en_US' => 'en_US',
+        'ja' => 'ja_JP',
+        'ja_JP' => 'ja_JP',
+        'ru' => 'ru_RU',
+        'ru_RU' => 'ru_RU',
+        'pt_BR' => 'pt_BR',
+        'es' => 'es_ES',
+        'es_ES' => 'es_ES',
+    ];
+    $vditorLang = $vditorLocaleMap[str_replace('-', '_', app()->getLocale())] ?? 'en_US';
+@endphp
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('vendor/vditor/dist/index.css') }}">
+    <style>
+        .knowledge-markdown-editor .vditor {
+            border: 0;
+            border-radius: 0 0 0.75rem 0.75rem;
+            min-height: 720px;
+        }
+
+        .knowledge-markdown-editor .vditor-toolbar {
+            background: #f9fafb;
+            border-bottom-color: #e5e7eb;
+            padding: 8px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .knowledge-markdown-editor .vditor-ir,
+        .knowledge-markdown-editor .vditor-sv,
+        .knowledge-markdown-editor .vditor-wysiwyg {
+            min-height: 660px;
+            padding: 30px 36px;
+            font-size: 16px;
+            line-height: 1.85;
+        }
+
+        .knowledge-markdown-editor .vditor-reset {
+            color: #111827;
+        }
+
+        .knowledge-markdown-editor .vditor-reset h1,
+        .knowledge-markdown-editor .vditor-reset h2,
+        .knowledge-markdown-editor .vditor-reset h3 {
+            color: #111827;
+            letter-spacing: 0;
+        }
+
+        .knowledge-markdown-editor .vditor-preview {
+            background: #fff;
+        }
+    </style>
+@endpush
+
+@section('content')
+    <div class="px-4 sm:px-0">
+        <div class="mb-8 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.knowledge-bases.index') }}" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </a>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ __('admin.knowledge_detail.heading') }}</h1>
+                    <p class="mt-1 text-sm text-gray-600">{{ $knowledgeBase->name }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.knowledge_detail.content_title') }}</h3>
+            </div>
+            <form id="knowledge-detail-form" method="POST" action="{{ route('admin.knowledge-bases.detail.update', ['knowledgeBaseId' => (int) $knowledgeBase->id]) }}" class="p-6 space-y-4">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.knowledge_detail.field_name') }}</label>
+                        <input type="text" name="name" value="{{ old('name', (string) $knowledgeBase->name) }}" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.knowledge_bases.field_doc_type') }}</label>
+                        <select name="file_type" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 text-sm" required>
+                            <option value="markdown" @selected(old('file_type', (string) ($knowledgeBase->file_type ?? 'markdown')) === 'markdown')>{{ __('admin.status.markdown') }}</option>
+                            <option value="word" @selected(old('file_type', (string) ($knowledgeBase->file_type ?? 'markdown')) === 'word')>{{ __('admin.status.word_document') }}</option>
+                            <option value="text" @selected(old('file_type', (string) ($knowledgeBase->file_type ?? 'markdown')) === 'text')>{{ __('admin.status.text') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.knowledge_detail.field_description') }}</label>
+                    <textarea name="description" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 text-sm">{{ old('description', (string) ($knowledgeBase->description ?? '')) }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.knowledge_detail.field_content') }}</label>
+                    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                        <div class="flex flex-col gap-3 border-b border-gray-200 bg-gray-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <span class="inline-flex w-fit items-center rounded-full bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700">
+                                <i data-lucide="file-pen-line" class="mr-2 h-4 w-4"></i>
+                                {{ __('admin.knowledge_detail.editor_badge') }}
+                            </span>
+                            <span class="text-sm text-gray-500">{{ __('admin.knowledge_detail.editor_hint') }}</span>
+                        </div>
+                        <textarea id="knowledge-content-textarea" name="content" rows="18" class="hidden w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 text-sm">{{ old('content', (string) ($knowledgeBase->content ?? '')) }}</textarea>
+                        <div id="knowledge-content-editor" class="knowledge-markdown-editor min-h-[720px]"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="-mt-2 flex flex-col gap-3 px-6 pb-6 sm:flex-row sm:items-center sm:justify-end">
+                <form method="POST" action="{{ route('admin.knowledge-bases.chunks.refresh', ['knowledgeBaseId' => (int) $knowledgeBase->id]) }}">
+                    @csrf
+                    <input type="hidden" name="redirect_to" value="{{ route('admin.knowledge-bases.detail', ['knowledgeBaseId' => (int) $knowledgeBase->id], false) }}">
+                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-100 sm:w-auto" title="{{ __('admin.knowledge_detail.resubmit_chunks_help') }}">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                        {{ __('admin.knowledge_detail.resubmit_chunks') }}
+                    </button>
+                </form>
+                <button type="submit" form="knowledge-detail-form" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm text-white bg-orange-600 hover:bg-orange-700">
+                    <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                    {{ __('admin.knowledge_detail.save_changes') }}
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="text-sm text-gray-500">{{ __('admin.knowledge_detail.chunk_count') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format((int) ($chunkStats['chunk_count'] ?? 0)) }}</div>
+            </div>
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="text-sm text-gray-500">{{ __('admin.knowledge_detail.vectorized_count') }}</div>
+                <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format((int) ($chunkStats['vectorized_count'] ?? 0)) }}</div>
+            </div>
+            <div class="bg-white shadow rounded-lg p-5">
+                <div class="text-sm text-gray-500">{{ __('admin.knowledge_detail.updated_at') }}</div>
+                <div class="mt-2 text-sm font-medium text-gray-900">{{ optional($knowledgeBase->updated_at)->format('Y-m-d H:i:s') ?? '-' }}</div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.common.related_tasks') }}</h3>
+            </div>
+            @if ($relatedTasks->isEmpty())
+                <div class="px-6 py-5 text-sm text-gray-500">{{ __('admin.knowledge_detail.related_tasks_empty') }}</div>
+            @else
+                <div class="divide-y divide-gray-200">
+                    @foreach ($relatedTasks as $task)
+                        <div class="px-6 py-4 flex items-center justify-between">
+                            <div class="text-sm text-gray-900">#{{ (int) $task->id }} {{ $task->name }}</div>
+                            <div class="text-xs text-gray-500">{{ $task->status }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        <div id="chunk-preview" class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.knowledge_detail.chunk_preview_title') }}</h3>
+                <p class="mt-1 text-sm text-gray-500">{{ __('admin.knowledge_detail.chunk_preview_desc') }}</p>
+            </div>
+            @if ($chunkPreviewRows->isEmpty())
+                <div class="px-6 py-8 text-sm text-gray-500">{{ __('admin.knowledge_detail.chunk_preview_empty') }}</div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_index') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_status') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_length') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_tokens') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_embedding') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.knowledge_detail.chunk_preview_column') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach ($chunkPreviewRows as $chunkRow)
+                            @php
+                                $isVectorized = $chunkRow['embedding_model_id'] !== null && (int) $chunkRow['embedding_dimensions'] > 0;
+                            @endphp
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{{ (int) $chunkRow['chunk_index'] }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    @if ($isVectorized)
+                                        <span class="inline-flex px-2 py-0.5 rounded bg-green-100 text-green-700">{{ __('admin.knowledge_detail.chunk_status_vectorized') }}</span>
+                                    @else
+                                        <span class="inline-flex px-2 py-0.5 rounded bg-amber-100 text-amber-700">{{ __('admin.knowledge_detail.chunk_status_fallback') }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ __('admin.knowledge_bases.text_unit', ['count' => (int) $chunkRow['content_length']]) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ number_format((int) $chunkRow['token_count']) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                    @if ($isVectorized)
+                                        {{ __('admin.knowledge_detail.chunk_embedding_meta', ['model_id' => (int) $chunkRow['embedding_model_id'], 'dimensions' => (int) $chunkRow['embedding_dimensions']]) }}
+                                    @else
+                                        {{ __('admin.knowledge_detail.chunk_embedding_none') }}
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <div class="mb-2 flex flex-wrap items-center gap-2">
+                                        <span class="inline-flex rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                                            {{ __('admin.knowledge_detail.chunk_strategy_label') }}:
+                                            {{ __('admin.knowledge_detail.chunk_strategy_'.$chunkRow['chunk_strategy']) }}
+                                        </span>
+                                        @if ($chunkRow['chunk_title'] !== '')
+                                            <span class="text-xs font-medium text-gray-700">{{ $chunkRow['chunk_title'] }}</span>
+                                        @endif
+                                    </div>
+                                    @if ($chunkRow['section_path'] !== '')
+                                        <div class="mb-2 text-xs text-gray-500">{{ $chunkRow['section_path'] }}</div>
+                                    @endif
+                                    <div class="max-w-xl break-words">{{ $chunkRow['content_preview'] }}</div>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('vendor/vditor/dist/index.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('knowledge-content-textarea');
+            const editorNode = document.getElementById('knowledge-content-editor');
+            const form = document.getElementById('knowledge-detail-form');
+
+            if (!textarea || !editorNode) {
+                return;
+            }
+
+            if (typeof Vditor === 'undefined') {
+                textarea.classList.remove('hidden');
+                textarea.required = true;
+                editorNode.classList.add('hidden');
+                return;
+            }
+
+            let editor = null;
+
+            editor = new Vditor('knowledge-content-editor', {
+                value: textarea.value || '',
+                height: 720,
+                mode: 'wysiwyg',
+                cdn: @json(asset('vendor/vditor')),
+                lang: @json($vditorLang),
+                cache: { enable: false },
+                preview: {
+                    markdown: { toc: true },
+                    hljs: { lineNumber: false },
+                },
+                toolbar: [
+                    'emoji',
+                    'headings',
+                    'bold',
+                    'italic',
+                    'strike',
+                    '|',
+                    'line',
+                    'quote',
+                    'list',
+                    'ordered-list',
+                    'check',
+                    '|',
+                    'code',
+                    'inline-code',
+                    'table',
+                    'link',
+                    '|',
+                    'undo',
+                    'redo',
+                    'fullscreen',
+                    'preview',
+                ],
+                input(value) {
+                    textarea.value = value;
+                },
+                after() {
+                    if (editor) {
+                        textarea.value = editor.getValue();
+                    }
+
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+                },
+            });
+
+            form?.addEventListener('submit', () => {
+                if (editor) {
+                    textarea.value = editor.getValue();
+                }
+            });
+        });
+    </script>
+@endpush

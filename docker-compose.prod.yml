@@ -1,0 +1,259 @@
+# postgres 凭据由 DB_* 插值映射为官方镜像的 POSTGRES_*；redis 使用 REDIS_PASSWORD。推荐 docker compose --env-file .env.prod …
+name: geoflow-laravel-prod
+
+x-prod-app-build-args: &prod_app_build_args
+  COMPOSER_IMAGE: ${COMPOSER_IMAGE:-composer:2}
+  PHP_FPM_IMAGE: ${PHP_FPM_IMAGE:-php:8.4-fpm-bookworm}
+  PECL_REDIS_VERSION: ${PECL_REDIS_VERSION:-6.3.0}
+  COMPOSER_PACKAGIST_MIRROR: ${COMPOSER_PACKAGIST_MIRROR:-}
+  HTTP_PROXY: ${DOCKER_BUILD_HTTP_PROXY:-}
+  HTTPS_PROXY: ${DOCKER_BUILD_HTTPS_PROXY:-${DOCKER_BUILD_HTTP_PROXY:-}}
+  NO_PROXY: ${DOCKER_BUILD_NO_PROXY:-localhost,127.0.0.1,::1,postgres,redis}
+
+services:
+  postgres:
+    image: ${PGVECTOR_IMAGE:-pgvector/pgvector:pg18}
+    container_name: geoflow-postgres-prod
+    environment:
+      POSTGRES_DB: "${DB_DATABASE:-geo_flow}"
+      POSTGRES_USER: "${DB_USERNAME:-geo_user}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-change-this-password}"
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./docker-data/prod/postgres}:${POSTGRES_CONTAINER_DATA_DIR:-/var/lib/postgresql}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:8-alpine}
+    container_name: geoflow-redis-prod
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+    command:
+      - /bin/sh
+      - -lc
+      - |
+        if [ -n "$${REDIS_PASSWORD:-}" ]; then
+          exec redis-server --appendonly yes --requirepass "$${REDIS_PASSWORD}"
+        fi
+        exec redis-server --appendonly yes
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "if [ -n \"$${REDIS_PASSWORD:-}\" ]; then redis-cli -a \"$${REDIS_PASSWORD}\" ping; else redis-cli ping; fi",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  init:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-init-prod
+    working_dir: /var/www/html
+    env_file:
+      - ./.env.prod
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "${AUTO_FIX_STORAGE_PERMISSIONS:-true}"
+      GEOFLOW_SECURITY_FRESH_INSTALL_CONFIRMED: "true"
+    command: ["true"]
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-app-prod
+    mem_limit: ${APP_CONTAINER_MEMORY_LIMIT:-768m}
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm -t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  web:
+    image: geoflow-web-prod:latest
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args:
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.27-alpine}
+    container_name: geoflow-web-prod
+    ports:
+      - "${WEB_PORT:-18080}:80"
+    volumes:
+      - ./storage:/var/www/html/storage:ro
+    depends_on:
+      app:
+        condition: service_started
+      reverb:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  queue:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-queue-prod
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    command: ["php", "-d", "memory_limit=256M", "artisan", "queue:work", "redis", "--queue=geoflow,distribution,theme-replication,default", "--sleep=1", "--tries=1", "--timeout=660", "--memory=128", "--max-jobs=100", "--max-time=3600"]
+    mem_limit: ${QUEUE_CONTAINER_MEMORY_LIMIT:-384m}
+    stop_grace_period: 690s
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  knowledge-queue:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-knowledge-queue-prod
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    command: ["php", "-d", "memory_limit=160M", "artisan", "queue:work", "redis", "--queue=knowledge", "--sleep=1", "--tries=1", "--timeout=210", "--memory=128", "--max-jobs=20", "--max-time=1800"]
+    mem_limit: ${KNOWLEDGE_QUEUE_CONTAINER_MEMORY_LIMIT:-256m}
+    stop_grace_period: 240s
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  system-update-queue:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-system-update-queue-prod
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    command: ["php", "-d", "memory_limit=256M", "artisan", "queue:work", "redis", "--queue=system-updates", "--sleep=1", "--tries=1", "--timeout=930", "--memory=256", "--max-jobs=10", "--max-time=3600"]
+    mem_limit: ${SYSTEM_UPDATE_QUEUE_CONTAINER_MEMORY_LIMIT:-384m}
+    stop_grace_period: 960s
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scheduler:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-scheduler-prod
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    command: ["php", "artisan", "schedule:work"]
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  reverb:
+    image: geoflow-app-prod:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.prod
+      network: ${DOCKER_BUILD_NETWORK:-default}
+      args: *prod_app_build_args
+    container_name: geoflow-reverb-prod
+    working_dir: /var/www/html
+    environment:
+      AUTO_FIX_STORAGE_PERMISSIONS: "false"
+    user: "www-data:www-data"
+    # 端口由 .env.prod 的 REVERB_SERVER_PORT 决定（见 config/reverb.php）；nginx /reverb 反代端口须与之对齐
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0"]
+    ports:
+      - "${REVERB_EXPOSE_PORT:-18081}:${REVERB_SERVER_PORT:-18080}"
+    volumes:
+      - ./.env.prod:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${DOCKER_NETWORK_NAME:-geoflow-prod-net}
+    ipam:
+      config:
+        # 避开 VPC 172.16.0.0/12，避免容器路由与内网地址冲突。
+        - subnet: ${DOCKER_NETWORK_SUBNET:-10.88.0.0/16}
+          gateway: ${DOCKER_NETWORK_GATEWAY:-10.88.0.1}
