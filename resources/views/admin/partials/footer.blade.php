@@ -1,5 +1,5 @@
 @php
-    $projectGithubUrl = 'https://github.com/yaojingang/GEOFlow';
+    $projectGithubUrl = 'https://github.com/zhangzhirongs/GEOflow';
     $xProfileUrl = 'https://x.com/yaojingang';
     $appVersion = (string) config('geoflow.app_version', '2.0');
     $changelogUrl = app()->getLocale() === 'en'

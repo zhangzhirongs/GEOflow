@@ -33,7 +33,7 @@
                 <p class="ent-article-hero__excerpt">把可信知识、AI 内容工程与多站点分发连接起来，为持续运营的 GEO 内容资产提供一套开放的工作流。</p>
                 <div class="ent-about-hero__actions">
                     <a href="#about-purpose" class="ent-text-link">了解项目 <i data-lucide="arrow-down" aria-hidden="true"></i></a>
-                    <a href="{{ $repositoryUrl }}" class="ent-text-link" target="_blank" rel="noopener noreferrer">GitHub 仓库 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+                    <!-- <a href="{{ $repositoryUrl }}" class="ent-text-link" target="_blank" rel="noopener noreferrer">GitHub 仓库 <i data-lucide="arrow-up-right" aria-hidden="true"></i></a> -->
                 </div>
             </div>
         </header>

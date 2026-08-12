@@ -25,10 +25,10 @@
                     <p class="article-kicker text-gray-600 max-w-3xl">
                         把可信知识、AI 内容工程与多站点分发连接起来，为持续运营的 GEO 内容资产提供一套开放的工作流。
                     </p>
-                    <a href="{{ $repositoryUrl }}" class="inline-flex items-center mt-6 text-blue-600 font-medium" target="_blank" rel="noopener noreferrer">
+                    <!-- <a href="{{ $repositoryUrl }}" class="inline-flex items-center mt-6 text-blue-600 font-medium" target="_blank" rel="noopener noreferrer">
                         GitHub 仓库
                         <i data-lucide="arrow-up-right" class="w-4 h-4 ml-2" aria-hidden="true"></i>
-                    </a>
+                    </a> -->
                 </header>
 
                 <div class="article-prose article-rail max-w-none">

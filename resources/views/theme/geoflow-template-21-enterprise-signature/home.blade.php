@@ -282,10 +282,10 @@
                         <code><b>$</b> cd GEOFlow</code>
                         <code><b>$</b> composer install</code>
                     </div>
-                    <a href="https://github.com/yaojingang/GEOFlow" class="ent-button ent-button--dark" target="_blank" rel="noopener noreferrer">
+                    <!-- <a href="https://github.com/yaojingang/GEOFlow" class="ent-button ent-button--dark" target="_blank" rel="noopener noreferrer">
                         <i data-lucide="code-2" aria-hidden="true"></i>
                         访问 GitHub
-                    </a>
+                    </a> -->
                 </div>
 
                 <div class="ent-architecture ent-reveal" data-ent-reveal-delay="1">
