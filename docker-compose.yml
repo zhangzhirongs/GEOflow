@@ -83,7 +83,7 @@ services:
       COMPOSER_ON_START: "${COMPOSER_ON_START:-true}"
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
     ports:
-      - "${APP_PORT:-18080}:8080"
+      - "127.0.0.1:${APP_PORT:-18080}:8080"
     volumes:
       - ./:/var/www/html
     depends_on:
@@ -213,7 +213,7 @@ services:
       COMPOSER_ON_START: "${COMPOSER_ON_START:-true}"
     command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
     ports:
-      - "${REVERB_EXPOSE_PORT:-18081}:8080"
+      - "127.0.0.1:${REVERB_EXPOSE_PORT:-18081}:8080"
     volumes:
       - ./:/var/www/html
     depends_on:

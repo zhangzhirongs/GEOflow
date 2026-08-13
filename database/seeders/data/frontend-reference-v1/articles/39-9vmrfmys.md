@@ -2,7 +2,7 @@
 
 ## 升级前必须完成的环境确认
 开始 GEOFlow 2.3.0 升级前，务必核对以下 5 项：
-1. 代码来源为 `https://github.com/yaojingang/GEOFlow.git`，部署分支为 `main`。
+1. 代码来源为 `https://github.com/zhangzhirongs/GEOflow.git`，部署分支为 `main`。
 2. 已记录当前版本、镜像标签与最近一次可用提交。
 3. 已备份 PostgreSQL、`.env.prod`（或 `.env`）、`storage` 与目标站点包。
 4. Queue 与 Scheduler 已停止接收新任务，旧进程和队列已排空。

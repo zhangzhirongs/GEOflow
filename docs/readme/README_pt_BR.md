@@ -8,9 +8,9 @@
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../../LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/yaojingang/GEOFlow?style=social)](https://github.com/yaojingang/GEOFlow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yaojingang/GEOFlow?style=social)](https://github.com/yaojingang/GEOFlow/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/yaojingang/GEOFlow)](https://github.com/yaojingang/GEOFlow/issues)
+[![GitHub stars](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
 
 O GEOFlow é lançado sob a [Licença Apache 2.0](../../LICENSE). Você pode usar, copiar, modificar e distribuir, inclusive para fins comerciais, desde que mantenha os avisos de direitos autorais e licença e cumpra os termos de patente, marca registrada e exoneração de garantia da Apache-2.0.
 
@@ -178,7 +178,7 @@ Uma base de conhecimento fraca com automação forte apenas escala ruído. No GE
 
 1. Clone o projeto:
 ```bash
-git clone https://github.com/yaojingang/GEOFlow.git
+git clone https://github.com/zhangzhirongs/GEOflow.git
 cd GEOFlow
 ```
 
@@ -302,17 +302,17 @@ GEOFlow é software livre sob a [Licença Apache 2.0](../../LICENSE).
 ---
 
 <p align="center">
-  <a href="https://github.com/yaojingang/GEOFlow">
-    <img src="https://img.shields.io/github/stars/yaojingang/GEOFlow?style=flat" alt="GitHub Stars" />
+  <a href="https://github.com/zhangzhirongs/GEOflow">
+    <img src="https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=flat" alt="GitHub Stars" />
   </a>
-  <a href="https://github.com/yaojingang/GEOFlow">
-    <img src="https://img.shields.io/github/forks/yaojingang/GEOFlow?style=flat" alt="GitHub Forks" />
+  <a href="https://github.com/zhangzhirongs/GEOflow">
+    <img src="https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=flat" alt="GitHub Forks" />
   </a>
-  <a href="https://github.com/yaojingang/GEOFlow/issues">
-    <img src="https://img.shields.io/github/issues/yaojingang/GEOFlow?style=flat" alt="GitHub Issues" />
+  <a href="https://github.com/zhangzhirongs/GEOflow/issues">
+    <img src="https://img.shields.io/github/issues/zhangzhirongs/GEOflow?style=flat" alt="GitHub Issues" />
   </a>
 </p>
 
 ## ⭐ Histórico de Stars
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yaojingang/GEOFlow&type=Date)](https://star-history.com/#yaojingang/GEOFlow&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)

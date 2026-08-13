@@ -252,7 +252,7 @@ class EnterpriseSignatureThemeTest extends TestCase
             ->assertSee('data-ent-article-toc', false)
             ->assertSee('data-ent-article-content', false)
             ->assertSee('AboutPage')
-            ->assertSee('https://github.com/yaojingang/GEOFlow');
+            ->assertSee('https://github.com/zhangzhirongs/GEOflow');
 
         $this->get(route('site.archive'))
             ->assertOk()
@@ -280,7 +280,7 @@ class EnterpriseSignatureThemeTest extends TestCase
             ->assertSee('article-detail-shell', false)
             ->assertSee('关于 GEOFlow')
             ->assertSee('一条完整的内容工作流')
-            ->assertSee('https://github.com/yaojingang/GEOFlow');
+            ->assertSee('https://github.com/zhangzhirongs/GEOflow');
     }
 
     public function test_article_related_heading_and_footer_use_the_compact_copy(): void

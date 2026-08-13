@@ -30,7 +30,7 @@ class AboutController extends Controller
             'pageKeywords' => 'GEOFlow,GEO,生成式引擎优化,开源内容系统,知识库,多站点分发',
             'pageOgType' => 'website',
             'canonicalUrl' => route('site.about'),
-            'repositoryUrl' => 'https://github.com/yaojingang/GEOFlow',
+            'repositoryUrl' => 'https://github.com/zhangzhirongs/GEOflow',
         ]);
     }
 }

@@ -6,7 +6,7 @@ set -Eeuo pipefail
 # docker-compose.prod.yml stack, seeds the default admin, and runs a healthcheck.
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-REPO_URL="${GEOFLOW_REPO_URL:-https://github.com/yaojingang/GEOFlow.git}"
+REPO_URL="${GEOFLOW_REPO_URL:-https://github.com/zhangzhirongs/GEOflow.git}"
 BRANCH="${GEOFLOW_BRANCH:-main}"
 APP_DIR="${GEOFLOW_APP_DIR:-/opt/geoflow}"
 NONINTERACTIVE="${GEOFLOW_NONINTERACTIVE:-0}"

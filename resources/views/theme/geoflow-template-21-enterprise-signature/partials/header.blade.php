@@ -1,7 +1,7 @@
 @php
     $currentPath = request()->path();
     $isHome = $currentPath === '' || $currentPath === '/';
-    $repositoryUrl = 'https://github.com/yaojingang/GEOFlow';
+    $repositoryUrl = 'https://github.com/zhangzhirongs/GEOflow';
 @endphp
 
 <header class="ent-header" data-ent-header>

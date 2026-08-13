@@ -8,9 +8,9 @@
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../../LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/yaojingang/GEOFlow?style=social)](https://github.com/yaojingang/GEOFlow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yaojingang/GEOFlow?style=social)](https://github.com/yaojingang/GEOFlow/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/yaojingang/GEOFlow)](https://github.com/yaojingang/GEOFlow/issues)
+[![GitHub stars](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
 
 GEOFlow is released under the [Apache License 2.0](../../LICENSE). You may use, copy, modify, and distribute it, including for commercial purposes, provided that you retain copyright and license notices and comply with the patent, trademark, and warranty-disclaimer terms of Apache-2.0.
 
@@ -188,7 +188,7 @@ Weak knowledge bases plus strong automation only scale noise. In GEOFlow, **know
 ### Option 1: Docker (development / demo)
 
 ```bash
-git clone https://github.com/yaojingang/GEOFlow.git
+git clone https://github.com/zhangzhirongs/GEOflow.git
 cd GEOFlow
 cp .env.example .env
 vi .env   # DB, Redis, APP_URL, ADMIN_BASE_PATH, REVERB_*, etc.
@@ -209,7 +209,7 @@ For production, use **`docker-compose.prod.yml`** with **Nginx + php-fpm** inste
 For a first install on a fresh empty database, you can use the reference deployment script to run host checks, prepare `.env.prod`, deploy containers, and run post-deployment health checks:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yaojingang/GEOFlow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
+curl -fsSL https://raw.githubusercontent.com/zhangzhirongs/GEOflow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
 bash geoflow-docker-deploy.sh
 ```
 
@@ -235,7 +235,7 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d app web que
 **Prerequisites:** PHP **8.3+** with `pdo_pgsql`, `redis`, and other typical Laravel extensions; local **PostgreSQL** and **Redis**; **Composer 2.x**.
 
 ```bash
-git clone https://github.com/yaojingang/GEOFlow.git
+git clone https://github.com/zhangzhirongs/GEOflow.git
 cd GEOFlow
 cp .env.example .env
 # Edit .env: DB_* → Postgres, REDIS_* → Redis, QUEUE_CONNECTION=redis, etc.
@@ -371,4 +371,4 @@ GEOFlow is licensed under the [Apache License 2.0](../../LICENSE). It allows per
 
 ## ⭐ Star history
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yaojingang/GEOFlow&type=Date)](https://star-history.com/#yaojingang/GEOFlow&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)

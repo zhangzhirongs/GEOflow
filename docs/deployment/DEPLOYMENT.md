@@ -33,7 +33,7 @@
 一键部署脚本仅用于全新、空数据库安装。如果希望在常见云服务器、VPS 或面板服务器上先做环境自检，再自动完成首次生产 Docker 部署，可以使用仓库中的参考脚本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yaojingang/GEOFlow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
+curl -fsSL https://raw.githubusercontent.com/zhangzhirongs/GEOflow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
 bash geoflow-docker-deploy.sh
 ```
 

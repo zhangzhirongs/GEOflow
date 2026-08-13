@@ -92,9 +92,9 @@
             'deployment' => 'border-blue-200 bg-blue-50 text-blue-700',
             'recommended' => 'border-emerald-200 bg-emerald-50 text-emerald-700',
         ];
-        $githubUrl = (string) ($links['github'] ?? 'https://github.com/yaojingang/GEOFlow');
+        $githubUrl = (string) ($links['github'] ?? 'https://github.com/zhangzhirongs/GEOflow');
         $changelogLinks = is_array($links['changelog'] ?? null) ? $links['changelog'] : [];
-        $changelogUrl = (string) ($changelogLinks[$localeForChangelog] ?? $changelogLinks['zh-CN'] ?? 'https://github.com/yaojingang/GEOFlow/blob/main/docs/CHANGELOG.md');
+        $changelogUrl = (string) ($changelogLinks[$localeForChangelog] ?? $changelogLinks['zh-CN'] ?? 'https://github.com/zhangzhirongs/GEOflow/blob/main/docs/CHANGELOG.md');
         $flagLabels = [
             'requires_composer' => __('admin.system_updates.plan.requires_composer'),
             'requires_npm_build' => __('admin.system_updates.plan.requires_npm_build'),
@@ -296,7 +296,7 @@
                                 <h3 class="text-sm font-semibold text-blue-900">{{ __('admin.system_updates.diagnostics.docs_title') }}</h3>
                                 <p class="mt-1 text-xs leading-5 text-blue-700">{{ __('admin.system_updates.diagnostics.docs_desc') }}</p>
                             </div>
-                            <a href="{{ (string) ($diagnosticDocs['url'] ?? 'https://github.com/yaojingang/GEOFlow/blob/main/docs/deployment/DEPLOYMENT.md') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+                            <a href="{{ (string) ($diagnosticDocs['url'] ?? 'https://github.com/zhangzhirongs/GEOflow/blob/main/docs/deployment/DEPLOYMENT.md') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-md bg-white px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100">
                                 <i data-lucide="external-link" class="mr-1.5 h-3.5 w-3.5"></i>
                                 {{ __('admin.system_updates.diagnostics.open_docs') }}
                             </a>

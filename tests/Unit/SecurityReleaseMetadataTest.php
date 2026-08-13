@@ -15,19 +15,19 @@ class SecurityReleaseMetadataTest extends TestCase
         $this->assertSame('2026-08-09', $manifest['release_date']);
         $this->assertSame('minor', $manifest['release_type']);
         $this->assertSame(
-            'https://github.com/yaojingang/GEOFlow/archive/refs/tags/v2.3.0.zip',
+            'https://github.com/zhangzhirongs/GEOflow/archive/refs/tags/v2.3.0.zip',
             $manifest['archive_url'],
         );
         $this->assertSame(
-            'https://github.com/yaojingang/GEOFlow/releases/tag/v2.3.0',
+            'https://github.com/zhangzhirongs/GEOflow/releases/tag/v2.3.0',
             $payload['release_url'],
         );
         $this->assertSame(
-            'https://github.com/yaojingang/GEOFlow/blob/v2.3.0/docs/CHANGELOG.md',
+            'https://github.com/zhangzhirongs/GEOflow/blob/v2.3.0/docs/CHANGELOG.md',
             $payload['changelog_url_zh'],
         );
         $this->assertSame(
-            'https://github.com/yaojingang/GEOFlow/blob/v2.3.0/docs/CHANGELOG_en.md',
+            'https://github.com/zhangzhirongs/GEOflow/blob/v2.3.0/docs/CHANGELOG_en.md',
             $payload['changelog_url_en'],
         );
 

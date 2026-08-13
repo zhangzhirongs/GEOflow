@@ -14,7 +14,7 @@ CLI 随 GEOFlow 源码提供，不需要单独下载。运行前需要：
 - 登录账号，或一个具有所需 API scope 的 Token。
 
 ```bash
-git clone https://github.com/yaojingang/GEOFlow.git
+git clone https://github.com/zhangzhirongs/GEOflow.git
 cd GEOFlow
 composer install --no-interaction --prefer-dist
 

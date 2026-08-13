@@ -17,9 +17,9 @@
             </div>
             <div>
                 <span class="ent-footer__label">Open Source</span>
-                <a href="https://github.com/yaojingang/GEOFlow" target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href="https://github.com/yaojingang/GEOFlow/issues" target="_blank" rel="noopener noreferrer">Issues</a>
-                <a href="https://github.com/yaojingang/GEOFlow/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+                <a href="https://github.com/zhangzhirongs/GEOflow" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://github.com/zhangzhirongs/GEOflow/issues" target="_blank" rel="noopener noreferrer">Issues</a>
+                <a href="https://github.com/zhangzhirongs/GEOflow/releases" target="_blank" rel="noopener noreferrer">Releases</a>
             </div>
             <div>
                 <span class="ent-footer__label">Enterprise</span>

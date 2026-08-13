@@ -38,7 +38,7 @@
 仅在全新空数据库的服务器执行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yaojingang/GEOFlow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
+curl -fsSL https://raw.githubusercontent.com/zhangzhirongs/GEOflow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
 bash geoflow-docker-deploy.sh
 ```
 
@@ -78,7 +78,7 @@ bash geoflow-docker-deploy.sh
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `GEOFLOW_REPO_URL` | `https://github.com/yaojingang/GEOFlow.git` | 源码仓库地址 |
+| `GEOFLOW_REPO_URL` | `https://github.com/zhangzhirongs/GEOflow.git` | 源码仓库地址 |
 | `GEOFLOW_BRANCH` | `main` | 部署分支 |
 | `GEOFLOW_APP_DIR` | `/opt/geoflow` | 服务器部署目录 |
 | `GEOFLOW_INSTALL_DOCKER` | `auto` | `1` 自动安装 Docker；`0` 缺少 Docker 时直接失败 |
@@ -172,7 +172,7 @@ Recommended for production:
 On a fresh server with an empty database, run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yaojingang/GEOFlow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
+curl -fsSL https://raw.githubusercontent.com/zhangzhirongs/GEOflow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
 bash geoflow-docker-deploy.sh
 ```
 
@@ -212,7 +212,7 @@ Optional variables:
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `GEOFLOW_REPO_URL` | `https://github.com/yaojingang/GEOFlow.git` | Source repository URL |
+| `GEOFLOW_REPO_URL` | `https://github.com/zhangzhirongs/GEOflow.git` | Source repository URL |
 | `GEOFLOW_BRANCH` | `main` | Branch to deploy |
 | `GEOFLOW_APP_DIR` | `/opt/geoflow` | Server installation directory |
 | `GEOFLOW_INSTALL_DOCKER` | `auto` | `1` to install Docker automatically, `0` to fail if Docker is missing |

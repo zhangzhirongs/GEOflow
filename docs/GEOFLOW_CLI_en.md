@@ -14,7 +14,7 @@ The CLI ships with the GEOFlow source tree. It requires:
 - An admin login or an API token with the required scopes.
 
 ```bash
-git clone https://github.com/yaojingang/GEOFlow.git
+git clone https://github.com/zhangzhirongs/GEOflow.git
 cd GEOFlow
 composer install --no-interaction --prefer-dist
 

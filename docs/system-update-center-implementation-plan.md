@@ -230,15 +230,15 @@ flowchart TD
   "release_type": "patch",
   "commit": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   "tag": "v2.0.3",
-  "archive_url": "https://github.com/yaojingang/GEOFlow/archive/refs/tags/v2.0.3.zip",
+  "archive_url": "https://github.com/zhangzhirongs/GEOflow/archive/refs/tags/v2.0.3.zip",
   "archive_sha256": "2f4c7fb12a5d8f3c46b9a1e2d5c6a7f88d9e0b1c2a3f4d5e6f708192a3b4c5d6",
   "payload": {
     "title_zh": "GEOFlow v2.0.3",
     "summary_zh": "优化系统更新中心、更新计划、备份与回滚基础能力。",
     "upgrade_tip_zh": "升级前请确认数据库和上传目录已经备份，并在更新中心生成更新计划。",
-    "release_url": "https://github.com/yaojingang/GEOFlow/releases/tag/v2.0.3",
-    "changelog_url_zh": "https://github.com/yaojingang/GEOFlow/blob/main/docs/CHANGELOG.md",
-    "changelog_url_en": "https://github.com/yaojingang/GEOFlow/blob/main/docs/CHANGELOG_en.md"
+    "release_url": "https://github.com/zhangzhirongs/GEOflow/releases/tag/v2.0.3",
+    "changelog_url_zh": "https://github.com/zhangzhirongs/GEOflow/blob/main/docs/CHANGELOG.md",
+    "changelog_url_en": "https://github.com/zhangzhirongs/GEOflow/blob/main/docs/CHANGELOG_en.md"
   }
 }
 ```
@@ -631,7 +631,7 @@ GEOFLOW_UPDATE_CENTER_ENABLED=true
 GEOFLOW_UPDATE_EXECUTION_ENABLED=false
 GEOFLOW_UPDATE_BACKUP_KEEP=10
 GEOFLOW_UPDATE_BACKUP_PATH=storage/app/geoflow-updates
-GEOFLOW_UPDATE_ALLOWED_REPOSITORY=https://github.com/yaojingang/GEOFlow
+GEOFLOW_UPDATE_ALLOWED_REPOSITORY=https://github.com/zhangzhirongs/GEOflow
 GEOFLOW_UPDATE_REQUIRE_ADMIN_PASSWORD=true
 GEOFLOW_UPDATE_ALLOW_ARCHIVE_APPLY=false
 GEOFLOW_UPDATE_DATABASE_BACKUP_ENABLED=true

@@ -80,7 +80,7 @@
                             预约 GEO 方案交流
                             <i data-lucide="arrow-right" aria-hidden="true"></i>
                         </a>
-                        <a href="https://github.com/yaojingang/GEOFlow" class="ent-text-link" target="_blank" rel="noopener noreferrer">
+                        <a href="https://github.com/zhangzhirongs/GEOflow" class="ent-text-link" target="_blank" rel="noopener noreferrer">
                             查看开源仓库
                             <i data-lucide="arrow-up-right" aria-hidden="true"></i>
                         </a>
@@ -278,11 +278,11 @@
                     <p>GEOFlow 以开放代码、可扩展通道和清晰工作流支持团队构建自己的 GEO 基础设施。</p>
                     <div class="ent-code-card">
                         <div><span></span><span></span><span></span><small>terminal</small></div>
-                        <code><b>$</b> git clone https://github.com/yaojingang/GEOFlow.git</code>
+                        <code><b>$</b> git clone https://github.com/zhangzhirongs/GEOflow.git</code>
                         <code><b>$</b> cd GEOFlow</code>
                         <code><b>$</b> composer install</code>
                     </div>
-                    <!-- <a href="https://github.com/yaojingang/GEOFlow" class="ent-button ent-button--dark" target="_blank" rel="noopener noreferrer">
+                    <!-- <a href="https://github.com/zhangzhirongs/GEOflow" class="ent-button ent-button--dark" target="_blank" rel="noopener noreferrer">
                         <i data-lucide="code-2" aria-hidden="true"></i>
                         访问 GitHub
                     </a> -->

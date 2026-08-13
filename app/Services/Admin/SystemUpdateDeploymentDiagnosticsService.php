@@ -36,7 +36,7 @@ class SystemUpdateDeploymentDiagnosticsService
             'commands' => $this->commands($deployment),
             'log' => $this->logSummary(),
             'docs' => [
-                'url' => 'https://github.com/yaojingang/GEOFlow/blob/main/docs/deployment/docker-prod-init-troubleshooting.md',
+                'url' => 'https://github.com/zhangzhirongs/GEOflow/blob/main/docs/deployment/docker-prod-init-troubleshooting.md',
             ],
         ];
     }

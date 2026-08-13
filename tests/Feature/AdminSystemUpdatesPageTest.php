@@ -344,14 +344,14 @@ class AdminSystemUpdatesPageTest extends TestCase
         $archive = $this->buildReleaseArchive([
             'app/Support/AdminWelcome/intro_copy.php' => "<?php\nreturn ['updated' => true];\n",
         ]);
-        $githubArchiveUrl = 'https://github.com/yaojingang/GEOFlow/archive/refs/tags/v2.1.1.zip';
-        $codeloadArchiveUrl = 'https://codeload.github.com/yaojingang/GEOFlow/zip/refs/tags/v2.1.1';
+        $githubArchiveUrl = 'https://github.com/zhangzhirongs/GEOflow/archive/refs/tags/v2.1.1.zip';
+        $codeloadArchiveUrl = 'https://codeload.github.com/zhangzhirongs/GEOflow/zip/refs/tags/v2.1.1';
 
         config([
             'geoflow.app_version' => '2.1.0',
             'geoflow.update_check_enabled' => true,
-            'geoflow.update_metadata_url' => 'https://github.com/yaojingang/GEOFlow/raw/refs/heads/main/version.json',
-            'geoflow.update_allowed_repository' => 'https://github.com/yaojingang/GEOFlow',
+            'geoflow.update_metadata_url' => 'https://github.com/zhangzhirongs/GEOflow/raw/refs/heads/main/version.json',
+            'geoflow.update_allowed_repository' => 'https://github.com/zhangzhirongs/GEOflow',
             'geoflow.update_archive_apply_enabled' => true,
         ]);
         $this->app->instance(HostResolver::class, new class implements HostResolver
@@ -363,7 +363,7 @@ class AdminSystemUpdatesPageTest extends TestCase
         });
 
         Http::fake([
-            'https://github.com/yaojingang/GEOFlow/raw/refs/heads/main/version.json' => Http::response([
+            'https://github.com/zhangzhirongs/GEOflow/raw/refs/heads/main/version.json' => Http::response([
                 'version' => '2.1.1',
                 'commit' => 'abc123',
                 'archive_url' => $githubArchiveUrl,
@@ -396,13 +396,13 @@ class AdminSystemUpdatesPageTest extends TestCase
         Storage::fake('local');
 
         $admin = $this->createAdmin();
-        $traversalUrl = 'https://github.com/yaojingang/GEOFlow/../../tw93/Waza/archive/refs/heads/main.zip';
+        $traversalUrl = 'https://github.com/zhangzhirongs/GEOflow/../../tw93/Waza/archive/refs/heads/main.zip';
 
         config([
             'geoflow.app_version' => '2.1.0',
             'geoflow.update_check_enabled' => true,
             'geoflow.update_metadata_url' => 'https://example.test/version.json',
-            'geoflow.update_allowed_repository' => 'https://github.com/yaojingang/GEOFlow',
+            'geoflow.update_allowed_repository' => 'https://github.com/zhangzhirongs/GEOflow',
             'geoflow.update_archive_apply_enabled' => true,
         ]);
         Http::fake([
@@ -432,14 +432,14 @@ class AdminSystemUpdatesPageTest extends TestCase
         Storage::fake('local');
 
         $admin = $this->createAdmin();
-        $githubArchiveUrl = 'https://github.com/yaojingang/GEOFlow/archive/refs/tags/v2.1.1.zip';
+        $githubArchiveUrl = 'https://github.com/zhangzhirongs/GEOflow/archive/refs/tags/v2.1.1.zip';
         $foreignCodeloadUrl = 'https://codeload.github.com/tw93/Waza/zip/refs/heads/main';
 
         config([
             'geoflow.app_version' => '2.1.0',
             'geoflow.update_check_enabled' => true,
             'geoflow.update_metadata_url' => 'https://example.test/version.json',
-            'geoflow.update_allowed_repository' => 'https://github.com/yaojingang/GEOFlow',
+            'geoflow.update_allowed_repository' => 'https://github.com/zhangzhirongs/GEOflow',
             'geoflow.update_archive_apply_enabled' => true,
         ]);
         $this->app->instance(HostResolver::class, new class implements HostResolver
@@ -636,7 +636,7 @@ class AdminSystemUpdatesPageTest extends TestCase
             'geoflow.app_version' => '2.0.2',
             'geoflow.update_check_enabled' => true,
             'geoflow.update_metadata_url' => 'https://example.test/version.json',
-            'geoflow.update_allowed_repository' => 'https://github.com/yaojingang/GEOFlow',
+            'geoflow.update_allowed_repository' => 'https://github.com/zhangzhirongs/GEOflow',
         ]);
 
         Http::fake([
@@ -744,7 +744,7 @@ class AdminSystemUpdatesPageTest extends TestCase
             'geoflow.app_version' => '2.0.2',
             'geoflow.update_check_enabled' => true,
             'geoflow.update_metadata_url' => 'https://example.test/version.json',
-            'geoflow.update_allowed_repository' => 'https://github.com/yaojingang/GEOFlow',
+            'geoflow.update_allowed_repository' => 'https://github.com/zhangzhirongs/GEOflow',
             'geoflow.update_archive_apply_enabled' => true,
         ]);
 

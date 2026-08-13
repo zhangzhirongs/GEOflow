@@ -33,7 +33,7 @@ esac
 
 TARGET_ORIGIN=$(git -C "$TARGET_ROOT" remote get-url origin 2>/dev/null || true)
 case "$TARGET_ORIGIN" in
-  https://github.com/yaojingang/GEOFlow|https://github.com/yaojingang/GEOFlow.git|git@github.com:yaojingang/GEOFlow.git|ssh://git@github.com/yaojingang/GEOFlow.git) ;;
+  https://github.com/zhangzhirongs/GEOflow|https://github.com/zhangzhirongs/GEOflow.git|git@github.com:zhangzhirongs/GEOflow.git|ssh://git@github.com/zhangzhirongs/GEOflow.git) ;;
   *)
     echo "Refusing to sync into a repository that is not the official GEOFlow public remote." >&2
     exit 1

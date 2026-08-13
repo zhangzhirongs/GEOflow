@@ -33,7 +33,7 @@ GEOFlow 依赖的出站网络必须能稳定访问 AI API 地址以及 GitHub �
 
 ## 部署前检查清单与常见问题
 部署或调整 GEOFlow 服务器配置前，建议逐项确认以下内容：
-- 服务器可访问 `https://github.com/yaojingang/GEOFlow` 并能拉取 Docker 镜像
+- 服务器可访问 `https://github.com/zhangzhirongs/GEOflow` 并能拉取 Docker 镜像
 - 域名已解析，目标端口未被占用
 - 若使用大陆服务器，已配置稳定的 Docker 镜像源和可访问的 AI API 服务商
 - 数据库与 Redis 端口未暴露在公网

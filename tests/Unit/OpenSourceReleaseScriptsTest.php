@@ -105,7 +105,7 @@ class OpenSourceReleaseScriptsTest extends TestCase
         $this->assertFalse(File::exists($target.'/protected.txt'));
         $this->assertTrue(File::exists($target.'/.git'));
         $this->assertSame(
-            'https://github.com/yaojingang/GEOFlow.git',
+            'https://github.com/zhangzhirongs/GEOflow.git',
             trim($this->runProcess(['git', '-C', $target, 'remote', 'get-url', 'origin'])->getOutput()),
         );
     }
@@ -133,7 +133,7 @@ class OpenSourceReleaseScriptsTest extends TestCase
             $this->runProcess(['git', '-C', $repository, 'commit', '--quiet', '-m', 'fixture']);
         }
         $this->runProcess([
-            'git', '-C', $target, 'remote', 'add', 'origin', 'https://github.com/yaojingang/GEOFlow.git',
+            'git', '-C', $target, 'remote', 'add', 'origin', 'https://github.com/zhangzhirongs/GEOflow.git',
         ]);
 
         $this->beforeApplicationDestroyed(fn () => File::deleteDirectory($root));
