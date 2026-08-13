@@ -101,6 +101,32 @@ class SocialPublicationPoolTest extends TestCase
         $this->assertSame('generic_http_api', $account->publish_adapter);
     }
 
+    public function test_xiaohongshu_gateway_account_can_be_saved_without_manual_session_or_secret(): void
+    {
+        $admin = $this->admin();
+        $persona = $this->persona($admin);
+
+        $this->actingAs($admin, 'admin')->post(route('admin.manual-publications.settings.accounts.store'), [
+            'persona_id' => $persona->id,
+            'platform' => ManualPublicationAccount::PLATFORM_XIAOHONGSHU,
+            'account_name' => 'XHS Pool',
+            'auto_publish_enabled' => '1',
+            'publish_endpoint_url' => 'http://host.docker.internal:8787/xhs/publish',
+            'publish_login_identifier' => 'xhs-user',
+            'publish_secret_key_id' => 'xhs-account-001',
+            'publish_secret' => '',
+            'publish_session' => '',
+            'is_active' => '1',
+        ])->assertRedirect();
+
+        $account = ManualPublicationAccount::query()->firstOrFail();
+        $this->assertSame('xiaohongshu_login_session', $account->publish_adapter);
+        $this->assertSame('xhs-account-001', $account->publish_secret_key_id);
+        $this->assertTrue((bool) ($account->publish_profile_json['gateway_managed_session'] ?? false));
+        $this->assertNull($account->getRawOriginal('publish_session_ciphertext'));
+        $this->assertNull($account->getRawOriginal('publish_secret_ciphertext'));
+    }
+
     public function test_published_article_queues_social_publication_job_for_enabled_accounts(): void
     {
         Queue::fake();

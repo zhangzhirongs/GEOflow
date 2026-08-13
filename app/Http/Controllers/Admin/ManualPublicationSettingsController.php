@@ -7,14 +7,19 @@ use App\Http\Requests\Admin\SaveManualPublicationAccountRequest;
 use App\Http\Requests\Admin\SaveManualPublicationPersonaRequest;
 use App\Models\ManualPublicationAccount;
 use App\Models\ManualPublicationPersona;
-use App\Support\GeoFlow\ApiKeyCrypto;
+use App\Services\GeoFlow\SocialGatewayClient;
 use App\Support\AdminWeb;
+use App\Support\GeoFlow\ApiKeyCrypto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Throwable;
 
 class ManualPublicationSettingsController extends Controller
 {
-    public function __construct(private readonly ApiKeyCrypto $apiKeyCrypto) {}
+    public function __construct(
+        private readonly ApiKeyCrypto $apiKeyCrypto,
+        private readonly SocialGatewayClient $socialGatewayClient,
+    ) {}
 
     public function index(): View
     {
@@ -29,7 +34,7 @@ class ManualPublicationSettingsController extends Controller
             'publishAuthTypes' => ['none', 'bearer', 'basic', 'header_key'],
             'publishAdapters' => [
                 'zhihu_login_session' => '知乎登录态发布',
-                'xiaohongshu_login_session' => '小红书登录态发布',
+                'xiaohongshu_login_session' => '小红书托管登录发布',
                 'bilibili_login_session' => 'B站登录态发布',
                 'generic_http_api' => '通用 HTTP 发布',
             ],
@@ -77,6 +82,48 @@ class ManualPublicationSettingsController extends Controller
         return back()->with('message', __('admin.manual_publications.settings.account_saved'));
     }
 
+    public function startXiaohongshuLogin(int $accountId): RedirectResponse
+    {
+        $account = $this->xiaohongshuAccount($accountId);
+
+        try {
+            $result = $this->socialGatewayClient->startXiaohongshuLogin($account);
+        } catch (Throwable $e) {
+            return back()->withErrors(['xiaohongshu_login' => $e->getMessage()]);
+        }
+
+        $account->forceFill([
+            'publish_profile_json' => $this->profileJson($account, [
+                'gateway_login_status' => (string) ($result['status'] ?? 'started'),
+                'gateway_login_url' => is_scalar($result['login_url'] ?? null) ? (string) $result['login_url'] : null,
+                'gateway_last_checked_at' => now()->toAtomString(),
+            ]),
+        ])->save();
+
+        return back()->with('message', '小红书登录已启动，请在弹出的浏览器窗口完成登录。');
+    }
+
+    public function xiaohongshuLoginStatus(int $accountId): RedirectResponse
+    {
+        $account = $this->xiaohongshuAccount($accountId);
+
+        try {
+            $result = $this->socialGatewayClient->xiaohongshuLoginStatus($account);
+        } catch (Throwable $e) {
+            return back()->withErrors(['xiaohongshu_login' => $e->getMessage()]);
+        }
+
+        $status = (string) ($result['status'] ?? 'unknown');
+        $account->forceFill([
+            'publish_profile_json' => $this->profileJson($account, [
+                'gateway_login_status' => $status,
+                'gateway_last_checked_at' => now()->toAtomString(),
+            ]),
+        ])->save();
+
+        return back()->with('message', '小红书登录态状态：'.$status);
+    }
+
     /** @return array<string, mixed> */
     private function personaPayload(SaveManualPublicationPersonaRequest $request): array
     {
@@ -99,16 +146,8 @@ class ManualPublicationSettingsController extends Controller
         $secret = trim((string) ($data['publish_secret'] ?? ''));
         $session = trim((string) ($data['publish_session'] ?? ''));
         $platform = (string) $data['platform'];
-        $publishAdapter = trim((string) ($data['publish_adapter'] ?? ''));
-
-        if ($publishAdapter === '') {
-            $publishAdapter = match ($platform) {
-                ManualPublicationAccount::PLATFORM_ZHIHU => 'zhihu_login_session',
-                ManualPublicationAccount::PLATFORM_XIAOHONGSHU => 'xiaohongshu_login_session',
-                ManualPublicationAccount::PLATFORM_BILIBILI => 'bilibili_login_session',
-                default => 'generic_http_api',
-            };
-        }
+        $publishAdapter = trim((string) ($data['publish_adapter'] ?? '')) ?: $this->defaultAdapter($platform);
+        $gatewayAccountId = trim((string) ($data['publish_secret_key_id'] ?? '')) ?: null;
 
         return [
             'persona_id' => (int) $data['persona_id'],
@@ -125,13 +164,15 @@ class ManualPublicationSettingsController extends Controller
             'publish_login_identifier' => trim((string) ($data['publish_login_identifier'] ?? '')) ?: null,
             'publish_auth_header_name' => trim((string) ($data['publish_auth_header_name'] ?? '')) ?: null,
             'publish_basic_username' => trim((string) ($data['publish_basic_username'] ?? '')) ?: null,
-            'publish_secret_key_id' => trim((string) ($data['publish_secret_key_id'] ?? '')) ?: null,
+            'publish_secret_key_id' => $gatewayAccountId,
             'publish_secret_ciphertext' => $secret !== '' ? $this->apiKeyCrypto->encrypt($secret) : null,
             'publish_session_ciphertext' => $session !== '' ? $this->apiKeyCrypto->encrypt($session) : null,
             'publish_profile_json' => [
-                'platform' => (string) $data['platform'],
+                'platform' => $platform,
                 'login_identifier' => trim((string) ($data['publish_login_identifier'] ?? '')) ?: null,
-                'adapter' => trim((string) ($data['publish_adapter'] ?? '')) ?: null,
+                'adapter' => $publishAdapter,
+                'gateway_account_id' => $gatewayAccountId,
+                'gateway_managed_session' => $platform === ManualPublicationAccount::PLATFORM_XIAOHONGSHU,
             ],
             'publish_status' => 'idle',
             'publish_attempt_count' => 0,
@@ -143,5 +184,34 @@ class ManualPublicationSettingsController extends Controller
             'last_remote_url' => null,
             'is_active' => $request->boolean('is_active'),
         ];
+    }
+
+    private function defaultAdapter(string $platform): string
+    {
+        return match ($platform) {
+            ManualPublicationAccount::PLATFORM_ZHIHU => 'zhihu_login_session',
+            ManualPublicationAccount::PLATFORM_XIAOHONGSHU => 'xiaohongshu_login_session',
+            ManualPublicationAccount::PLATFORM_BILIBILI => 'bilibili_login_session',
+            default => 'generic_http_api',
+        };
+    }
+
+    private function xiaohongshuAccount(int $accountId): ManualPublicationAccount
+    {
+        return ManualPublicationAccount::query()
+            ->whereKey($accountId)
+            ->where('platform', ManualPublicationAccount::PLATFORM_XIAOHONGSHU)
+            ->firstOrFail();
+    }
+
+    /**
+     * @param  array<string,mixed>  $overrides
+     * @return array<string,mixed>
+     */
+    private function profileJson(ManualPublicationAccount $account, array $overrides): array
+    {
+        $profile = is_array($account->publish_profile_json) ? $account->publish_profile_json : [];
+
+        return array_merge($profile, $overrides);
     }
 }

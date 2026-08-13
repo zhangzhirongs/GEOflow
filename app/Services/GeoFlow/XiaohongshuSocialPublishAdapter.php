@@ -21,20 +21,25 @@ class XiaohongshuSocialPublishAdapter extends AbstractSocialPublishAdapter
     {
         $endpoint = trim((string) ($account->publish_endpoint_url ?: ''));
         if ($endpoint === '') {
-            throw new RuntimeException('小红书账号缺少发布地址。');
+            throw new RuntimeException('小红书账号缺少发布网关地址。');
+        }
+
+        $gatewayAccountId = trim((string) ($account->publish_secret_key_id ?: ''));
+        if ($gatewayAccountId === '') {
+            $gatewayAccountId = 'geoflow-account-'.$account->id;
         }
 
         $response = $this->sendJson($account, $endpoint, (string) ($account->publish_method ?: 'POST'), [
             'platform' => 'xiaohongshu',
-            'mode' => 'login_session',
+            'mode' => 'gateway_managed_session',
+            'gateway_account_id' => $gatewayAccountId,
             'login_identifier' => (string) ($account->publish_login_identifier ?? ''),
-            'session_cookie_present' => $this->session($account) !== '',
             'account' => [
                 'id' => (int) $account->id,
                 'name' => (string) $account->account_name,
             ],
             'payload' => $payload,
-        ], 20);
+        ], 30);
 
         return [
             'remote_id' => (string) ($response['note_id'] ?? $response['id'] ?? $response['remote_id'] ?? ''),

@@ -73,13 +73,15 @@ class SaveManualPublicationAccountRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:120',
-                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')),
+                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')
+                    && $this->input('platform') !== ManualPublicationAccount::PLATFORM_XIAOHONGSHU),
             ],
             'publish_secret' => [
                 'nullable',
                 'string',
                 'max:10000',
-                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')),
+                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')
+                    && $this->input('platform') !== ManualPublicationAccount::PLATFORM_XIAOHONGSHU),
             ],
             'publish_session' => ['nullable', 'string', 'max:10000'],
             'is_active' => ['nullable', 'boolean'],

@@ -216,6 +216,8 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
                 Route::put('personas/{personaId}', [ManualPublicationSettingsController::class, 'updatePersona'])->name('personas.update')->whereNumber('personaId');
                 Route::post('accounts', [ManualPublicationSettingsController::class, 'storeAccount'])->name('accounts.store');
                 Route::put('accounts/{accountId}', [ManualPublicationSettingsController::class, 'updateAccount'])->name('accounts.update')->whereNumber('accountId');
+                Route::post('accounts/{accountId}/xiaohongshu-login/start', [ManualPublicationSettingsController::class, 'startXiaohongshuLogin'])->name('accounts.xiaohongshu-login.start')->whereNumber('accountId');
+                Route::post('accounts/{accountId}/xiaohongshu-login/status', [ManualPublicationSettingsController::class, 'xiaohongshuLoginStatus'])->name('accounts.xiaohongshu-login.status')->whereNumber('accountId');
             });
             Route::get('{manualPublicationId}', [ManualPublicationController::class, 'show'])->name('show')->whereNumber('manualPublicationId');
             Route::get('{manualPublicationId}/edit', [ManualPublicationController::class, 'edit'])->name('edit')->whereNumber('manualPublicationId');
