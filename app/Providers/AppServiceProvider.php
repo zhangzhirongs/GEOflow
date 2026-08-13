@@ -8,11 +8,17 @@ use App\Models\Admin;
 use App\Services\Admin\AdminUpdateMetadataService;
 use App\Services\Admin\AdminWelcomeModalService;
 use App\Services\GeoFlow\AnonymousUsageTelemetry;
+use App\Services\GeoFlow\BilibiliSocialPublishAdapter;
 use App\Services\GeoFlow\ArticleGeoFlowService;
+use App\Services\GeoFlow\GenericSocialPublishAdapter;
 use App\Services\GeoFlow\HorizonMetricsAdapter;
 use App\Services\GeoFlow\JobQueueService;
 use App\Services\GeoFlow\TaskLifecycleService;
 use App\Services\GeoFlow\TaskMonitoringQueryService;
+use App\Services\GeoFlow\SocialPublishAdapterInterface;
+use App\Services\GeoFlow\SocialPublishAdapterManager;
+use App\Services\GeoFlow\XiaohongshuSocialPublishAdapter;
+use App\Services\GeoFlow\ZhihuSocialPublishAdapter;
 use App\Services\Outbound\FinalOutboundSecurityPolicy;
 use App\Services\Outbound\LaravelPinnedOutboundTransport;
 use App\Services\Outbound\SafeOutboundHttpClient;
@@ -62,6 +68,24 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TaskMonitoringQueryService::class);
         $this->app->singleton(TaskLifecycleService::class);
         $this->app->singleton(ArticleGeoFlowService::class);
+        $this->app->tag([
+            ZhihuSocialPublishAdapter::class,
+            XiaohongshuSocialPublishAdapter::class,
+            BilibiliSocialPublishAdapter::class,
+            GenericSocialPublishAdapter::class,
+        ], 'geo.social_publish_adapters');
+        $this->app->bind(SocialPublishAdapterManager::class, function ($app): SocialPublishAdapterManager {
+            return new SocialPublishAdapterManager($app->tagged('geo.social_publish_adapters'));
+        });
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+            ->needs('$apiKeyCrypto')
+            ->give(fn ($app) => $app->make(\App\Support\GeoFlow\ApiKeyCrypto::class));
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+            ->needs('$safeHttp')
+            ->give(fn ($app) => $app->make(SafeOutboundHttpClient::class));
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+            ->needs('$http')
+            ->give(fn ($app) => $app->make(HttpFactory::class));
     }
 
     /**

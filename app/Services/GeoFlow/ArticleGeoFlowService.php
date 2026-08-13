@@ -18,6 +18,7 @@ class ArticleGeoFlowService
     public function __construct(
         private readonly ArticleRiskScanner $articleRiskScanner,
         private readonly ArticleWorkflowTransitionService $articleWorkflowTransitionService,
+        private readonly SocialPublicationOrchestrator $socialPublicationOrchestrator,
     ) {}
 
     public function listArticles(int $page = 1, int $perPage = 20, array $filters = []): array
@@ -129,6 +130,10 @@ class ArticleGeoFlowService
         $article = $creation['article'];
         if ($creation['gate_rejection'] instanceof ArticleRiskGateException) {
             throw $this->riskBlockedException($article, $creation['gate_rejection']);
+        }
+
+        if (($article->status ?? 'draft') === 'published') {
+            $this->socialPublicationOrchestrator->enqueueForArticle($article);
         }
 
         return $this->getArticle((int) $article->id);
@@ -259,9 +264,9 @@ class ArticleGeoFlowService
 
         $workflowState = ArticleWorkflow::normalizeState($desiredStatus, $reviewStatus, $article['published_at'] ?? null);
 
-        if (in_array($reviewStatus, ['approved', 'auto_approved'], true)) {
-            $fallbackWorkflowState = ArticleWorkflow::normalizeState('draft', 'pending');
-            $isAutomaticApproval = $reviewStatus === 'auto_approved';
+            if (in_array($reviewStatus, ['approved', 'auto_approved'], true)) {
+                $fallbackWorkflowState = ArticleWorkflow::normalizeState('draft', 'pending');
+                $isAutomaticApproval = $reviewStatus === 'auto_approved';
 
             $gateRejection = DB::transaction(function () use (
                 $articleId,
@@ -300,6 +305,11 @@ class ArticleGeoFlowService
             if ($gateRejection instanceof ArticleRiskGateException) {
                 throw $this->riskBlockedException(Article::query()->findOrFail($articleId), $gateRejection);
             }
+
+            $updatedArticle = Article::query()->findOrFail($articleId);
+            if ((string) $updatedArticle->status === 'published') {
+                $this->socialPublicationOrchestrator->enqueueForArticle($updatedArticle);
+            }
         } else {
             DB::transaction(function () use ($articleId, $workflowState, $reviewStatus, $reviewNote, $auditAdminId) {
                 Article::query()->whereKey($articleId)->update([
@@ -316,6 +326,11 @@ class ArticleGeoFlowService
                     'review_note' => trim($reviewNote),
                 ]);
             });
+
+            $updatedArticle = Article::query()->findOrFail($articleId);
+            if ((string) $updatedArticle->status === 'published') {
+                $this->socialPublicationOrchestrator->enqueueForArticle($updatedArticle);
+            }
         }
 
         return $this->getArticle($articleId);
@@ -350,6 +365,11 @@ class ArticleGeoFlowService
             );
         } catch (ArticleRiskGateException $exception) {
             throw $this->riskBlockedException(Article::query()->findOrFail($articleId), $exception);
+        }
+
+        $publishedArticle = Article::query()->find($articleId);
+        if ($publishedArticle && (string) $publishedArticle->status === 'published') {
+            $this->socialPublicationOrchestrator->enqueueForArticle($publishedArticle);
         }
 
         return $this->getArticle($articleId);
