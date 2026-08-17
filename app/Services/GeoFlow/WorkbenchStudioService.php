@@ -5,12 +5,15 @@ namespace App\Services\GeoFlow;
 use App\Models\AiModel;
 use App\Models\Author;
 use App\Models\Category;
+use App\Models\DistributionChannel;
 use App\Models\ImageLibrary;
 use App\Models\KnowledgeBase;
 use App\Models\Prompt;
+use App\Models\Task;
 use App\Models\TitleLibrary;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 final class WorkbenchStudioService
@@ -31,6 +34,7 @@ final class WorkbenchStudioService
         return [
             'catalog' => $catalog,
             'skills' => $this->skills(),
+            'capability_groups' => $this->capabilityGroups(),
             'task' => [
                 'create_url' => route('admin.tasks.create'),
                 'submit_url' => route('admin.tasks.store'),
@@ -56,9 +60,13 @@ final class WorkbenchStudioService
                 'task_models' => count($catalog['models'] ?? []),
                 'content_prompts' => count($catalog['prompts'] ?? []),
                 'title_libraries' => count($catalog['title_libraries'] ?? []),
+                'keyword_libraries' => count($catalog['keyword_libraries'] ?? []),
+                'image_libraries' => count($catalog['image_libraries'] ?? []),
                 'knowledge_bases' => count($catalog['knowledge_bases'] ?? []),
                 'authors' => count($catalog['authors'] ?? []),
                 'categories' => count($catalog['categories'] ?? []),
+                'tasks' => Schema::hasTable('tasks') ? Task::query()->count() : 0,
+                'distribution_channels' => Schema::hasTable('distribution_channels') ? DistributionChannel::query()->count() : 0,
             ],
         ];
     }
@@ -163,6 +171,75 @@ final class WorkbenchStudioService
     }
 
     /**
+     * @return array<int, array{title:string,desc:string,items:array<int, array{label:string,desc:string,href:string,icon:string,restricted?:bool}>}>
+     */
+    private function capabilityGroups(): array
+    {
+        $isSuperAdmin = $this->isSuperAdmin();
+
+        return collect([
+            [
+                'title' => __('admin.ai_configurator.groups.content.title'),
+                'desc' => __('admin.ai_configurator.groups.content.desc'),
+                'items' => [
+                    ['label' => __('admin.nav.tasks'), 'desc' => __('admin.ai_configurator.groups.content.tasks'), 'href' => route('admin.tasks.index'), 'icon' => 'list-checks'],
+                    ['label' => __('admin.ai_configurator.groups.content.create_task'), 'desc' => __('admin.ai_configurator.groups.content.create_task_desc'), 'href' => route('admin.tasks.create'), 'icon' => 'workflow'],
+                    ['label' => __('admin.nav.articles'), 'desc' => __('admin.ai_configurator.groups.content.articles'), 'href' => route('admin.articles.index'), 'icon' => 'file-text'],
+                    ['label' => __('admin.ai_configurator.groups.content.create_article'), 'desc' => __('admin.ai_configurator.groups.content.create_article_desc'), 'href' => route('admin.articles.create'), 'icon' => 'file-plus-2'],
+                    ['label' => __('admin.ai_configurator.groups.content.manual_publications'), 'desc' => __('admin.ai_configurator.groups.content.manual_publications_desc'), 'href' => route('admin.manual-publications.index'), 'icon' => 'send'],
+                ],
+            ],
+            [
+                'title' => __('admin.ai_configurator.groups.assets.title'),
+                'desc' => __('admin.ai_configurator.groups.assets.desc'),
+                'items' => [
+                    ['label' => __('admin.nav.materials'), 'desc' => __('admin.ai_configurator.groups.assets.materials'), 'href' => route('admin.materials.index'), 'icon' => 'database'],
+                    ['label' => __('admin.ai_configurator.groups.assets.knowledge'), 'desc' => __('admin.ai_configurator.groups.assets.knowledge_desc'), 'href' => route('admin.knowledge-bases.index'), 'icon' => 'brain'],
+                    ['label' => __('admin.ai_configurator.groups.assets.titles'), 'desc' => __('admin.ai_configurator.groups.assets.titles_desc'), 'href' => route('admin.title-libraries.index'), 'icon' => 'library-big'],
+                    ['label' => __('admin.ai_configurator.groups.assets.keywords'), 'desc' => __('admin.ai_configurator.groups.assets.keywords_desc'), 'href' => route('admin.keyword-libraries.index'), 'icon' => 'tags'],
+                    ['label' => __('admin.ai_configurator.groups.assets.images'), 'desc' => __('admin.ai_configurator.groups.assets.images_desc'), 'href' => route('admin.image-libraries.index'), 'icon' => 'images'],
+                    ['label' => __('admin.ai_configurator.groups.assets.authors'), 'desc' => __('admin.ai_configurator.groups.assets.authors_desc'), 'href' => route('admin.authors.index'), 'icon' => 'user-pen'],
+                    ['label' => __('admin.ai_configurator.groups.assets.categories'), 'desc' => __('admin.ai_configurator.groups.assets.categories_desc'), 'href' => route('admin.categories.index'), 'icon' => 'folders'],
+                    ['label' => __('admin.ai_configurator.groups.assets.url_import'), 'desc' => __('admin.ai_configurator.groups.assets.url_import_desc'), 'href' => route('admin.url-import'), 'icon' => 'link-2', 'restricted' => true],
+                ],
+            ],
+            [
+                'title' => __('admin.ai_configurator.groups.ai.title'),
+                'desc' => __('admin.ai_configurator.groups.ai.desc'),
+                'items' => [
+                    ['label' => __('admin.ai_configurator.skills.models.title'), 'desc' => __('admin.ai_configurator.skills.models.desc'), 'href' => route('admin.ai-models.index'), 'icon' => 'cpu'],
+                    ['label' => __('admin.ai_configurator.skills.prompts.title'), 'desc' => __('admin.ai_configurator.skills.prompts.desc'), 'href' => route('admin.ai-prompts'), 'icon' => 'message-square-text'],
+                    ['label' => __('admin.ai_configurator.special_title'), 'desc' => __('admin.ai_configurator.special_desc'), 'href' => route('admin.ai-special-prompts'), 'icon' => 'braces'],
+                    ['label' => __('admin.ai_configurator.skills.providers.title'), 'desc' => __('admin.ai_configurator.skills.providers.desc'), 'href' => route('admin.ai-source-providers.index'), 'icon' => 'search-check'],
+                ],
+            ],
+            [
+                'title' => __('admin.ai_configurator.groups.system.title'),
+                'desc' => __('admin.ai_configurator.groups.system.desc'),
+                'items' => [
+                    ['label' => __('admin.nav.site_settings'), 'desc' => __('admin.ai_configurator.groups.system.site_settings'), 'href' => route('admin.site-settings.index'), 'icon' => 'settings-2'],
+                    ['label' => __('admin.nav.security'), 'desc' => __('admin.ai_configurator.groups.system.security'), 'href' => route('admin.security-settings.index'), 'icon' => 'shield-check'],
+                    ['label' => __('admin.nav.distribution'), 'desc' => __('admin.ai_configurator.groups.system.distribution'), 'href' => route('admin.distribution.index'), 'icon' => 'radio-tower', 'restricted' => true],
+                    ['label' => __('admin.nav.admin_users'), 'desc' => __('admin.ai_configurator.groups.system.admin_users'), 'href' => route('admin.admin-users.index'), 'icon' => 'users', 'restricted' => true],
+                    ['label' => __('admin.nav.api_tokens'), 'desc' => __('admin.ai_configurator.groups.system.api_tokens'), 'href' => route('admin.api-tokens.index'), 'icon' => 'key-round', 'restricted' => true],
+                    ['label' => __('admin.nav.activity_logs'), 'desc' => __('admin.ai_configurator.groups.system.activity_logs'), 'href' => route('admin.admin-activity-logs'), 'icon' => 'clipboard-list', 'restricted' => true],
+                ],
+            ],
+        ])
+            ->map(function (array $group) use ($isSuperAdmin): array {
+                $group['items'] = collect($group['items'])
+                    ->filter(static fn (array $item): bool => empty($item['restricted']) || $isSuperAdmin)
+                    ->values()
+                    ->all();
+
+                return $group;
+            })
+            ->filter(static fn (array $group): bool => $group['items'] !== [])
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return array<string, array<int, array{id:int,name:string}>>
      */
     private function taskOptions(): array
@@ -259,7 +336,7 @@ final class WorkbenchStudioService
             ],
             [
                 'key' => 'source-providers',
-                'title' => __('admin.ai_configurator.skills.providers.title'),
+                'title' => __('admin.ai_configurator.search_title'),
                 'desc' => __('admin.ai_configurator.skills.providers.desc'),
                 'icon' => 'search-check',
                 'tone' => 'orange',
@@ -352,6 +429,13 @@ final class WorkbenchStudioService
         $first = $rows->first();
 
         return (int) data_get($first, 'id', 0);
+    }
+
+    private function isSuperAdmin(): bool
+    {
+        $admin = auth('admin')->user();
+
+        return $admin && method_exists($admin, 'canManageProtectedWorkflows') && $admin->canManageProtectedWorkflows();
     }
 
     /**

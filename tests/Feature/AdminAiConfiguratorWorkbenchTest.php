@@ -28,7 +28,39 @@ class AdminAiConfiguratorWorkbenchTest extends TestCase
             ->assertSee(__('admin.ai_configurator.intent_title'))
             ->assertSee(__('admin.ai_configurator.skills.task.title'))
             ->assertSee(__('admin.ai_configurator.skills.article.title'))
-            ->assertSee(route('admin.ai.configurator.resolve'), false);
+            ->assertSee(__('admin.ai_configurator.groups.content.title'))
+            ->assertSee(__('admin.ai_configurator.groups.assets.title'))
+            ->assertSee(__('admin.ai_configurator.groups.ai.title'))
+            ->assertSee(__('admin.ai_configurator.groups.system.title'))
+            ->assertSee(route('admin.tasks.index'), false)
+            ->assertSee(route('admin.articles.index'), false)
+            ->assertSee(route('admin.materials.index'), false)
+            ->assertSee(route('admin.ai-models.index'), false)
+            ->assertSee(route('admin.site-settings.index'), false)
+            ->assertSee('id="ai-workbench-intent-form"', false);
+    }
+
+    public function test_admin_header_only_shows_primary_navigation_entries(): void
+    {
+        $this->seedWorkbenchCatalog();
+
+        $response = $this->actingAs($this->createAdmin(), 'admin')
+            ->get(route('admin.ai.configurator'));
+
+        $response->assertOk();
+
+        $html = (string) $response->getContent();
+        preg_match('/<nav class="hidden md:flex.*?<\/nav>/s', $html, $matches);
+        $desktopNav = $matches[0] ?? '';
+
+        $this->assertStringContainsString(__('admin.nav.dashboard'), $desktopNav);
+        $this->assertStringContainsString(__('admin.nav.analytics'), $desktopNav);
+        $this->assertStringContainsString(__('admin.nav.ai_config'), $desktopNav);
+        $this->assertStringNotContainsString(route('admin.tasks.index'), $desktopNav);
+        $this->assertStringNotContainsString(route('admin.articles.index'), $desktopNav);
+        $this->assertStringNotContainsString(route('admin.materials.index'), $desktopNav);
+        $this->assertStringNotContainsString(route('admin.site-settings.index'), $desktopNav);
+        $this->assertStringNotContainsString(route('admin.admin-users.index'), $desktopNav);
     }
 
     public function test_workbench_resolves_article_requests_to_prefilled_article_form(): void

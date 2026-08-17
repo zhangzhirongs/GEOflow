@@ -3,6 +3,7 @@
 @php
     $workbench = $workbench ?? [];
     $skills = $workbench['skills'] ?? [];
+    $capabilityGroups = $workbench['capability_groups'] ?? [];
     $quickStats = $workbench['stats'] ?? [];
     $shortcuts = $workbench['shortcuts'] ?? [];
     $taskSeed = $workbench['task']['seed'] ?? [];
@@ -21,7 +22,7 @@
 
 @section('content')
     <div class="px-4 sm:px-0">
-        <div class="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">{{ __('admin.ai_configurator.workbench_eyebrow') }}</p>
                 <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ __('admin.ai_configurator.heading') }}</h1>
@@ -37,8 +38,29 @@
             </div>
         </div>
 
+        <section class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-8">
+            @foreach ([
+                ['label' => __('admin.ai_configurator.stats.models'), 'value' => (int) ($quickStats['task_models'] ?? 0), 'icon' => 'cpu'],
+                ['label' => __('admin.ai_configurator.stats.prompts'), 'value' => (int) ($quickStats['content_prompts'] ?? 0), 'icon' => 'message-square-text'],
+                ['label' => __('admin.ai_configurator.stats.tasks'), 'value' => (int) ($quickStats['tasks'] ?? 0), 'icon' => 'list-checks'],
+                ['label' => __('admin.ai_configurator.stats.titles'), 'value' => (int) ($quickStats['title_libraries'] ?? 0), 'icon' => 'library-big'],
+                ['label' => __('admin.ai_configurator.stats.keywords'), 'value' => (int) ($quickStats['keyword_libraries'] ?? 0), 'icon' => 'tags'],
+                ['label' => __('admin.ai_configurator.stats.knowledge'), 'value' => (int) ($quickStats['knowledge_bases'] ?? 0), 'icon' => 'database'],
+                ['label' => __('admin.ai_configurator.stats.images'), 'value' => (int) ($quickStats['image_libraries'] ?? 0), 'icon' => 'images'],
+                ['label' => __('admin.ai_configurator.stats.channels'), 'value' => (int) ($quickStats['distribution_channels'] ?? 0), 'icon' => 'radio-tower'],
+            ] as $stat)
+                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="truncate text-sm font-medium text-gray-500">{{ $stat['label'] }}</span>
+                        <i data-lucide="{{ $stat['icon'] }}" class="h-4 w-4 shrink-0 text-gray-400"></i>
+                    </div>
+                    <div class="mt-3 text-2xl font-bold text-gray-900">{{ $stat['value'] }}</div>
+                </div>
+            @endforeach
+        </section>
+
         <section class="mb-8 overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
-            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px]">
                 <div class="p-6">
                     <div class="mb-5">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('admin.ai_configurator.intent_title') }}</h2>
@@ -69,7 +91,7 @@
                 <aside class="border-t border-blue-100 bg-blue-50/50 p-6 lg:border-l lg:border-t-0">
                     <h2 class="text-base font-semibold text-gray-900">{{ __('admin.ai_configurator.skills_title') }}</h2>
                     <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.skills_desc') }}</p>
-                    <div class="mt-5 grid gap-3">
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                         @foreach ($skills as $skill)
                             @php($toneClass = $toneClasses[$skill['tone']] ?? $toneClasses['slate'])
                             <a href="{{ $skill['route'] }}" class="grid grid-cols-[38px_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-white bg-white p-3 shadow-sm hover:border-blue-200 hover:bg-blue-50">
@@ -88,26 +110,7 @@
             </div>
         </section>
 
-        <section class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-            @foreach ([
-                ['label' => __('admin.ai_configurator.stats.models'), 'value' => (int) ($quickStats['task_models'] ?? 0), 'icon' => 'cpu'],
-                ['label' => __('admin.ai_configurator.stats.prompts'), 'value' => (int) ($quickStats['content_prompts'] ?? 0), 'icon' => 'message-square-text'],
-                ['label' => __('admin.ai_configurator.stats.titles'), 'value' => (int) ($quickStats['title_libraries'] ?? 0), 'icon' => 'library-big'],
-                ['label' => __('admin.ai_configurator.stats.knowledge'), 'value' => (int) ($quickStats['knowledge_bases'] ?? 0), 'icon' => 'database'],
-                ['label' => __('admin.ai_configurator.stats.authors'), 'value' => (int) ($quickStats['authors'] ?? 0), 'icon' => 'user-pen'],
-                ['label' => __('admin.ai_configurator.stats.categories'), 'value' => (int) ($quickStats['categories'] ?? 0), 'icon' => 'folders'],
-            ] as $stat)
-                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="text-sm font-medium text-gray-500">{{ $stat['label'] }}</span>
-                        <i data-lucide="{{ $stat['icon'] }}" class="h-4 w-4 text-gray-400"></i>
-                    </div>
-                    <div class="mt-3 text-2xl font-bold text-gray-900">{{ $stat['value'] }}</div>
-                </div>
-            @endforeach
-        </section>
-
-        <section class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <section class="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
             <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                 <div class="flex items-start gap-4">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
@@ -175,6 +178,31 @@
                     </div>
                 </div>
             </article>
+        </section>
+
+        <section class="grid grid-cols-1 gap-5 lg:grid-cols-2">
+            @foreach ($capabilityGroups as $group)
+                <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">{{ $group['title'] }}</h2>
+                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ $group['desc'] }}</p>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        @foreach ($group['items'] as $item)
+                            <a href="{{ $item['href'] }}" class="grid min-h-[86px] grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 hover:border-blue-200 hover:bg-blue-50">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-gray-700 ring-1 ring-gray-200">
+                                    <i data-lucide="{{ $item['icon'] }}" class="h-4 w-4"></i>
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="block truncate text-sm font-semibold text-gray-900">{{ $item['label'] }}</span>
+                                    <span class="mt-1 block text-xs leading-5 text-gray-500">{{ $item['desc'] }}</span>
+                                </span>
+                                <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endforeach
         </section>
     </div>
 @endsection

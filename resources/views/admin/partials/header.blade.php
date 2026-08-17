@@ -21,19 +21,8 @@
     $menu = [
         'dashboard' => ['route' => 'admin.dashboard', 'name' => __('admin.nav.dashboard')],
         'analytics' => ['route' => 'admin.analytics', 'name' => __('admin.nav.analytics')],
-        'tasks' => ['route' => 'admin.tasks.index', 'name' => __('admin.nav.tasks')],
-        'distribution' => ['route' => 'admin.distribution.index', 'name' => __('admin.nav.distribution')],
-        'articles' => ['route' => 'admin.articles.index', 'name' => __('admin.nav.articles')],
-        'materials' => ['route' => 'admin.materials.index', 'name' => __('admin.nav.materials')],
         'ai_config' => ['route' => 'admin.ai.configurator', 'name' => __('admin.nav.ai_config')],
-        'site_settings' => ['route' => 'admin.site-settings.index', 'name' => __('admin.nav.site_settings')],
     ];
-    if (!$isSuperAdmin) {
-        unset($menu['distribution']);
-    }
-    if ($isSuperAdmin) {
-        $menu['admin_users'] = ['route' => 'admin.admin-users.index', 'name' => __('admin.nav.admin_users')];
-    }
     $subMap = [
         'admin.analytics' => 'analytics',
         'admin.analytics.content' => 'analytics',
@@ -45,78 +34,84 @@
         'admin.system-updates.check' => 'dashboard',
         'admin.system-updates.plan' => 'dashboard',
         'admin.system-updates.backup' => 'dashboard',
-        'admin.tasks.create' => 'tasks',
-        'admin.tasks.edit' => 'tasks',
-        'admin.distribution.index' => 'distribution',
-        'admin.distribution.create' => 'distribution',
-        'admin.distribution.store' => 'distribution',
-        'admin.distribution.edit' => 'distribution',
-        'admin.distribution.update' => 'distribution',
-        'admin.distribution.show' => 'distribution',
-        'admin.distribution.jobs' => 'distribution',
-        'admin.distribution.retry' => 'distribution',
-        'admin.distribution.health' => 'distribution',
-        'admin.distribution.pause' => 'distribution',
-        'admin.distribution.activate' => 'distribution',
-        'admin.distribution.rotate-secret' => 'distribution',
-        'admin.articles.create' => 'articles',
-        'admin.articles.edit' => 'articles',
-        'admin.manual-publications.index' => 'articles',
-        'admin.manual-publications.create' => 'articles',
-        'admin.manual-publications.show' => 'articles',
-        'admin.manual-publications.edit' => 'articles',
-        'admin.manual-publications.settings.index' => 'articles',
-        'admin.categories.index' => 'materials',
-        'admin.categories.create' => 'materials',
-        'admin.categories.edit' => 'materials',
-        'admin.authors.index' => 'materials',
-        'admin.authors.create' => 'materials',
-        'admin.authors.edit' => 'materials',
-        'admin.authors.detail' => 'materials',
-        'admin.keyword-libraries.index' => 'materials',
-        'admin.keyword-libraries.create' => 'materials',
-        'admin.keyword-libraries.edit' => 'materials',
-        'admin.keyword-libraries.detail' => 'materials',
-        'admin.keyword-libraries.detail.update' => 'materials',
-        'admin.keyword-libraries.keywords.store' => 'materials',
-        'admin.keyword-libraries.keywords.delete' => 'materials',
-        'admin.keyword-libraries.import' => 'materials',
-        'admin.title-libraries.index' => 'materials',
-        'admin.title-libraries.create' => 'materials',
-        'admin.title-libraries.edit' => 'materials',
-        'admin.title-libraries.detail' => 'materials',
-        'admin.title-libraries.titles.store' => 'materials',
-        'admin.title-libraries.titles.delete' => 'materials',
-        'admin.title-libraries.import' => 'materials',
-        'admin.title-libraries.ai-generate' => 'materials',
-        'admin.title-libraries.ai-generate.submit' => 'materials',
-        'admin.image-libraries.index' => 'materials',
-        'admin.image-libraries.create' => 'materials',
-        'admin.image-libraries.edit' => 'materials',
-        'admin.image-libraries.detail' => 'materials',
-        'admin.image-libraries.images.upload' => 'materials',
-        'admin.image-libraries.images.delete' => 'materials',
-        'admin.image-libraries.detail.update' => 'materials',
-        'admin.knowledge-bases.index' => 'materials',
-        'admin.knowledge-bases.create' => 'materials',
-        'admin.knowledge-bases.edit' => 'materials',
-        'admin.knowledge-bases.detail' => 'materials',
-        'admin.knowledge-bases.upload' => 'materials',
-        'admin.knowledge-bases.detail.update' => 'materials',
-        'admin.url-import' => 'materials',
+        'admin.tasks.index' => 'ai_config',
+        'admin.tasks.create' => 'ai_config',
+        'admin.tasks.edit' => 'ai_config',
+        'admin.distribution.index' => 'ai_config',
+        'admin.distribution.create' => 'ai_config',
+        'admin.distribution.store' => 'ai_config',
+        'admin.distribution.edit' => 'ai_config',
+        'admin.distribution.update' => 'ai_config',
+        'admin.distribution.show' => 'ai_config',
+        'admin.distribution.jobs' => 'ai_config',
+        'admin.distribution.retry' => 'ai_config',
+        'admin.distribution.health' => 'ai_config',
+        'admin.distribution.pause' => 'ai_config',
+        'admin.distribution.activate' => 'ai_config',
+        'admin.distribution.rotate-secret' => 'ai_config',
+        'admin.articles.index' => 'ai_config',
+        'admin.articles.create' => 'ai_config',
+        'admin.articles.edit' => 'ai_config',
+        'admin.manual-publications.index' => 'ai_config',
+        'admin.manual-publications.create' => 'ai_config',
+        'admin.manual-publications.show' => 'ai_config',
+        'admin.manual-publications.edit' => 'ai_config',
+        'admin.manual-publications.settings.index' => 'ai_config',
+        'admin.materials.index' => 'ai_config',
+        'admin.categories.index' => 'ai_config',
+        'admin.categories.create' => 'ai_config',
+        'admin.categories.edit' => 'ai_config',
+        'admin.authors.index' => 'ai_config',
+        'admin.authors.create' => 'ai_config',
+        'admin.authors.edit' => 'ai_config',
+        'admin.authors.detail' => 'ai_config',
+        'admin.keyword-libraries.index' => 'ai_config',
+        'admin.keyword-libraries.create' => 'ai_config',
+        'admin.keyword-libraries.edit' => 'ai_config',
+        'admin.keyword-libraries.detail' => 'ai_config',
+        'admin.keyword-libraries.detail.update' => 'ai_config',
+        'admin.keyword-libraries.keywords.store' => 'ai_config',
+        'admin.keyword-libraries.keywords.delete' => 'ai_config',
+        'admin.keyword-libraries.import' => 'ai_config',
+        'admin.title-libraries.index' => 'ai_config',
+        'admin.title-libraries.create' => 'ai_config',
+        'admin.title-libraries.edit' => 'ai_config',
+        'admin.title-libraries.detail' => 'ai_config',
+        'admin.title-libraries.titles.store' => 'ai_config',
+        'admin.title-libraries.titles.delete' => 'ai_config',
+        'admin.title-libraries.import' => 'ai_config',
+        'admin.title-libraries.ai-generate' => 'ai_config',
+        'admin.title-libraries.ai-generate.submit' => 'ai_config',
+        'admin.image-libraries.index' => 'ai_config',
+        'admin.image-libraries.create' => 'ai_config',
+        'admin.image-libraries.edit' => 'ai_config',
+        'admin.image-libraries.detail' => 'ai_config',
+        'admin.image-libraries.images.upload' => 'ai_config',
+        'admin.image-libraries.images.delete' => 'ai_config',
+        'admin.image-libraries.detail.update' => 'ai_config',
+        'admin.knowledge-bases.index' => 'ai_config',
+        'admin.knowledge-bases.create' => 'ai_config',
+        'admin.knowledge-bases.edit' => 'ai_config',
+        'admin.knowledge-bases.detail' => 'ai_config',
+        'admin.knowledge-bases.upload' => 'ai_config',
+        'admin.knowledge-bases.detail.update' => 'ai_config',
+        'admin.url-import' => 'ai_config',
         'admin.ai-models.index' => 'ai_config',
         'admin.ai-source-providers.index' => 'ai_config',
         'admin.ai-prompts' => 'ai_config',
-        'admin.site-settings.sensitive-words' => 'site_settings',
-        'admin.site-settings.sensitive-words.store' => 'site_settings',
-        'admin.site-settings.sensitive-words.delete' => 'site_settings',
-        'admin.security-settings.index' => 'site_settings',
-        'admin.security-settings.words.store' => 'site_settings',
-        'admin.security-settings.words.delete' => 'site_settings',
-        'admin.api-tokens.index' => 'admin_users',
-        'admin.api-tokens.store' => 'admin_users',
-        'admin.api-tokens.revoke' => 'admin_users',
-        'admin.admin-activity-logs' => 'admin_users',
+        'admin.ai-special-prompts' => 'ai_config',
+        'admin.site-settings.index' => 'ai_config',
+        'admin.site-settings.sensitive-words' => 'ai_config',
+        'admin.site-settings.sensitive-words.store' => 'ai_config',
+        'admin.site-settings.sensitive-words.delete' => 'ai_config',
+        'admin.security-settings.index' => 'ai_config',
+        'admin.security-settings.words.store' => 'ai_config',
+        'admin.security-settings.words.delete' => 'ai_config',
+        'admin.admin-users.index' => 'ai_config',
+        'admin.api-tokens.index' => 'ai_config',
+        'admin.api-tokens.store' => 'ai_config',
+        'admin.api-tokens.revoke' => 'ai_config',
+        'admin.admin-activity-logs' => 'ai_config',
     ];
     $routeName = request()->route()?->getName();
     $resolvedActive = $activeMenu;
@@ -234,24 +229,10 @@
                             <i data-lucide="home" class="w-4 h-4 inline mr-2"></i>
                             {{ __('admin.nav.back_home') }}
                         </a>
-                        <a href="{{ route('admin.site-settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <i data-lucide="settings" class="w-4 h-4 inline mr-2"></i>
-                            {{ __('admin.nav.system_settings') }}
+                        <a href="{{ route('admin.ai.configurator') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <i data-lucide="wand-sparkles" class="w-4 h-4 inline mr-2"></i>
+                            {{ __('admin.nav.ai_config') }}
                         </a>
-                        @if ($isSuperAdmin)
-                            <a href="{{ route('admin.admin-users.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>
-                                {{ __('admin.nav.admin_management') }}
-                            </a>
-                            <a href="{{ route('admin.admin-activity-logs') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i data-lucide="clipboard-list" class="w-4 h-4 inline mr-2"></i>
-                                {{ __('admin.nav.activity_logs') }}
-                            </a>
-                            <a href="{{ route('admin.api-tokens.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i data-lucide="key-round" class="w-4 h-4 inline mr-2"></i>
-                                {{ __('admin.nav.api_tokens') }}
-                            </a>
-                        @endif
                         <div class="border-t border-gray-100"></div>
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
