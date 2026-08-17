@@ -19,6 +19,7 @@ use App\Models\TitleLibrary;
 use App\Services\GeoFlow\ArticleRiskScanner;
 use App\Services\GeoFlow\ArticleWorkflowTransitionService;
 use App\Services\GeoFlow\DistributionOrchestrator;
+use App\Services\GeoFlow\WorkbenchStudioService;
 use App\Support\AdminWeb;
 use App\Support\GeoFlow\ArticleWorkflow;
 use Illuminate\Database\QueryException;
@@ -214,15 +215,41 @@ class ArticleController extends Controller
     /**
      * 文章创建页：与编辑页共用一个 Blade 模板。
      */
-    public function create(Request $request): View
+    public function create(Request $request, WorkbenchStudioService $workbench): View
     {
+        $prefill = $request->hasAny([
+            'workbench',
+            'title',
+            'excerpt',
+            'content',
+            'keywords',
+            'meta_description',
+            'category_id',
+            'author_id',
+        ]);
+
         return view('admin.articles.form', [
             'pageTitle' => __('admin.article_create.page_title'),
             'activeMenu' => 'articles',
             'adminSiteName' => AdminWeb::siteName(),
             'isEdit' => false,
             'articleId' => null,
-            'articleForm' => null,
+            'articleForm' => $prefill ? $workbench->articleSeed([
+                'title' => $request->string('title')->toString() ?: null,
+                'excerpt' => $request->string('excerpt')->toString() ?: null,
+                'content' => $request->string('content')->toString() ?: null,
+                'keywords' => $request->string('keywords')->toString() ?: null,
+                'meta_description' => $request->string('meta_description')->toString() ?: null,
+                'category_id' => $request->integer('category_id') ?: null,
+                'author_id' => $request->integer('author_id') ?: null,
+                'status' => $request->string('status')->toString() ?: null,
+                'review_status' => $request->string('review_status')->toString() ?: null,
+                'task_name' => $request->string('task_name')->toString() ?: null,
+                'is_hot' => $request->has('is_hot') ? ($request->boolean('is_hot') ? '1' : '0') : null,
+                'is_featured' => $request->has('is_featured') ? ($request->boolean('is_featured') ? '1' : '0') : null,
+                'source_title_id' => $request->integer('source_title_id') ?: null,
+                'is_ai_generated' => $request->has('is_ai_generated') ? ($request->boolean('is_ai_generated') ? '1' : '0') : null,
+            ]) : null,
             'riskScan' => null,
             'formOptions' => $this->loadFormOptions(true),
             'canCreateManualPublication' => $this->canCreateManualPublication($request),

@@ -17,6 +17,7 @@ use App\Services\GeoFlow\DistributionOrchestrator;
 use App\Services\GeoFlow\TaskDistributionChannelSelector;
 use App\Services\GeoFlow\TaskLifecycleService;
 use App\Services\GeoFlow\TaskMonitoringQueryService;
+use App\Services\GeoFlow\WorkbenchStudioService;
 use App\Support\AdminWeb;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -131,9 +132,43 @@ class TaskController extends Controller
     /**
      * 任务创建页（先接入可用创建链路，后续继续做 1:1 细节对齐）。
      */
-    public function create(): View
+    public function create(Request $request, WorkbenchStudioService $workbench): View
     {
         $formOptions = $this->loadTaskFormOptions();
+        $prefill = $request->hasAny([
+            'workbench',
+            'task_name',
+            'title_library_id',
+            'prompt_id',
+            'ai_model_id',
+            'author_id',
+            'image_library_id',
+            'knowledge_base_id',
+            'fixed_category_id',
+        ]);
+        $seed = $prefill ? $workbench->taskSeed([
+            'task_name' => $request->string('task_name')->toString() ?: null,
+            'title_library_id' => $request->integer('title_library_id') ?: null,
+            'prompt_id' => $request->integer('prompt_id') ?: null,
+            'ai_model_id' => $request->integer('ai_model_id') ?: null,
+            'author_id' => $request->integer('author_id') ?: null,
+            'image_library_id' => $request->integer('image_library_id') ?: null,
+            'image_count' => $request->integer('image_count') ?: null,
+            'knowledge_base_id' => $request->integer('knowledge_base_id') ?: null,
+            'fixed_category_id' => $request->integer('fixed_category_id') ?: null,
+            'status' => $request->string('status')->toString() ?: null,
+            'article_limit' => $request->integer('article_limit') ?: null,
+            'draft_limit' => $request->integer('draft_limit') ?: null,
+            'publish_interval' => $request->integer('publish_interval') ?: null,
+            'category_mode' => $request->string('category_mode')->toString() ?: null,
+            'model_selection_mode' => $request->string('model_selection_mode')->toString() ?: null,
+            'publish_scope' => $request->string('publish_scope')->toString() ?: null,
+            'distribution_strategy' => $request->string('distribution_strategy')->toString() ?: null,
+            'need_review' => $request->has('need_review') ? (int) $request->boolean('need_review') : null,
+            'is_loop' => $request->has('is_loop') ? (int) $request->boolean('is_loop') : null,
+            'auto_keywords' => $request->has('auto_keywords') ? (int) $request->boolean('auto_keywords') : null,
+            'auto_description' => $request->has('auto_description') ? (int) $request->boolean('auto_description') : null,
+        ]) : null;
 
         // 创建页选项与 tasks.php 数据口径一致（库/模型/作者/分类）。
         return view('admin.tasks.form', [
@@ -144,7 +179,7 @@ class TaskController extends Controller
             'hasCategories' => ! empty($formOptions['categories']),
             'categoryCreateUrl' => route('admin.categories.create'),
             'isEdit' => false,
-            'taskForm' => null,
+            'taskForm' => $seed,
             'taskId' => null,
             'canManageProtectedWorkflows' => auth('admin')->user()?->canManageProtectedWorkflows() === true,
         ]);

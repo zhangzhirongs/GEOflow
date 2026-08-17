@@ -346,6 +346,7 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
         // AI 配置模块（配置器 / 模型 / 提示词）
         Route::group([], function () {
             Route::get('ai-configurator', [LegacyController::class, 'aiConfigurator'])->name('ai.configurator');
+            Route::post('ai-configurator/resolve', [LegacyController::class, 'resolveAiConfiguratorIntent'])->name('ai.configurator.resolve');
             Route::prefix('ai-models')->name('ai-models.')->group(function () {
                 Route::get('/', [AiModelController::class, 'index'])->name('index');
                 Route::post('create', [AiModelController::class, 'store'])->name('store');

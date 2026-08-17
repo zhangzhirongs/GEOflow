@@ -8,8 +8,10 @@ use App\Models\AiSourceProvider;
 use App\Models\AiVisibilityRun;
 use App\Models\Prompt;
 use App\Models\Task;
+use App\Services\GeoFlow\WorkbenchStudioService;
 use App\Support\AdminWeb;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
@@ -134,14 +136,24 @@ class LegacyController extends Controller
         return $this->stub('admin.materials.page_title', 'materials');
     }
 
-    public function aiConfigurator(): View
+    public function aiConfigurator(WorkbenchStudioService $workbench): View
     {
         return view('admin.ai-configurator.index', [
             'pageTitle' => __('admin.ai_configurator.page_title'),
             'activeMenu' => 'ai_config',
             'adminSiteName' => AdminWeb::siteName(),
             'stats' => $this->loadAiConfiguratorStats(),
+            'workbench' => $workbench->pageData(),
         ]);
+    }
+
+    public function resolveAiConfiguratorIntent(Request $request, WorkbenchStudioService $workbench): JsonResponse
+    {
+        $validated = $request->validate([
+            'input' => ['required', 'string', 'max:2000'],
+        ]);
+
+        return response()->json($workbench->resolve((string) $validated['input']));
     }
 
     /**
