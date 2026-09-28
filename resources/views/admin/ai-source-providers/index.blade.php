@@ -5,41 +5,53 @@
         <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">{{ __('admin.ai_source_providers.page_title') }}</h1>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.page_subtitle') }}</p>
+                    <h1 class="qdk-page-title">{{ __('admin.ai_source_providers.page_title') }}</h1>
+                    <p class="qdk-page-sub">{{ __('admin.ai_source_providers.page_subtitle') }}</p>
                 </div>
             </div>
-            <button type="button" onclick="showCreateProviderModal()" class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700">
+            <button type="button" onclick="showCreateProviderModal()" class="qdk-btn qdk-btn-primary">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 {{ __('admin.ai_source_providers.create') }}
             </button>
         </div>
 
-        <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="text-sm font-medium text-gray-500">{{ __('admin.ai_source_providers.stats.total') }}</div>
-                <div class="mt-2 text-2xl font-bold text-gray-900">{{ (int) ($stats['provider_count'] ?? 0) }}</div>
+        <div class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-4">
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="server" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.total') }}</div>
+                    <div class="qdk-stat-value">{{ (int) ($stats['provider_count'] ?? 0) }}</div>
+                </div>
             </div>
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="text-sm font-medium text-gray-500">{{ __('admin.ai_source_providers.stats.active') }}</div>
-                <div class="mt-2 text-2xl font-bold text-teal-600">{{ (int) ($stats['active_provider_count'] ?? 0) }}</div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="check-circle" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.active') }}</div>
+                    <div class="qdk-stat-value">{{ (int) ($stats['active_provider_count'] ?? 0) }}</div>
+                </div>
             </div>
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="text-sm font-medium text-gray-500">{{ __('admin.ai_source_providers.stats.today_usage') }}</div>
-                <div class="mt-2 text-2xl font-bold text-orange-600">{{ number_format((int) ($stats['provider_today_usage'] ?? 0)) }}</div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="activity" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.today_usage') }}</div>
+                    <div class="qdk-stat-value">{{ number_format((int) ($stats['provider_today_usage'] ?? 0)) }}</div>
+                </div>
             </div>
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="text-sm font-medium text-gray-500">{{ __('admin.ai_source_providers.stats.failed_runs') }}</div>
-                <div class="mt-2 text-2xl font-bold text-rose-600">{{ number_format((int) ($stats['failed_runs'] ?? 0)) }}</div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="alert-triangle" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.failed_runs') }}</div>
+                    <div class="qdk-stat-value">{{ number_format((int) ($stats['failed_runs'] ?? 0)) }}</div>
+                </div>
             </div>
         </div>
 
-        <div class="mb-6 rounded-lg bg-white shadow">
-            <div class="border-b border-gray-200 px-6 py-4">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.ai_source_providers.quick_config_title') }}</h3>
-                <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.quick_config_desc') }}</p>
+        <div class="qdk-card mb-6">
+            <div class="qdk-card-head">
+                <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.quick_config_title') }}</h3>
+                <p class="qdk-card-sub">{{ __('admin.ai_source_providers.quick_config_desc') }}</p>
             </div>
-            <div class="grid grid-cols-1 divide-y divide-gray-200 xl:grid-cols-2 xl:divide-x xl:divide-y-0">
+            <div class="grid grid-cols-1 divide-y divide-gray-100 xl:grid-cols-2 xl:divide-x xl:divide-y-0">
                 <form method="POST" action="{{ route('admin.ai-source-providers.model-bindings.upsert-api') }}" class="space-y-5 p-6">
                     @csrf
                     <input type="hidden" name="binding_type" value="deepseek">
@@ -47,52 +59,52 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <div class="flex items-center gap-2">
-                                <i data-lucide="braces" class="h-5 w-5 text-emerald-600"></i>
+                                <i data-lucide="braces" class="h-5 w-5 text-[color:var(--qdk-primary)]"></i>
                                 <h4 class="text-base font-semibold text-gray-900">{{ __('admin.ai_source_providers.deepseek_config_title') }}</h4>
                             </div>
                             <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.deepseek_config_desc') }}</p>
                         </div>
-                        <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-800">JSON</span>
+                        <span class="qdk-badge qdk-badge-gray shrink-0">JSON</span>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="deepseek_api_name" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_name') }}</label>
-                            <input type="text" name="name" id="deepseek_api_name" required value="{{ $deepSeekApiConfig['name'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <input type="text" name="name" id="deepseek_api_name" required value="{{ $deepSeekApiConfig['name'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                         </div>
                         <div>
                             <label for="deepseek_api_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_model_id') }}</label>
-                            <input type="text" name="model_id" id="deepseek_api_model_id" required value="{{ $deepSeekApiConfig['model_id'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="{{ __('admin.ai_source_providers.placeholder_deepseek_model_id') }}">
+                            <input type="text" name="model_id" id="deepseek_api_model_id" required value="{{ $deepSeekApiConfig['model_id'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_deepseek_model_id') }}">
                         </div>
                     </div>
 
                     <div>
                         <label for="deepseek_api_url" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_api_url') }}</label>
-                        <input type="url" name="api_url" id="deepseek_api_url" required value="{{ $deepSeekApiConfig['api_url'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                        <input type="url" name="api_url" id="deepseek_api_url" required value="{{ $deepSeekApiConfig['api_url'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div class="sm:col-span-1">
                             <label for="deepseek_api_key" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_api_key') }}</label>
-                            <input type="password" name="api_key" id="deepseek_api_key" @if ((int) ($deepSeekApiConfig['id'] ?? 0) <= 0) required @endif class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500" placeholder="{{ (int) ($deepSeekApiConfig['id'] ?? 0) > 0 ? __('admin.ai_source_providers.placeholder_api_key_keep') : __('admin.ai_source_providers.placeholder_api_key') }}">
+                            <input type="password" name="api_key" id="deepseek_api_key" @if ((int) ($deepSeekApiConfig['id'] ?? 0) <= 0) required @endif class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                             <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.configured_key') }}: {{ $deepSeekApiConfig['masked_api_key'] }}</p>
                         </div>
                         <div>
                             <label for="deepseek_daily_limit" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_daily_limit') }}</label>
-                            <input type="number" name="daily_limit" id="deepseek_daily_limit" min="0" value="{{ (int) ($deepSeekApiConfig['daily_limit'] ?? 0) }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <input type="number" name="daily_limit" id="deepseek_daily_limit" min="0" value="{{ (int) ($deepSeekApiConfig['daily_limit'] ?? 0) }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                         </div>
                         <div>
                             <label for="deepseek_max_tokens" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_max_tokens') }}</label>
-                            <input type="number" name="max_tokens" id="deepseek_max_tokens" min="1" value="{{ $deepSeekApiConfig['max_tokens'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500">
+                            <input type="number" name="max_tokens" id="deepseek_max_tokens" min="1" value="{{ $deepSeekApiConfig['max_tokens'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                             <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.max_tokens_help') }}</p>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">
-                        <button type="button" onclick="testConfiguredModelBinding('deepseek', 'deepseek_config_model_id', 'deepseek-config-test-result', this)" class="rounded-md border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50">
+                        <button type="button" onclick="testConfiguredModelBinding('deepseek', 'deepseek_config_model_id', 'deepseek-config-test-result', this)" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
                             {{ __('admin.ai_source_providers.structured_test') }}
                         </button>
-                        <button type="submit" class="rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary qdk-btn-sm">
                             {{ __('admin.ai_source_providers.save_api_config') }}
                         </button>
                     </div>
@@ -106,52 +118,52 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <div class="flex items-center gap-2">
-                                <i data-lucide="search-check" class="h-5 w-5 text-teal-600"></i>
+                                <i data-lucide="search-check" class="h-5 w-5 text-[color:var(--qdk-primary)]"></i>
                                 <h4 class="text-base font-semibold text-gray-900">{{ __('admin.ai_source_providers.doubao_ark_config_title') }}</h4>
                             </div>
                             <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.doubao_ark_config_desc') }}</p>
                         </div>
-                        <span class="shrink-0 rounded-full bg-teal-100 px-2 py-1 text-xs font-semibold text-teal-800">Responses</span>
+                        <span class="qdk-badge qdk-badge-gray shrink-0">Responses</span>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label for="ark_api_name" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_name') }}</label>
-                            <input type="text" name="name" id="ark_api_name" required value="{{ $arkApiConfig['name'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                            <input type="text" name="name" id="ark_api_name" required value="{{ $arkApiConfig['name'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                         </div>
                         <div>
                             <label for="ark_api_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_model_id') }}</label>
-                            <input type="text" name="model_id" id="ark_api_model_id" required value="{{ $arkApiConfig['model_id'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_ark_model_id') }}">
+                            <input type="text" name="model_id" id="ark_api_model_id" required value="{{ $arkApiConfig['model_id'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_ark_model_id') }}">
                         </div>
                     </div>
 
                     <div>
                         <label for="ark_api_url" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_api_url') }}</label>
-                        <input type="url" name="api_url" id="ark_api_url" required value="{{ $arkApiConfig['api_url'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                        <input type="url" name="api_url" id="ark_api_url" required value="{{ $arkApiConfig['api_url'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div class="sm:col-span-1">
                             <label for="ark_api_key" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_api_key') }}</label>
-                            <input type="password" name="api_key" id="ark_api_key" @if ((int) ($arkApiConfig['id'] ?? 0) <= 0) required @endif class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ (int) ($arkApiConfig['id'] ?? 0) > 0 ? __('admin.ai_source_providers.placeholder_api_key_keep') : __('admin.ai_source_providers.placeholder_api_key') }}">
+                            <input type="password" name="api_key" id="ark_api_key" @if ((int) ($arkApiConfig['id'] ?? 0) <= 0) required @endif class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ (int) ($arkApiConfig['id'] ?? 0) > 0 ? __('admin.ai_source_providers.placeholder_api_key_keep') : __('admin.ai_source_providers.placeholder_api_key') }}">
                             <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.configured_key') }}: {{ $arkApiConfig['masked_api_key'] }}</p>
                         </div>
                         <div>
                             <label for="ark_daily_limit" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_daily_limit') }}</label>
-                            <input type="number" name="daily_limit" id="ark_daily_limit" min="0" value="{{ (int) ($arkApiConfig['daily_limit'] ?? 0) }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                            <input type="number" name="daily_limit" id="ark_daily_limit" min="0" value="{{ (int) ($arkApiConfig['daily_limit'] ?? 0) }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                         </div>
                         <div>
                             <label for="ark_max_tokens" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_max_tokens') }}</label>
-                            <input type="number" name="max_tokens" id="ark_max_tokens" min="1" value="{{ $arkApiConfig['max_tokens'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                            <input type="number" name="max_tokens" id="ark_max_tokens" min="1" value="{{ $arkApiConfig['max_tokens'] }}" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                             <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.max_tokens_help') }}</p>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">
-                        <button type="button" onclick="testConfiguredModelBinding('ark', 'ark_config_model_id', 'ark-config-test-result', this)" class="rounded-md border border-teal-200 bg-white px-4 py-2 text-sm font-medium text-teal-700 hover:bg-teal-50">
+                        <button type="button" onclick="testConfiguredModelBinding('ark', 'ark_config_model_id', 'ark-config-test-result', this)" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
                             {{ __('admin.ai_source_providers.structured_test') }}
                         </button>
-                        <button type="submit" class="rounded-md border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary qdk-btn-sm">
                             {{ __('admin.ai_source_providers.save_api_config') }}
                         </button>
                     </div>
@@ -161,15 +173,15 @@
         </div>
 
         <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div class="rounded-lg bg-white shadow lg:col-span-2">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="text-lg font-medium text-gray-900">{{ __('admin.ai_source_providers.search_list_title') }}</h3>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.search_list_desc') }}</p>
+            <div class="qdk-card lg:col-span-2">
+                <div class="qdk-card-head">
+                    <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.search_list_title') }}</h3>
+                    <p class="qdk-card-sub">{{ __('admin.ai_source_providers.search_list_desc') }}</p>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-[#fafbfc]">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.ai_source_providers.column.provider') }}</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.ai_source_providers.column.options') }}</th>
@@ -178,24 +190,24 @@
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.ai_source_providers.column.actions') }}</th>
                         </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
+                        <tbody class="divide-y divide-gray-100 bg-white">
                         @if (empty($providers))
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
                                     <i data-lucide="search-x" class="mx-auto mb-2 h-8 w-8 text-gray-400"></i>
                                     <p>{{ __('admin.ai_source_providers.empty') }}</p>
-                                    <button type="button" onclick="showCreateProviderModal()" class="mt-2 text-teal-600 hover:text-teal-800">
+                                    <button type="button" onclick="showCreateProviderModal()" class="mt-2 text-[color:var(--qdk-primary)] hover:underline">
                                         {{ __('admin.ai_source_providers.add_first') }}
                                     </button>
                                 </td>
                             </tr>
                         @else
                             @foreach ($providers as $provider)
-                                <tr>
+                                <tr class="qdk-row">
                                     <td class="px-6 py-4 align-top">
                                         <div class="flex items-center gap-2">
                                             <div class="text-sm font-medium text-gray-900">{{ $provider['name'] }}</div>
-                                            <span class="inline-flex rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-800">
+                                            <span class="qdk-badge">
                                                 {{ $provider['provider_label'] }}
                                             </span>
                                         </div>
@@ -212,22 +224,22 @@
                                             <div>{{ (int) $provider['used_today'] }} / {{ (int) $provider['daily_limit'] }}</div>
                                             <div class="text-xs text-gray-500">{{ __('admin.ai_source_providers.limit_today') }}</div>
                                         @else
-                                            <div class="text-green-600">{{ __('admin.ai_source_providers.limit_unlimited') }}</div>
+                                            <div class="text-[#10894e]">{{ __('admin.ai_source_providers.limit_unlimited') }}</div>
                                         @endif
                                         <div class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.total_used', ['count' => number_format((int) $provider['total_used'])]) }}</div>
                                     </td>
                                     <td class="px-6 py-4 align-top">
                                         @if ($provider['status'] === 'active')
-                                            <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">{{ __('admin.ai_source_providers.status_active') }}</span>
+                                            <span class="qdk-badge qdk-badge-green">{{ __('admin.ai_source_providers.status_active') }}</span>
                                         @else
-                                            <span class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">{{ __('admin.ai_source_providers.status_inactive') }}</span>
+                                            <span class="qdk-badge" style="background:#fde8e8;color:#c53030;">{{ __('admin.ai_source_providers.status_inactive') }}</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 align-top text-sm font-medium">
                                         <div class="flex flex-wrap items-center gap-3">
-                                            <button type="button" onclick="testSourceProvider({{ (int) $provider['id'] }}, this)" class="text-emerald-600 hover:text-emerald-900">{{ __('admin.ai_source_providers.test') }}</button>
-                                            <button type="button" onclick='editProvider(@json($provider, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))' class="text-blue-600 hover:text-blue-900">{{ __('admin.ai_source_providers.edit') }}</button>
-                                            <button type="button" onclick="deleteProvider({{ (int) $provider['id'] }}, @js($provider['name']))" class="text-red-600 hover:text-red-900">{{ __('admin.ai_source_providers.delete') }}</button>
+                                            <button type="button" onclick="testSourceProvider({{ (int) $provider['id'] }}, this)" class="text-[#10894e] hover:underline">{{ __('admin.ai_source_providers.test') }}</button>
+                                            <button type="button" onclick='editProvider(@json($provider, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))' class="text-[color:var(--qdk-primary)] hover:underline">{{ __('admin.ai_source_providers.edit') }}</button>
+                                            <button type="button" onclick="deleteProvider({{ (int) $provider['id'] }}, @js($provider['name']))" class="text-red-600 hover:underline">{{ __('admin.ai_source_providers.delete') }}</button>
                                         </div>
                                         <div id="provider-test-result-{{ (int) $provider['id'] }}" class="mt-2 max-w-xs whitespace-normal text-xs"></div>
                                     </td>
@@ -239,16 +251,16 @@
                 </div>
             </div>
 
-            <div class="rounded-lg bg-white shadow">
-                <div class="border-b border-gray-200 px-6 py-4">
-                    <h3 class="text-lg font-medium text-gray-900">{{ __('admin.ai_source_providers.model_bindings_title') }}</h3>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.model_bindings_desc') }}</p>
+            <div class="qdk-card">
+                <div class="qdk-card-head">
+                    <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.model_bindings_title') }}</h3>
+                    <p class="qdk-card-sub">{{ __('admin.ai_source_providers.model_bindings_desc') }}</p>
                 </div>
                 <form method="POST" action="{{ route('admin.ai-source-providers.model-bindings') }}" class="space-y-5 px-6 py-5">
                     @csrf
                     <div>
                         <label for="ark_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.ark_model') }}</label>
-                        <select name="ark_model_id" id="ark_model_id" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                        <select name="ark_model_id" id="ark_model_id" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                             <option value="0">{{ __('admin.ai_source_providers.model_none') }}</option>
                             @foreach ($chatModels as $model)
                                 <option value="{{ (int) $model['id'] }}" @selected((int) $arkModelId === (int) $model['id'])>
@@ -258,14 +270,14 @@
                         </select>
                         <div class="mt-2 flex items-center justify-between gap-3">
                             <p class="text-xs text-gray-500">{{ __('admin.ai_source_providers.ark_model_help') }}</p>
-                            <button type="button" onclick="testModelBinding('ark', 'ark_model_id', 'ark-model-test-result', this)" class="shrink-0 text-xs font-medium text-emerald-600 hover:text-emerald-900">{{ __('admin.ai_source_providers.test') }}</button>
+                            <button type="button" onclick="testModelBinding('ark', 'ark_model_id', 'ark-model-test-result', this)" class="shrink-0 text-xs font-medium text-[color:var(--qdk-primary)] hover:underline">{{ __('admin.ai_source_providers.test') }}</button>
                         </div>
                         <div id="ark-model-test-result" class="mt-2 text-xs"></div>
                     </div>
 
                     <div>
                         <label for="deepseek_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.deepseek_model') }}</label>
-                        <select name="deepseek_model_id" id="deepseek_model_id" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                        <select name="deepseek_model_id" id="deepseek_model_id" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                             <option value="0">{{ __('admin.ai_source_providers.model_none') }}</option>
                             @foreach ($chatModels as $model)
                                 <option value="{{ (int) $model['id'] }}" @selected((int) $deepSeekModelId === (int) $model['id'])>
@@ -275,13 +287,13 @@
                         </select>
                         <div class="mt-2 flex items-center justify-between gap-3">
                             <p class="text-xs text-gray-500">{{ __('admin.ai_source_providers.deepseek_model_help') }}</p>
-                            <button type="button" onclick="testModelBinding('deepseek', 'deepseek_model_id', 'deepseek-model-test-result', this)" class="shrink-0 text-xs font-medium text-emerald-600 hover:text-emerald-900">{{ __('admin.ai_source_providers.test') }}</button>
+                            <button type="button" onclick="testModelBinding('deepseek', 'deepseek_model_id', 'deepseek-model-test-result', this)" class="shrink-0 text-xs font-medium text-[color:var(--qdk-primary)] hover:underline">{{ __('admin.ai_source_providers.test') }}</button>
                         </div>
                         <div id="deepseek-model-test-result" class="mt-2 text-xs"></div>
                     </div>
 
                     <div class="flex justify-end">
-                        <button type="submit" class="inline-flex items-center rounded-md border border-transparent bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-900">
+                        <button type="submit" class="qdk-btn qdk-btn-primary qdk-btn-sm">
                             {{ __('admin.ai_source_providers.save_bindings') }}
                         </button>
                     </div>
@@ -304,51 +316,51 @@
                     @csrf
                     <input type="hidden" name="_method" id="providerFormMethod" value="POST">
 
-                    <div class="rounded-md border border-teal-200 bg-teal-50 px-4 py-3">
-                        <div class="flex items-center gap-2 text-sm font-medium text-teal-900">
+                    <div class="rounded-md border border-[#d6e2ff] bg-[color:var(--qdk-primary-weak)] px-4 py-3">
+                        <div class="flex items-center gap-2 text-sm font-medium text-[color:var(--qdk-primary)]">
                             <i data-lucide="search-check" class="h-4 w-4"></i>
                             {{ __('admin.ai_source_providers.provider.doubao_search_custom') }}
                         </div>
-                        <p class="mt-1 text-xs text-teal-800">{{ __('admin.ai_source_providers.doubao_custom_hint') }}</p>
+                        <p class="mt-1 text-xs text-[#3f5fb0]">{{ __('admin.ai_source_providers.doubao_custom_hint') }}</p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <label for="provider_name" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_name') }}</label>
-                            <input type="text" name="name" id="provider_name" required class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_name') }}">
+                            <input type="text" name="name" id="provider_name" required class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_name') }}">
                         </div>
                         <div>
                             <label for="provider_daily_limit" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_daily_limit') }}</label>
-                            <input type="number" name="daily_limit" id="provider_daily_limit" min="0" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" value="0">
+                            <input type="number" name="daily_limit" id="provider_daily_limit" min="0" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" value="0">
                         </div>
                     </div>
 
                     <div>
                         <label for="provider_endpoint_url" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_endpoint_url') }}</label>
-                        <input type="url" name="endpoint_url" id="provider_endpoint_url" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" value="{{ $defaultDoubaoEndpoint }}" placeholder="{{ $defaultDoubaoEndpoint }}">
+                        <input type="url" name="endpoint_url" id="provider_endpoint_url" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" value="{{ $defaultDoubaoEndpoint }}" placeholder="{{ $defaultDoubaoEndpoint }}">
                     </div>
 
                     <div>
                         <label for="provider_api_key" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_api_key') }}</label>
-                        <input type="password" name="api_key" id="provider_api_key" required class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_api_key') }}">
+                        <input type="password" name="api_key" id="provider_api_key" required class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_api_key') }}">
                         <p id="providerApiKeyHelp" class="mt-1 text-xs text-gray-500">{{ __('admin.ai_source_providers.api_key_help_create') }}</p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div>
                             <label for="provider_count" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_count') }}</label>
-                            <input type="number" name="count" id="provider_count" min="1" max="20" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" value="10">
+                            <input type="number" name="count" id="provider_count" min="1" max="20" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" value="10">
                         </div>
                         <div>
                             <label for="provider_content_formats" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_content_formats') }}</label>
-                            <select name="content_formats" id="provider_content_formats" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                            <select name="content_formats" id="provider_content_formats" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                                 <option value="Markdown">Markdown</option>
                                 <option value="Text">Text</option>
                             </select>
                         </div>
                         <div id="providerStatusField" class="hidden">
                             <label for="provider_status" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_status') }}</label>
-                            <select name="status" id="provider_status" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                            <select name="status" id="provider_status" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm">
                                 <option value="active">{{ __('admin.ai_source_providers.status_active') }}</option>
                                 <option value="inactive">{{ __('admin.ai_source_providers.status_inactive') }}</option>
                             </select>
@@ -361,40 +373,40 @@
                     <input type="hidden" name="need_url" value="0">
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <label class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
-                            <input type="checkbox" name="need_summary" id="provider_need_summary" value="1" checked class="rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                            <input type="checkbox" name="need_summary" id="provider_need_summary" value="1" checked class="rounded border-gray-300 text-[color:var(--qdk-primary)]">
                             {{ __('admin.ai_source_providers.field_need_summary') }}
                         </label>
                         <label class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
-                            <input type="checkbox" name="need_content" id="provider_need_content" value="1" checked class="rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                            <input type="checkbox" name="need_content" id="provider_need_content" value="1" checked class="rounded border-gray-300 text-[color:var(--qdk-primary)]">
                             {{ __('admin.ai_source_providers.field_need_content') }}
                         </label>
                         <label class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700">
-                            <input type="checkbox" name="need_url" id="provider_need_url" value="1" checked class="rounded border-gray-300 text-teal-600 focus:ring-teal-500">
+                            <input type="checkbox" name="need_url" id="provider_need_url" value="1" checked class="rounded border-gray-300 text-[color:var(--qdk-primary)]">
                             {{ __('admin.ai_source_providers.field_need_url') }}
                         </label>
                     </div>
 
                     <div>
                         <label for="provider_auth_info_level" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_auth_info_level') }}</label>
-                        <input type="text" name="auth_info_level" id="provider_auth_info_level" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_auth_info_level') }}">
+                        <input type="text" name="auth_info_level" id="provider_auth_info_level" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_auth_info_level') }}">
                     </div>
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <label for="provider_sites" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_sites') }}</label>
-                            <textarea name="sites" id="provider_sites" rows="3" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_sites') }}"></textarea>
+                            <textarea name="sites" id="provider_sites" rows="3" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_sites') }}"></textarea>
                         </div>
                         <div>
                             <label for="provider_block_hosts" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_source_providers.field_block_hosts') }}</label>
-                            <textarea name="block_hosts" id="provider_block_hosts" rows="3" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="{{ __('admin.ai_source_providers.placeholder_block_hosts') }}"></textarea>
+                            <textarea name="block_hosts" id="provider_block_hosts" rows="3" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('admin.ai_source_providers.placeholder_block_hosts') }}"></textarea>
                         </div>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-4">
-                        <button type="button" onclick="closeProviderModal()" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="closeProviderModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="rounded-md border border-transparent bg-teal-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-teal-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.button.save') }}
                         </button>
                     </div>

@@ -25,152 +25,116 @@
     <div class="px-4 sm:px-0">
         <div class="mb-8">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('admin.image-libraries.index') }}" class="text-gray-400 hover:text-gray-600">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.image-libraries.index') }}" class="qdk-back">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     </a>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">{{ $library->name }}</h1>
-                        <p class="mt-1 text-sm text-gray-600">{{ $library->description !== '' ? $library->description : __('admin.common.none_desc') }}</p>
+                        <h1 class="qdk-page-title">{{ $library->name }}</h1>
+                        <p class="qdk-page-sub">{{ $library->description !== '' ? $library->description : __('admin.common.none_desc') }}</p>
                     </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button type="button" onclick="showEditModal()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
-                        <i data-lucide="edit" class="w-4 h-4 mr-1"></i>
+                <div class="flex gap-2">
+                    <button type="button" onclick="showEditModal()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
+                        <i data-lucide="edit" class="w-4 h-4"></i>
                         {{ __('admin.button.edit') }}
                     </button>
-                    <button type="button" onclick="showUploadModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                        <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+                    <button type="button" onclick="showUploadModal()" class="qdk-btn qdk-btn-primary">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
                         {{ __('admin.button.upload') }}
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="image" class="h-6 w-6 text-purple-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.image_detail.total_images') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ (int) $totalImages }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="image" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.image_detail.total_images') }}</div>
+                    <div class="qdk-stat-value">{{ (int) $totalImages }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="trending-up" class="h-6 w-6 text-green-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.common.usage') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ (int) $usageTotal }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="trending-up" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.common.usage') }}</div>
+                    <div class="qdk-stat-value">{{ (int) $usageTotal }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="calendar" class="h-6 w-6 text-blue-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.common.created_at') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ optional($library->created_at)->format('m-d') ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="calendar" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.common.created_at') }}</div>
+                    <div class="qdk-stat-value">{{ optional($library->created_at)->format('m-d') ?? '-' }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="clock" class="h-6 w-6 text-orange-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.common.updated_at') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ optional($library->updated_at)->format('m-d') ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="clock" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.common.updated_at') }}</div>
+                    <div class="qdk-stat-value">{{ optional($library->updated_at)->format('m-d') ?? '-' }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4">
-                <div class="flex items-center justify-between">
-                    <form method="GET" class="flex items-center space-x-4">
-                        <div class="flex-1">
+        <div class="qdk-card mb-6">
+            <div class="px-5 py-4">
+                <div class="flex items-center justify-between gap-4">
+                    <form method="GET" class="flex items-center gap-3 flex-1">
+                        <div class="flex-1 max-w-md">
                             <input type="text" name="search" value="{{ $search }}"
                                 placeholder="{{ __('admin.image_detail.search_placeholder') }}"
-                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                                class="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
                         </div>
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                            <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
+                            <i data-lucide="search" class="w-4 h-4"></i>
                             {{ __('admin.button.search') }}
                         </button>
-                        <a href="{{ route('admin.image-libraries.detail', ['libraryId' => (int) $library->id]) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                        <a href="{{ route('admin.image-libraries.detail', ['libraryId' => (int) $library->id]) }}" class="qdk-btn qdk-btn-ghost">
+                            <i data-lucide="x" class="w-4 h-4"></i>
                             {{ __('admin.button.clear') }}
                         </a>
                     </form>
-                    <div class="flex space-x-2">
-                        <button type="button" onclick="toggleBatchActions()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="check-square" class="w-4 h-4 mr-1"></i>
-                            {{ __('admin.button.bulk_actions') }}
-                        </button>
-                    </div>
+                    <button type="button" onclick="toggleBatchActions()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
+                        <i data-lucide="check-square" class="w-4 h-4"></i>
+                        {{ __('admin.button.bulk_actions') }}
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium text-gray-900">
-                        {{ __('admin.image_detail.list_title') }}
-                        <span class="text-sm text-gray-500">({{ __('admin.image_detail.total_images_count', ['count' => (int) $totalImages]) }})</span>
-                    </h3>
-                </div>
+        <div class="qdk-card">
+            <div class="qdk-card-head">
+                <h3 class="qdk-card-title">
+                    {{ __('admin.image_detail.list_title') }}
+                    <span class="qdk-card-sub">({{ __('admin.image_detail.total_images_count', ['count' => (int) $totalImages]) }})</span>
+                </h3>
             </div>
 
             @if ($images->isEmpty())
-                <div class="px-6 py-8 text-center">
-                    <i data-lucide="image" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('admin.image_detail.empty') }}</h3>
-                    <p class="text-gray-500 mb-4">{{ $search !== '' ? __('admin.image_detail.empty_search') : __('admin.image_detail.empty_desc') }}</p>
+                <div class="qdk-empty">
+                    <i data-lucide="image" class="qdk-empty-icon"></i>
+                    <h3 class="qdk-empty-title">{{ __('admin.image_detail.empty') }}</h3>
+                    <p class="qdk-empty-sub mb-4">{{ $search !== '' ? __('admin.image_detail.empty_search') : __('admin.image_detail.empty_desc') }}</p>
                     @if ($search === '')
-                        <button type="button" onclick="showUploadModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                            <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+                        <button type="button" onclick="showUploadModal()" class="qdk-btn qdk-btn-primary">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
                             {{ __('admin.button.upload') }}
                         </button>
                     @endif
                 </div>
             @else
-                <div id="batch-actions" class="hidden px-6 py-3 bg-gray-50 border-b border-gray-200">
+                <div id="batch-actions" class="hidden px-5 py-3 bg-[#fafbfc] border-b border-gray-100">
                     <form method="POST" action="{{ route('admin.image-libraries.images.delete', ['libraryId' => (int) $library->id]) }}" id="batch-form">
                         @csrf
-                        <div class="flex items-center space-x-4">
+                        <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-600" id="selected-count-wrap">{{ __('admin.image_detail.selected_count', ['count' => 0]) }}</span>
-                            <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700">
-                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i>
+                            <button type="submit" class="qdk-btn qdk-btn-danger qdk-btn-sm">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 {{ __('admin.image_detail.delete_selected') }}
                             </button>
-                            <button type="button" onclick="toggleBatchActions()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
+                            <button type="button" onclick="toggleBatchActions()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
                                 {{ __('admin.button.cancel') }}
                             </button>
                         </div>
@@ -183,8 +147,8 @@
                             @php
                                 $imageUrl = \App\Support\GeoFlow\ImageUrlNormalizer::toPublicUrl((string) ($image->file_path ?? ''));
                             @endphp
-                            <div class="image-item relative overflow-hidden rounded-lg border-2 border-transparent transition-all hover:border-purple-500 hover:scale-[1.02]" data-image-id="{{ (int) $image->id }}">
-                                <input type="checkbox" form="batch-form" name="image_ids[]" value="{{ (int) $image->id }}" class="image-checkbox hidden absolute top-2 left-2 rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 z-10">
+                            <div class="image-item relative overflow-hidden rounded-lg border-2 border-transparent transition-all hover:border-[#3b6ef6] hover:scale-[1.02]" data-image-id="{{ (int) $image->id }}">
+                                <input type="checkbox" form="batch-form" name="image_ids[]" value="{{ (int) $image->id }}" class="image-checkbox hidden absolute top-2 left-2 rounded border-gray-300 text-[color:var(--qdk-primary)] shadow-sm z-10">
                                 <img
                                     src="{{ $imageUrl }}"
                                     alt="{{ (string) ($image->original_name ?? '') }}"
@@ -208,9 +172,9 @@
                 </div>
 
                 @if ($images->lastPage() > 1)
-                    <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="px-5 py-4 border-t border-gray-100">
                         <div class="flex items-center justify-between">
-                            <div class="text-sm text-gray-700">
+                            <div class="text-sm text-gray-600">
                                 {{ __('admin.image_detail.pagination_summary', ['from' => $images->firstItem(), 'to' => $images->lastItem(), 'total' => $images->total()]) }}
                             </div>
                             <div>
@@ -236,8 +200,8 @@
                                 <i data-lucide="upload-cloud" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
                                 <p class="text-lg font-medium text-gray-900 mb-2">{{ __('admin.image_detail.upload_hint') }}</p>
                                 <p class="text-sm text-gray-500 mb-4">{{ __('admin.image_detail.upload_formats') }}</p>
-                                <button type="button" id="trigger-image-picker" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                                    <i data-lucide="folder-open" class="w-4 h-4 mr-2"></i>
+                                <button type="button" id="trigger-image-picker" class="qdk-btn qdk-btn-primary">
+                                    <i data-lucide="folder-open" class="w-4 h-4"></i>
                                     {{ __('admin.image_detail.select_images') }}
                                 </button>
                             </div>
@@ -250,11 +214,11 @@
                     </div>
 
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideUploadModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideUploadModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" id="upload-btn" disabled class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                            <i data-lucide="upload" class="w-4 h-4 mr-2 inline"></i>
+                        <button type="submit" id="upload-btn" disabled class="qdk-btn qdk-btn-primary disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            <i data-lucide="upload" class="w-4 h-4 inline"></i>
                             {{ __('admin.button.upload') }}
                         </button>
                     </div>
@@ -273,18 +237,18 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.image_libraries.field_name') }}</label>
-                            <input type="text" name="name" required value="{{ old('name', (string) $library->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+                            <input type="text" name="name" required value="{{ old('name', (string) $library->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.common.description') }}</label>
-                            <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">{{ old('description', (string) ($library->description ?? '')) }}</textarea>
+                            <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">{{ old('description', (string) ($library->description ?? '')) }}</textarea>
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideEditModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideEditModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.button.save') }}
                         </button>
                     </div>

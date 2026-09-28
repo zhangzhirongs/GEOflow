@@ -4,164 +4,128 @@
     <div class="px-4 sm:px-0">
         <div class="mb-8">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('admin.keyword-libraries.index') }}" class="text-gray-400 hover:text-gray-600">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.keyword-libraries.index') }}" class="qdk-back">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     </a>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">{{ $library->name }}</h1>
-                        <p class="mt-1 text-sm text-gray-600">{{ $library->description !== '' ? $library->description : __('admin.keyword_detail.no_description') }}</p>
+                        <h1 class="qdk-page-title">{{ $library->name }}</h1>
+                        <p class="qdk-page-sub">{{ $library->description !== '' ? $library->description : __('admin.keyword_detail.no_description') }}</p>
                     </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button type="button" onclick="showEditModal()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
-                        <i data-lucide="edit" class="w-4 h-4 mr-1"></i>
+                <div class="flex gap-2">
+                    <button type="button" onclick="showEditModal()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
+                        <i data-lucide="edit" class="w-4 h-4"></i>
                         {{ __('admin.keyword_detail.edit_info') }}
                     </button>
-                    <button type="button" onclick="showAddModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                    <button type="button" onclick="showAddModal()" class="qdk-btn qdk-btn-primary">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
                         {{ __('admin.keyword_detail.add_keyword') }}
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="key" class="h-6 w-6 text-blue-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.keyword_detail.total_keywords') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $keywords->total() }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="key" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.keyword_detail.total_keywords') }}</div>
+                    <div class="qdk-stat-value">{{ $keywords->total() }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="trending-up" class="h-6 w-6 text-green-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.keyword_detail.usage_total') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $usageTotal }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="trending-up" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.keyword_detail.usage_total') }}</div>
+                    <div class="qdk-stat-value">{{ $usageTotal }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="calendar" class="h-6 w-6 text-purple-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.keyword_detail.created_date') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ optional($library->created_at)->format('m-d') ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="calendar" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.keyword_detail.created_date') }}</div>
+                    <div class="qdk-stat-value">{{ optional($library->created_at)->format('m-d') ?? '-' }}</div>
                 </div>
             </div>
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="clock" class="h-6 w-6 text-orange-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.keyword_detail.updated_date') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ optional($library->updated_at)->format('m-d') ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="clock" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.keyword_detail.updated_date') }}</div>
+                    <div class="qdk-stat-value">{{ optional($library->updated_at)->format('m-d') ?? '-' }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4">
-                <div class="flex items-center justify-between">
-                    <form method="GET" class="flex items-center space-x-4">
-                        <div class="flex-1">
+        <div class="qdk-card mb-6">
+            <div class="px-5 py-4">
+                <div class="flex items-center justify-between gap-4">
+                    <form method="GET" class="flex items-center gap-3 flex-1">
+                        <div class="flex-1 max-w-md">
                             <input type="text" name="search" value="{{ $search }}"
                                 placeholder="{{ __('admin.keyword_detail.search_placeholder') }}"
-                                class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                class="block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
                         </div>
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
+                            <i data-lucide="search" class="w-4 h-4"></i>
                             {{ __('admin.button.search') }}
                         </button>
-                        <a href="{{ route('admin.keyword-libraries.detail', ['libraryId' => (int) $library->id]) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="x" class="w-4 h-4 mr-2"></i>
+                        <a href="{{ route('admin.keyword-libraries.detail', ['libraryId' => (int) $library->id]) }}" class="qdk-btn qdk-btn-ghost">
+                            <i data-lucide="x" class="w-4 h-4"></i>
                             {{ __('admin.button.clear') }}
                         </a>
                     </form>
-                    <div class="flex space-x-2">
-                        <button type="button" onclick="toggleBatchActions()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="check-square" class="w-4 h-4 mr-1"></i>
-                            {{ __('admin.keyword_detail.batch_actions') }}
-                        </button>
-                    </div>
+                    <button type="button" onclick="toggleBatchActions()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
+                        <i data-lucide="check-square" class="w-4 h-4"></i>
+                        {{ __('admin.keyword_detail.batch_actions') }}
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-medium text-gray-900">
-                        {{ __('admin.keyword_detail.list_title') }}
-                        <span class="text-sm text-gray-500">{{ __('admin.keyword_detail.list_total', ['count' => $keywords->total()]) }}</span>
-                    </h3>
-                </div>
+        <div class="qdk-card">
+            <div class="qdk-card-head">
+                <h3 class="qdk-card-title">
+                    {{ __('admin.keyword_detail.list_title') }}
+                    <span class="qdk-card-sub">{{ __('admin.keyword_detail.list_total', ['count' => $keywords->total()]) }}</span>
+                </h3>
             </div>
 
             @if ($keywords->isEmpty())
-                <div class="px-6 py-8 text-center">
-                    <i data-lucide="search" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('admin.keyword_detail.empty') }}</h3>
-                    <p class="text-gray-500 mb-4">{{ $search !== '' ? __('admin.keyword_detail.empty_search') : __('admin.keyword_detail.empty_desc') }}</p>
+                <div class="qdk-empty">
+                    <i data-lucide="search" class="qdk-empty-icon"></i>
+                    <h3 class="qdk-empty-title">{{ __('admin.keyword_detail.empty') }}</h3>
+                    <p class="qdk-empty-sub mb-4">{{ $search !== '' ? __('admin.keyword_detail.empty_search') : __('admin.keyword_detail.empty_desc') }}</p>
                     @if ($search === '')
-                        <button type="button" onclick="showAddModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        <button type="button" onclick="showAddModal()" class="qdk-btn qdk-btn-primary">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
                             {{ __('admin.keyword_detail.add_keyword') }}
                         </button>
                     @endif
                 </div>
             @else
-                <div id="batch-actions" class="hidden px-6 py-3 bg-gray-50 border-b border-gray-200">
+                <div id="batch-actions" class="hidden px-5 py-3 bg-[#fafbfc] border-b border-gray-100">
                     <form method="POST" action="{{ route('admin.keyword-libraries.keywords.delete', ['libraryId' => (int) $library->id]) }}" id="batch-form">
                         @csrf
-                        <div class="flex items-center space-x-4">
+                        <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-600" id="selected-keyword-count">{{ __('admin.keyword_detail.selected_count', ['count' => 0]) }}</span>
-                            <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700">
-                                <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i>
+                            <button type="submit" class="qdk-btn qdk-btn-danger qdk-btn-sm">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 {{ __('admin.keyword_detail.delete_selected') }}
                             </button>
-                            <button type="button" onclick="toggleBatchActions()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
+                            <button type="button" onclick="toggleBatchActions()" class="qdk-btn qdk-btn-ghost qdk-btn-sm">
                                 {{ __('admin.button.cancel') }}
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <div class="px-6 py-4">
+                <div class="px-5 py-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         @foreach ($keywords as $keyword)
-                            <div class="group flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            <div class="group flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-[#fafbfc]">
                                 <div class="flex items-center space-x-2 min-w-0">
-                                    <input type="checkbox" form="batch-form" name="keyword_ids[]" value="{{ (int) $keyword->id }}" class="keyword-checkbox hidden rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                    <input type="checkbox" form="batch-form" name="keyword_ids[]" value="{{ (int) $keyword->id }}" class="keyword-checkbox hidden rounded border-gray-300 text-[color:var(--qdk-primary)] shadow-sm">
                                     <span class="text-sm text-gray-900 break-all">{{ $keyword->keyword }}</span>
                                 </div>
                                 <button type="button" onclick="deleteKeyword({{ (int) $keyword->id }}, @js($keyword->keyword))" class="text-red-600 hover:text-red-800 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -202,14 +166,14 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.keyword_detail.field_keyword') }}</label>
-                            <input type="text" name="keyword" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="{{ __('admin.keyword_detail.placeholder_keyword') }}">
+                            <input type="text" name="keyword" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="{{ __('admin.keyword_detail.placeholder_keyword') }}">
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideAddModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideAddModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.button.add') }}
                         </button>
                     </div>
@@ -228,22 +192,22 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.keyword_detail.field_name') }}</label>
-                            <input type="text" name="name" required value="{{ old('name', (string) $library->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            <input type="text" name="name" required value="{{ old('name', (string) $library->name) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.keyword_detail.field_description') }}</label>
-                            <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">{{ old('description', (string) ($library->description ?? '')) }}</textarea>
+                            <textarea name="description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">{{ old('description', (string) ($library->description ?? '')) }}</textarea>
                         </div>
                     </div>
                     <div class="mt-6 flex justify-between space-x-3">
-                        <button type="button" onclick="showImportModal()" class="px-4 py-2 border border-blue-200 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100">
+                        <button type="button" onclick="showImportModal()" class="qdk-btn qdk-btn-sm" style="background:var(--qdk-primary-weak);color:var(--qdk-primary);">
                             {{ __('admin.button.import') }}
                         </button>
                         <div class="space-x-3">
-                            <button type="button" onclick="hideEditModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            <button type="button" onclick="hideEditModal()" class="qdk-btn qdk-btn-ghost">
                                 {{ __('admin.button.cancel') }}
                             </button>
-                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            <button type="submit" class="qdk-btn qdk-btn-primary">
                                 {{ __('admin.button.save') }}
                             </button>
                         </div>
@@ -256,13 +220,13 @@
     <div id="import-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-10 mx-auto p-5 border w-2/3 max-w-2xl shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('admin.keyword_libraries.modal_import') }} <span class="text-blue-600">{{ $library->name }}</span></h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('admin.keyword_libraries.modal_import') }} <span class="text-[color:var(--qdk-primary)]">{{ $library->name }}</span></h3>
                 <form method="POST" action="{{ route('admin.keyword-libraries.import', ['libraryId' => (int) $library->id]) }}">
                     @csrf
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.keyword_libraries.field_keywords') }}</label>
-                            <textarea name="keywords_text" rows="10" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="{{ __('admin.keyword_libraries.placeholder_keywords') }}"></textarea>
+                            <textarea name="keywords_text" rows="10" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="{{ __('admin.keyword_libraries.placeholder_keywords') }}"></textarea>
                         </div>
                         <div class="text-sm text-gray-500">
                             <p class="mb-2">{{ __('admin.keyword_libraries.format_title') }}</p>
@@ -274,10 +238,10 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideImportModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideImportModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.keyword_libraries.import_button') }}
                         </button>
                     </div>

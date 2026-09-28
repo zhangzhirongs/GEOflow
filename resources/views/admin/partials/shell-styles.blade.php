@@ -187,4 +187,77 @@
             z-index: 45;
         }
     }
+
+    /* ===== 统一管理端 UI 组件 ===== */
+    .admin-main-inner input:not([type=checkbox]):not([type=radio]):focus,
+    .admin-main-inner textarea:focus,
+    .admin-main-inner select:focus {
+        border-color: var(--qdk-primary) !important;
+        box-shadow: 0 0 0 2px rgba(59, 110, 246, 0.18) !important;
+        outline: none;
+    }
+    .qdk-page-title { font-size: 20px; font-weight: 700; color: var(--qdk-text); margin: 0; }
+    .qdk-page-sub { margin-top: 3px; font-size: 13px; color: var(--qdk-text-sub); }
+    .qdk-back {
+        width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #8b909a; background: #fff; border: 1px solid var(--qdk-border);
+        transition: all .15s ease;
+    }
+    .qdk-back:hover { color: var(--qdk-primary); border-color: #cdd8f5; background: var(--qdk-primary-weak); }
+
+    .qdk-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        height: 38px; padding: 0 16px; border-radius: 9px;
+        font-size: 14px; font-weight: 500; line-height: 1;
+        border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+        transition: all .15s ease; text-decoration: none;
+    }
+    .qdk-btn-sm { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+    .qdk-btn-primary { background: var(--qdk-primary); color: #fff; }
+    .qdk-btn-primary:hover { background: #2f5ad4; color: #fff; }
+    .qdk-btn-ghost { background: #fff; color: #4a505c; border-color: #dfe3ea; }
+    .qdk-btn-ghost:hover { background: #f5f7fa; border-color: #cdd3dd; }
+    .qdk-btn-danger { background: #ef4444; color: #fff; }
+    .qdk-btn-danger:hover { background: #dc2626; color: #fff; }
+    /* QDK_KIT_MARKER */
+    .qdk-card {
+        background: #fff; border: 1px solid var(--qdk-border);
+        border-radius: 12px; box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+    }
+    .qdk-card-head { padding: 16px 20px; border-bottom: 1px solid var(--qdk-border); }
+    .qdk-card-title { font-size: 15px; font-weight: 600; color: var(--qdk-text); margin: 0; }
+    .qdk-card-sub { margin-top: 3px; font-size: 13px; color: var(--qdk-text-sub); }
+
+    .qdk-stat {
+        background: #fff; border: 1px solid var(--qdk-border); border-radius: 12px;
+        padding: 18px; display: flex; align-items: center; gap: 14px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+    }
+    .qdk-stat-icon {
+        width: 44px; height: 44px; border-radius: 11px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--qdk-primary-weak); color: var(--qdk-primary);
+    }
+    .qdk-stat-label { font-size: 13px; color: var(--qdk-text-sub); }
+    .qdk-stat-value { font-size: 22px; font-weight: 700; color: var(--qdk-text); line-height: 1.25; }
+
+    .qdk-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+        background: var(--qdk-primary-weak); color: var(--qdk-primary);
+    }
+    .qdk-badge-gray { background: #f2f4f7; color: #5f6672; }
+    .qdk-badge-green { background: #e6f7ee; color: #10894e; }
+    .qdk-badge-amber { background: #fef3e2; color: #b76a09; }
+
+    .qdk-empty { padding: 56px 24px; text-align: center; }
+    .qdk-empty-icon { width: 44px; height: 44px; margin: 0 auto 14px; color: #c2c7d0; }
+    .qdk-empty-title { font-size: 15px; font-weight: 600; color: var(--qdk-text); }
+    .qdk-empty-sub { margin-top: 4px; font-size: 13px; color: var(--qdk-text-sub); }
+
+    .qdk-row { transition: background .15s ease; }
+    .qdk-row:hover { background: #fafbfc; }
+    .qdk-link { color: var(--qdk-text); transition: color .15s ease; }
+    .qdk-link:hover { color: var(--qdk-primary); }
 </style>

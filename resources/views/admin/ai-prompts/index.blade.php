@@ -3,31 +3,29 @@
 @section('content')
     <div class="px-4 sm:px-0">
         <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center space-x-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">{{ __('admin.ai_prompts.heading') }}</h1>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_prompts.subtitle') }}</p>
-                </div>
+            <div>
+                <h1 class="qdk-page-title">{{ __('admin.ai_prompts.heading') }}</h1>
+                <p class="qdk-page-sub">{{ __('admin.ai_prompts.subtitle') }}</p>
             </div>
-            <button type="button" onclick="showCreatePromptModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+            <button type="button" onclick="showCreatePromptModal()" class="qdk-btn qdk-btn-primary">
+                <i data-lucide="plus" class="w-4 h-4"></i>
                 {{ __('admin.ai_prompts.add') }}
             </button>
         </div>
 
-        <div class="mb-6 rounded-md border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+        <div class="mb-6 rounded-md border border-[#d6e2ff] bg-[color:var(--qdk-primary-weak)] p-4 text-sm text-[color:var(--qdk-primary)]">
             {!! __('admin.ai_prompts.help_banner', ['url' => route('admin.ai-special-prompts')]) !!}
         </div>
 
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.ai_prompts.list_title') }}</h3>
-                <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_prompts.list_subtitle') }}</p>
+        <div class="qdk-card">
+            <div class="qdk-card-head">
+                <h3 class="qdk-card-title">{{ __('admin.ai_prompts.list_title') }}</h3>
+                <p class="qdk-card-sub">{{ __('admin.ai_prompts.list_subtitle') }}</p>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-[#fafbfc]">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_prompts.column_info') }}</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_prompts.column_type') }}</th>
@@ -36,20 +34,20 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.common.actions') }}</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white divide-y divide-gray-100">
                         @if (empty($prompts))
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
                                     <i data-lucide="message-square" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
                                     <p>{{ __('admin.ai_prompts.empty') }}</p>
-                                    <button type="button" onclick="showCreatePromptModal()" class="mt-2 text-green-600 hover:text-green-800">
+                                    <button type="button" onclick="showCreatePromptModal()" class="mt-2 text-[color:var(--qdk-primary)] hover:underline">
                                         {{ __('admin.ai_prompts.add_first') }}
                                     </button>
                                 </td>
                             </tr>
                         @else
                             @foreach ($prompts as $prompt)
-                                <tr>
+                                <tr class="qdk-row">
                                     <td class="px-6 py-4">
                                         <div>
                                             <div class="text-sm font-medium text-gray-900">{{ $prompt['name'] }}</div>
@@ -59,7 +57,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        <span class="qdk-badge">
                                             {{ __('admin.ai_prompts.type_content') }}
                                         </span>
                                     </td>
@@ -69,11 +67,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $prompt['created_at'] ?? '-' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button type="button" onclick='editPrompt(@json($prompt, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))' class="text-green-600 hover:text-green-900">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                                        <button type="button" onclick='editPrompt(@json($prompt, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP))' class="text-[color:var(--qdk-primary)] hover:underline">
                                             {{ __('admin.button.edit') }}
                                         </button>
-                                        <button type="button" onclick="deletePrompt({{ (int) $prompt['id'] }}, @js($prompt['name']))" class="text-red-600 hover:text-red-900">
+                                        <button type="button" onclick="deletePrompt({{ (int) $prompt['id'] }}, @js($prompt['name']))" class="text-red-600 hover:text-red-800">
                                             {{ __('admin.button.delete') }}
                                         </button>
                                     </td>
@@ -103,14 +101,14 @@
                     <div>
                         <label for="prompt_name" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_prompts.field_name') }}</label>
                         <input type="text" name="name" id="prompt_name" required
-                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
                                placeholder="{{ __('admin.ai_prompts.placeholder_name') }}">
                     </div>
 
                     <div>
                         <label for="prompt_content" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_prompts.field_content') }}</label>
                         <textarea name="content" id="prompt_content" required rows="12"
-                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
                                   placeholder="{{ __('admin.ai_prompts.placeholder_content') }}"></textarea>
 
                         <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
@@ -125,10 +123,10 @@
                     </div>
 
                     <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closePromptModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <button type="button" onclick="closePromptModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.button.save') }}
                         </button>
                     </div>

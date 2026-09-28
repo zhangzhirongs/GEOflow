@@ -3,130 +3,104 @@
 @section('content')
     <div class="px-4 sm:px-0">
         <div class="mb-8 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.title-libraries.index') }}" class="text-gray-400 hover:text-gray-600">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.title-libraries.index') }}" class="qdk-back">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">{{ $library->name }}</h1>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.title_detail.subtitle') }}</p>
+                    <h1 class="qdk-page-title">{{ $library->name }}</h1>
+                    <p class="qdk-page-sub">{{ __('admin.title_detail.subtitle') }}</p>
                 </div>
             </div>
-            <div class="flex space-x-2">
-                <button type="button" onclick="showImportModal()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+            <div class="flex gap-2">
+                <button type="button" onclick="showImportModal()" class="qdk-btn qdk-btn-ghost">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
                     {{ __('admin.title_detail.import_batch') }}
                 </button>
-                <button type="button" onclick="showAddModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                <button type="button" onclick="showAddModal()" class="qdk-btn qdk-btn-primary">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
                     {{ __('admin.title_detail.add_title') }}
                 </button>
-                <a href="{{ route('admin.title-libraries.ai-generate', ['libraryId' => (int) $library->id]) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    <i data-lucide="zap" class="w-4 h-4 mr-2"></i>
+                <a href="{{ route('admin.title-libraries.ai-generate', ['libraryId' => (int) $library->id]) }}" class="qdk-btn qdk-btn-sm" style="background:#efeafe;color:#6d5efc;height:38px;">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
                     {{ __('admin.title_detail.ai_generate') }}
                 </a>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="list" class="h-6 w-6 text-green-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.title_detail.total_titles') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $titles->total() }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="list" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.title_detail.total_titles') }}</div>
+                    <div class="qdk-stat-value">{{ $titles->total() }}</div>
                 </div>
             </div>
-
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="calendar" class="h-6 w-6 text-blue-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.title_detail.created_date') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ optional($library->created_at)->format('Y-m-d') ?? '-' }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="calendar" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.title_detail.created_date') }}</div>
+                    <div class="qdk-stat-value">{{ optional($library->created_at)->format('Y-m-d') ?? '-' }}</div>
                 </div>
             </div>
-
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i data-lucide="trending-up" class="h-6 w-6 text-purple-600"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">{{ __('admin.title_detail.usage_total') }}</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $usageTotal }}</dd>
-                            </dl>
-                        </div>
-                    </div>
+            <div class="qdk-stat">
+                <div class="qdk-stat-icon"><i data-lucide="trending-up" class="h-5 w-5"></i></div>
+                <div>
+                    <div class="qdk-stat-label">{{ __('admin.title_detail.usage_total') }}</div>
+                    <div class="qdk-stat-value">{{ $usageTotal }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.title_detail.list_title') }}</h3>
+        <div class="qdk-card">
+            <div class="qdk-card-head">
+                <h3 class="qdk-card-title">{{ __('admin.title_detail.list_title') }}</h3>
             </div>
 
             @if ($titles->isEmpty())
-                <div class="px-6 py-8 text-center">
-                    <i data-lucide="list" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('admin.title_detail.empty') }}</h3>
-                    <p class="text-gray-500 mb-4">{{ __('admin.title_detail.empty_desc') }}</p>
-                    <div class="flex justify-center space-x-2">
-                        <button type="button" onclick="showAddModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                <div class="qdk-empty">
+                    <i data-lucide="list" class="qdk-empty-icon"></i>
+                    <h3 class="qdk-empty-title">{{ __('admin.title_detail.empty') }}</h3>
+                    <p class="qdk-empty-sub mb-4">{{ __('admin.title_detail.empty_desc') }}</p>
+                    <div class="flex justify-center gap-2">
+                        <button type="button" onclick="showAddModal()" class="qdk-btn qdk-btn-primary">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
                             {{ __('admin.title_detail.add_title') }}
                         </button>
-                        <button type="button" onclick="showImportModal()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            <i data-lucide="upload" class="w-4 h-4 mr-2"></i>
+                        <button type="button" onclick="showImportModal()" class="qdk-btn qdk-btn-ghost">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
                             {{ __('admin.title_detail.import_batch') }}
                         </button>
                     </div>
                 </div>
             @else
-                <div class="divide-y divide-gray-200">
+                <div class="divide-y divide-gray-100">
                     @foreach ($titles as $title)
-                        <div class="px-6 py-4">
-                            <div class="flex items-center justify-between">
+                        <div class="qdk-row px-5 py-4">
+                            <div class="flex items-center justify-between gap-4">
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-center space-x-3">
-                                        <h4 class="text-lg font-medium text-gray-900 break-all">{{ $title->title }}</h4>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h4 class="text-sm font-semibold text-gray-900 break-all">{{ $title->title }}</h4>
                                         @if ((bool) $title->is_ai_generated)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                                <i data-lucide="zap" class="w-3 h-3 mr-1"></i>
+                                            <span class="qdk-badge" style="background:#efeafe;color:#6d5efc;">
+                                                <i data-lucide="zap" class="w-3 h-3"></i>
                                                 {{ __('admin.title_detail.ai_badge') }}
                                             </span>
                                         @endif
                                         @if ((string) ($title->keyword ?? '') !== '')
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                            <span class="qdk-badge qdk-badge-gray">
                                                 {{ $title->keyword }}
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+                                    <div class="mt-1.5 flex items-center gap-4 text-xs text-gray-400">
                                         <span>{{ __('admin.title_detail.usage_count', ['count' => (int) ($title->used_count ?? 0)]) }}</span>
                                         <span>{{ __('admin.title_detail.created_at', ['value' => optional($title->created_at)->format('Y-m-d H:i') ?? '-']) }}</span>
                                     </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <button type="button" onclick="deleteTitle({{ (int) $title->id }}, @js($title->title))" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700">
-                                        <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    <button type="button" onclick="deleteTitle({{ (int) $title->id }}, @js($title->title))" class="qdk-btn qdk-btn-danger qdk-btn-sm">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         {{ __('admin.button.delete') }}
                                     </button>
                                 </div>
@@ -136,9 +110,9 @@
                 </div>
 
                 @if ($titles->lastPage() > 1)
-                    <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="px-5 py-4 border-t border-gray-100">
                         <div class="flex items-center justify-between">
-                            <div class="text-sm text-gray-700">
+                            <div class="text-sm text-gray-600">
                                 {{ __('admin.title_detail.pagination', ['start' => $titles->firstItem(), 'end' => $titles->lastItem(), 'total' => $titles->total()]) }}
                             </div>
                             <div>
@@ -165,18 +139,18 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.title_detail.field_title') }}</label>
-                            <input type="text" name="title" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_title') }}">
+                            <input type="text" name="title" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_title') }}">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.title_detail.field_keyword') }}</label>
-                            <input type="text" name="keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_keyword') }}">
+                            <input type="text" name="keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_keyword') }}">
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideAddModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideAddModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.button.add') }}
                         </button>
                     </div>
@@ -194,7 +168,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">{{ __('admin.title_detail.field_titles') }}</label>
-                            <textarea name="titles_text" rows="10" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_titles') }}"></textarea>
+                            <textarea name="titles_text" rows="10" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm" placeholder="{{ __('admin.title_detail.placeholder_titles') }}"></textarea>
                         </div>
                         <div class="text-sm text-gray-500">
                             <p class="mb-2">{{ __('admin.title_detail.import_format_title') }}</p>
@@ -206,10 +180,10 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" onclick="hideImportModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="hideImportModal()" class="qdk-btn qdk-btn-ghost">
                             {{ __('admin.button.cancel') }}
                         </button>
-                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                        <button type="submit" class="qdk-btn qdk-btn-primary">
                             {{ __('admin.title_detail.import_button') }}
                         </button>
                     </div>
