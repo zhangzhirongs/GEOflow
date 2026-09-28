@@ -253,7 +253,7 @@
                     <button type="button" onclick="hideEmbeddingConfigModal()" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
                         {{ __('admin.button.cancel') }}
                     </button>
-                    <a href="{{ route('admin.ai.configurator') }}" class="inline-flex items-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600">
+                    <a href="{{ route('admin.ai-models.index') }}" class="inline-flex items-center rounded-xl bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600">
                         {{ __('admin.knowledge_bases.vector_notice_configure_link') }}
                     </a>
                 </div>
