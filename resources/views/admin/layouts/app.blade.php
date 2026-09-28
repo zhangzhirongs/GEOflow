@@ -18,31 +18,51 @@
     <title>@isset($pageTitle){{ $pageTitle }} — @endisset{{ $adminBrandName }}</title>
     <script src="{{ asset('js/tailwindcss.play-cdn.js') }}"></script>
     <script src="{{ asset('js/lucide.min.js') }}"></script>
+    @include('admin.partials.shell-styles')
+    {{-- 折叠状态提前应用，避免刷新闪烁 --}}
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('geoflow.sidebar.collapsed') === '1') {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
+            } catch (e) {}
+        })();
+    </script>
     @stack('styles')
 </head>
-<body class="bg-gray-50">
-@include('admin.partials.header', [
-    'adminBrandName' => $adminBrandName,
-    'adminSiteName' => $adminSiteName ?? $adminBrandName,
-    'pageTitle' => $pageTitle ?? '',
-    'activeMenu' => $activeMenu ?? '',
-])
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        @if (session('message'))
-            <div class="admin-flash-alert mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                <span class="block sm:inline">{{ session('message') }}</span>
+<body class="admin-body-root">
+<div id="admin-shell" class="admin-shell">
+    @include('admin.partials.header', [
+        'adminBrandName' => $adminBrandName,
+        'adminSiteName' => $adminSiteName ?? $adminBrandName,
+        'pageTitle' => $pageTitle ?? '',
+    ])
+    <div class="admin-layout-body">
+        @include('admin.partials.sidebar', [
+            'activeMenu' => $activeMenu ?? '',
+        ])
+        <div id="admin-sidebar-overlay" class="admin-sidebar-overlay" onclick="toggleSidebarDrawer(false)"></div>
+        <main class="admin-main">
+            <div class="admin-main-inner max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                @if (session('message'))
+                    <div class="admin-flash-alert mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                        <span class="block sm:inline">{{ session('message') }}</span>
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="admin-flash-alert mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                        @foreach ($errors->all() as $err)
+                            <div>{{ $err }}</div>
+                        @endforeach
+                    </div>
+                @endif
+                @yield('content')
             </div>
-        @endif
-        @if ($errors->any())
-            <div class="admin-flash-alert mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                @foreach ($errors->all() as $err)
-                    <div>{{ $err }}</div>
-                @endforeach
-            </div>
-        @endif
-        @yield('content')
-    </main>
-@include('admin.partials.footer')
+            @include('admin.partials.footer')
+        </main>
+    </div>
+</div>
 @include('admin.partials.welcome-modal')
 @vite('resources/js/app.js')
 @if (is_array($anonymousUsageTelemetryPayload ?? null))
