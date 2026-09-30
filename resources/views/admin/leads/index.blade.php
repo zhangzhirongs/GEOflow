@@ -43,47 +43,37 @@
             @endforeach
         </div>
 
-        <section class="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-            <form method="GET" action="{{ route('admin.leads.index') }}" class="grid grid-cols-1 gap-4 lg:grid-cols-6">
-                <div>
-                    <label class="mb-2 block text-xs font-medium text-gray-600">{{ __('admin.leads.filter.status') }}</label>
-                    <select name="status" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">{{ __('admin.leads.filter.all') }}</option>
-                        @foreach (\App\Models\LeadSubmission::STATUSES as $status)
-                            <option value="{{ $status }}" @selected($selectedStatus === $status)>{{ __('admin.leads.status.'.$status) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="mb-2 block text-xs font-medium text-gray-600">{{ __('admin.leads.filter.form') }}</label>
-                    <select name="form_id" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">{{ __('admin.leads.filter.all') }}</option>
-                        @foreach ($forms as $form)
-                            <option value="{{ $form->id }}" @selected($selectedFormId === (int) $form->id)>{{ $form->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="mb-2 block text-xs font-medium text-gray-600">{{ __('admin.leads.filter.date_from') }}</label>
-                    <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="mb-2 block text-xs font-medium text-gray-600">{{ __('admin.leads.filter.date_to') }}</label>
-                    <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="mb-2 block text-xs font-medium text-gray-600">{{ __('admin.leads.filter.search') }}</label>
-                    <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="{{ __('admin.leads.filter.search_placeholder') }}">
-                </div>
-                <div class="flex items-end gap-2">
-                    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                        <i data-lucide="filter" class="mr-2 h-4 w-4"></i>
-                        {{ __('admin.leads.filter.apply') }}
-                    </button>
-                    <a href="{{ route('admin.leads.index') }}" class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('admin.leads.filter.reset') }}</a>
-                </div>
-            </form>
-        </section>
+        <x-admin.filter-bar
+            :action="route('admin.leads.index')"
+            :reset-url="route('admin.leads.index')"
+            :search-label="__('admin.leads.filter.apply')"
+            :reset-label="__('admin.leads.filter.reset')">
+            <x-admin.filter-field :label="__('admin.leads.filter.status')" width="150">
+                <select name="status" class="admin-filter-control">
+                    <option value="">{{ __('admin.leads.filter.all') }}</option>
+                    @foreach (\App\Models\LeadSubmission::STATUSES as $status)
+                        <option value="{{ $status }}" @selected($selectedStatus === $status)>{{ __('admin.leads.status.'.$status) }}</option>
+                    @endforeach
+                </select>
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.leads.filter.form')" width="160">
+                <select name="form_id" class="admin-filter-control">
+                    <option value="">{{ __('admin.leads.filter.all') }}</option>
+                    @foreach ($forms as $form)
+                        <option value="{{ $form->id }}" @selected($selectedFormId === (int) $form->id)>{{ $form->name }}</option>
+                    @endforeach
+                </select>
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.leads.filter.date_from')" width="150">
+                <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.leads.filter.date_to')" width="150">
+                <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.leads.filter.search')" width="200">
+                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-filter-control" placeholder="{{ __('admin.leads.filter.search_placeholder') }}">
+            </x-admin.filter-field>
+        </x-admin.filter-bar>
 
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="overflow-x-auto">

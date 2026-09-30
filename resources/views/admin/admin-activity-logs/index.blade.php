@@ -61,34 +61,23 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4">
-                <form method="GET" action="{{ route('admin.admin-activity-logs') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-2">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.activity_logs.search') }}</label>
-                        <input type="text" name="search" id="search" value="{{ $filters['search'] }}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="{{ __('admin.activity_logs.search_placeholder') }}">
-                    </div>
-                    <div>
-                        <label for="admin_id" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.activity_logs.admin') }}</label>
-                        <select name="admin_id" id="admin_id" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="0">{{ __('admin.activity_logs.all_admins') }}</option>
-                            @foreach ($admins as $admin)
-                                <option value="{{ $admin['id'] }}" @selected($filters['admin_id'] === $admin['id'])>{{ $admin['name'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="flex items-end gap-3">
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                            <i data-lucide="search" class="w-4 h-4 mr-2"></i>
-                            {{ __('admin.activity_logs.filter') }}
-                        </button>
-                        <a href="{{ route('admin.admin-activity-logs') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            {{ __('admin.activity_logs.reset') }}
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <x-admin.filter-bar
+            :action="route('admin.admin-activity-logs')"
+            :reset-url="route('admin.admin-activity-logs')"
+            :search-label="__('admin.activity_logs.filter')"
+            :reset-label="__('admin.activity_logs.reset')">
+            <x-admin.filter-field :label="__('admin.activity_logs.search')" width="260">
+                <input type="text" name="search" id="search" value="{{ $filters['search'] }}" class="admin-filter-control" placeholder="{{ __('admin.activity_logs.search_placeholder') }}">
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.activity_logs.admin')" width="180">
+                <select name="admin_id" id="admin_id" class="admin-filter-control">
+                    <option value="0">{{ __('admin.activity_logs.all_admins') }}</option>
+                    @foreach ($admins as $admin)
+                        <option value="{{ $admin['id'] }}" @selected($filters['admin_id'] === $admin['id'])>{{ $admin['name'] }}</option>
+                    @endforeach
+                </select>
+            </x-admin.filter-field>
+        </x-admin.filter-bar>
 
         <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">

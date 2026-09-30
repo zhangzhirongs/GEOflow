@@ -260,4 +260,105 @@
     .qdk-row:hover { background: #fafbfc; }
     .qdk-link { color: var(--qdk-text); transition: color .15s ease; }
     .qdk-link:hover { color: var(--qdk-primary); }
+
+    /* ============================================================
+       列表页皮肤层（参考 CSWG 任务列表观感）
+       作用域限定在 .admin-main，隔离站点前台 / 登录页。
+       所有规则为未分层样式，天然覆盖 Tailwind Play CDN 的 @layer utilities。
+       ============================================================ */
+    :root {
+        --qdk-list-radius: 10px;
+        --qdk-list-shadow: 0 2px 12px rgba(16, 24, 40, .05);
+        --qdk-list-stripe: #fafbfc;
+        --qdk-list-head-bg: #f7f8fa;
+    }
+
+    /* 卡片：柔和圆角 + 轻阴影 + 浅边框 */
+    .admin-main .bg-white.shadow.rounded-lg,
+    .admin-main .bg-white.rounded-lg.border,
+    .admin-main .rounded-lg.border.bg-white.shadow-sm {
+        border-radius: var(--qdk-list-radius);
+        box-shadow: var(--qdk-list-shadow);
+        border: 1px solid var(--qdk-border);
+    }
+
+    /* 表格容器圆角裁切（表头/斑马纹不溢出） */
+    .admin-main .bg-white.shadow.rounded-lg,
+    .admin-main .rounded-lg.border.bg-white.shadow-sm { overflow: hidden; }
+
+    /* 表格：表头更柔和 */
+    .admin-main table.min-w-full > thead { background: var(--qdk-list-head-bg); }
+    .admin-main table.min-w-full > thead > tr > th {
+        color: var(--qdk-text-sub);
+        font-weight: 600;
+        letter-spacing: .02em;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--qdk-border);
+    }
+
+    /* 表格：行高更透气 + 斑马纹 + 柔和悬停（悬停规则在后，优先级高于斑马纹） */
+    .admin-main table.min-w-full > tbody > tr { transition: background-color .15s ease; }
+    .admin-main table.min-w-full > tbody > tr > td { padding-top: 13px; padding-bottom: 13px; vertical-align: middle; }
+    .admin-main table.min-w-full > tbody > tr:nth-child(even) { background-color: var(--qdk-list-stripe); }
+    .admin-main table.min-w-full > tbody > tr:hover { background-color: var(--qdk-primary-weak); }
+
+    /* 表单控件：统一高度 / 圆角 / 主色聚焦（对未接入组件的页面也生效） */
+    .admin-main form :is(select, input[type="text"], input[type="search"], input[type="date"], input[type="number"], input[type="email"], input[type="url"], input[type="password"]),
+    .admin-main .admin-filter-control {
+        border-radius: 8px;
+        border: 1px solid #d5d9e0;
+        background-color: #fff;
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .admin-main form :is(select, input[type="text"], input[type="search"], input[type="date"], input[type="number"], input[type="email"], input[type="url"], input[type="password"]):focus,
+    .admin-main .admin-filter-control:focus {
+        outline: none;
+        border-color: var(--qdk-primary);
+        box-shadow: 0 0 0 3px rgba(59, 110, 246, .15);
+    }
+
+    /* 分页：圆角 + 柔和悬停 + 主色当前页 */
+    .admin-main nav[role="navigation"] a,
+    .admin-main nav[role="navigation"] span[aria-current] > span,
+    .admin-main nav[role="navigation"] > div:last-child span,
+    .admin-main nav[role="navigation"] > div:last-child a {
+        border-radius: 8px !important;
+        transition: background-color .15s ease, color .15s ease;
+    }
+    .admin-main nav[role="navigation"] a:hover { background-color: var(--qdk-primary-weak) !important; color: var(--qdk-primary) !important; }
+    .admin-main nav[role="navigation"] span[aria-current] > span { background-color: var(--qdk-primary) !important; border-color: var(--qdk-primary) !important; color: #fff !important; }
+
+    /* ===== 紧凑筛选栏组件（x-admin.filter-bar / filter-field） ===== */
+    .admin-filter-bar {
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        background: #fff;
+        border: 1px solid var(--qdk-border);
+        border-radius: var(--qdk-list-radius);
+        box-shadow: var(--qdk-list-shadow);
+    }
+    .admin-filter-bar__row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; width: 100%; }
+    .admin-filter-bar__form { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; flex: 1; min-width: 0; }
+    .admin-filter-bar__actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .admin-filter-field { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .admin-filter-field > label { font-size: 13px; font-weight: 500; color: var(--qdk-text); white-space: nowrap; }
+    .admin-filter-field__control { display: inline-flex; flex-shrink: 0; }
+    .admin-filter-field__control > * { width: 100%; }
+    .admin-filter-control { height: 34px; padding: 0 10px; font-size: 13px; color: var(--qdk-text); }
+    select.admin-filter-control { padding-right: 26px; }
+    .admin-filter-actions { display: inline-flex; align-items: center; gap: 8px; margin-left: 4px; }
+    .admin-filter-btn {
+        display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px;
+        border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s ease; border: 1px solid transparent;
+    }
+    .admin-filter-btn--primary { background: var(--qdk-primary); color: #fff; }
+    .admin-filter-btn--primary:hover { background: #2f5fe0; }
+    .admin-filter-btn--ghost { background: #fff; color: var(--qdk-text); border-color: #d5d9e0; }
+    .admin-filter-btn--ghost:hover { background: #f6f7f9; }
+    @media (max-width: 768px) {
+        .admin-filter-bar__row { flex-direction: column; align-items: stretch; }
+        .admin-filter-field { display: flex; }
+        .admin-filter-field > label { min-width: 64px; }
+    }
 </style>

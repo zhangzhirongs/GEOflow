@@ -258,137 +258,108 @@
         </div>
         @endif
 
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('admin.articles.filters.title') }}</h3>
+        @if($selectedTaskId > 0)
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                <div class="inline-flex items-center gap-2">
+                    <i data-lucide="filter" class="h-4 w-4"></i>
+                    <span>{{ __('admin.articles.filters.current_task', ['task' => $selectedTaskName !== '' ? $selectedTaskName : '#'.$selectedTaskId]) }}</span>
+                </div>
+                <a href="{{ $clearTaskFilterUrl }}" class="inline-flex items-center font-medium text-blue-700 hover:text-blue-900">
+                    <i data-lucide="x" class="mr-1 h-4 w-4"></i>
+                    {{ __('admin.articles.filters.clear_task') }}
+                </a>
             </div>
-            <div class="px-6 py-4">
-                @if($selectedTaskId > 0)
-                    <div class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                        <div class="inline-flex items-center gap-2">
-                            <i data-lucide="filter" class="h-4 w-4"></i>
-                            <span>{{ __('admin.articles.filters.current_task', ['task' => $selectedTaskName !== '' ? $selectedTaskName : '#'.$selectedTaskId]) }}</span>
-                        </div>
-                        <a href="{{ $clearTaskFilterUrl }}" class="inline-flex items-center font-medium text-blue-700 hover:text-blue-900">
-                            <i data-lucide="x" class="mr-1 h-4 w-4"></i>
-                            {{ __('admin.articles.filters.clear_task') }}
-                        </a>
-                    </div>
-                @endif
-                <form method="GET" class="space-y-4">
-                    @if($isTrashView)
-                        <input type="hidden" name="trashed" value="1">
-                    @endif
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.task') }}</label>
-                            <select name="task_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">{{ __('admin.articles.filters.all_tasks') }}</option>
-                                @foreach($tasks as $task)
-                                    <option value="{{ (int) $task['id'] }}" @selected($selectedTaskId === (int) $task['id'])>{{ $task['name'] }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if(!$isTrashView)
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.status') }}</label>
-                            <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">{{ __('admin.articles.filters.all_status') }}</option>
-                                <option value="draft" @selected($selectedStatus === 'draft')>{{ __('admin.articles.status.draft') }}</option>
-                                <option value="published" @selected($selectedStatus === 'published')>{{ __('admin.articles.status.published') }}</option>
-                                <option value="private" @selected($selectedStatus === 'private')>{{ __('admin.articles.status.private') }}</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.review_status') }}</label>
-                            <select name="review_status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">{{ __('admin.articles.filters.all_review') }}</option>
-                                <option value="pending" @selected($selectedReviewStatus === 'pending')>{{ __('admin.articles.review.pending') }}</option>
-                                <option value="approved" @selected($selectedReviewStatus === 'approved')>{{ __('admin.articles.review.approved') }}</option>
-                                <option value="rejected" @selected($selectedReviewStatus === 'rejected')>{{ __('admin.articles.review.rejected') }}</option>
-                                <option value="auto_approved" @selected($selectedReviewStatus === 'auto_approved')>{{ __('admin.articles.review.auto_approved') }}</option>
-                            </select>
-                        </div>
-                        @endif
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.author') }}</label>
-                            <select name="author_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <option value="">{{ __('admin.articles.filters.all_authors') }}</option>
-                                @foreach($authors as $author)
-                                    <option value="{{ (int) $author['id'] }}" @selected($selectedAuthorId === (int) $author['id'])>{{ $author['name'] }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.date_from') }}</label>
-                            <input type="date" name="date_from" value="{{ $selectedDateFrom }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.date_to') }}</label>
-                            <input type="date" name="date_to" value="{{ $selectedDateTo }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                    </div>
-                    @if(!empty($distributionChannels))
-                        <div>
-                            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
-                                <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.distribution_channel') }}</label>
-                                <div class="flex items-center gap-2">
-                                    <span data-distribution-channel-filter-count class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                                        {{ __('admin.articles.filters.distribution_channel_selected_count', ['count' => count($selectedDistributionChannelIds)]) }}
-                                    </span>
-                                    <button type="button"
-                                            data-distribution-channel-filter-toggle
-                                            aria-expanded="false"
-                                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-                                        <span data-distribution-channel-filter-toggle-label>{{ __('admin.articles.filters.distribution_channel_expand') }}</span>
-                                        <i data-lucide="chevron-down" data-distribution-channel-filter-toggle-icon class="ml-1 h-3.5 w-3.5 transition-transform"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div data-distribution-channel-filter-panel class="hidden grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                                @foreach($distributionChannels as $channel)
-                                    <label data-distribution-channel-filter-card @class([
-                                        'flex items-start gap-3 rounded-md border px-4 py-3 text-sm transition',
-                                        'border-blue-200 bg-blue-50' => in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true),
-                                        'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50' => ! in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true),
-                                    ])>
-                                        <input type="checkbox"
-                                               name="distribution_channel_ids[]"
-                                               value="{{ (int) ($channel['id'] ?? 0) }}"
-                                               @checked(in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true))
-                                               data-distribution-channel-filter-input
-                                               class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <span class="min-w-0">
-                                            <span class="block font-medium text-gray-900">{{ $channel['name'] }}</span>
-                                            @if((string) ($channel['domain'] ?? '') !== '')
-                                                <span class="block break-all text-gray-500">{{ (string) ($channel['domain'] ?? '') }}</span>
-                                            @endif
-                                        </span>
-                                    </label>
-                                @endforeach
-                            </div>
-                            <p class="mt-2 text-xs text-gray-500">{{ __('admin.articles.filters.distribution_channel_help') }}</p>
-                        </div>
-                    @endif
-                    <div class="flex items-end space-x-4">
-                        <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.search') }}</label>
-                            <input type="text" name="search" value="{{ $selectedSearch }}" placeholder="{{ __('admin.articles.filters.search_placeholder') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                        </div>
-                        <div class="flex space-x-2">
-                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                <i data-lucide="search" class="w-4 h-4 mr-2"></i>
-                                {{ __('admin.button.search') }}
+        @endif
+        <x-admin.filter-bar :reset-url="$isTrashView ? route('admin.articles.index', ['trashed' => 1]) : route('admin.articles.index')">
+            @if($isTrashView)<x-slot:hidden><input type="hidden" name="trashed" value="1"></x-slot:hidden>@endif
+            <x-admin.filter-field :label="__('admin.articles.filters.task')" width="180">
+                <select name="task_id" class="admin-filter-control">
+                    <option value="">{{ __('admin.articles.filters.all_tasks') }}</option>
+                    @foreach($tasks as $task)
+                        <option value="{{ (int) $task['id'] }}" @selected($selectedTaskId === (int) $task['id'])>{{ $task['name'] }}</option>
+                    @endforeach
+                </select>
+            </x-admin.filter-field>
+            @if(!$isTrashView)
+            <x-admin.filter-field :label="__('admin.articles.filters.status')" width="140">
+                <select name="status" class="admin-filter-control">
+                    <option value="">{{ __('admin.articles.filters.all_status') }}</option>
+                    <option value="draft" @selected($selectedStatus === 'draft')>{{ __('admin.articles.status.draft') }}</option>
+                    <option value="published" @selected($selectedStatus === 'published')>{{ __('admin.articles.status.published') }}</option>
+                    <option value="private" @selected($selectedStatus === 'private')>{{ __('admin.articles.status.private') }}</option>
+                </select>
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.articles.filters.review_status')" width="150">
+                <select name="review_status" class="admin-filter-control">
+                    <option value="">{{ __('admin.articles.filters.all_review') }}</option>
+                    <option value="pending" @selected($selectedReviewStatus === 'pending')>{{ __('admin.articles.review.pending') }}</option>
+                    <option value="approved" @selected($selectedReviewStatus === 'approved')>{{ __('admin.articles.review.approved') }}</option>
+                    <option value="rejected" @selected($selectedReviewStatus === 'rejected')>{{ __('admin.articles.review.rejected') }}</option>
+                    <option value="auto_approved" @selected($selectedReviewStatus === 'auto_approved')>{{ __('admin.articles.review.auto_approved') }}</option>
+                </select>
+            </x-admin.filter-field>
+            @endif
+            <x-admin.filter-field :label="__('admin.articles.filters.author')" width="150">
+                <select name="author_id" class="admin-filter-control">
+                    <option value="">{{ __('admin.articles.filters.all_authors') }}</option>
+                    @foreach($authors as $author)
+                        <option value="{{ (int) $author['id'] }}" @selected($selectedAuthorId === (int) $author['id'])>{{ $author['name'] }}</option>
+                    @endforeach
+                </select>
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.articles.filters.date_from')" width="150">
+                <input type="date" name="date_from" value="{{ $selectedDateFrom }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.articles.filters.date_to')" width="150">
+                <input type="date" name="date_to" value="{{ $selectedDateTo }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.articles.filters.search')" width="220">
+                <input type="text" name="search" value="{{ $selectedSearch }}" placeholder="{{ __('admin.articles.filters.search_placeholder') }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            @if(!empty($distributionChannels))
+                <div class="w-full">
+                    <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <label class="block text-sm font-medium text-gray-700">{{ __('admin.articles.filters.distribution_channel') }}</label>
+                        <div class="flex items-center gap-2">
+                            <span data-distribution-channel-filter-count class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                                {{ __('admin.articles.filters.distribution_channel_selected_count', ['count' => count($selectedDistributionChannelIds)]) }}
+                            </span>
+                            <button type="button"
+                                    data-distribution-channel-filter-toggle
+                                    aria-expanded="false"
+                                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                                <span data-distribution-channel-filter-toggle-label>{{ __('admin.articles.filters.distribution_channel_expand') }}</span>
+                                <i data-lucide="chevron-down" data-distribution-channel-filter-toggle-icon class="ml-1 h-3.5 w-3.5 transition-transform"></i>
                             </button>
-                            <a href="{{ $isTrashView ? route('admin.articles.index', ['trashed' => 1]) : route('admin.articles.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                                <i data-lucide="x" class="w-4 h-4 mr-2"></i>
-                                {{ __('admin.button.clear') }}
-                            </a>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
+                    <div data-distribution-channel-filter-panel class="hidden grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        @foreach($distributionChannels as $channel)
+                            <label data-distribution-channel-filter-card @class([
+                                'flex items-start gap-3 rounded-md border px-4 py-3 text-sm transition',
+                                'border-blue-200 bg-blue-50' => in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true),
+                                'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50' => ! in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true),
+                            ])>
+                                <input type="checkbox"
+                                       name="distribution_channel_ids[]"
+                                       value="{{ (int) ($channel['id'] ?? 0) }}"
+                                       @checked(in_array((int) ($channel['id'] ?? 0), $selectedDistributionChannelIds, true))
+                                       data-distribution-channel-filter-input
+                                       class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <span class="min-w-0">
+                                    <span class="block font-medium text-gray-900">{{ $channel['name'] }}</span>
+                                    @if((string) ($channel['domain'] ?? '') !== '')
+                                        <span class="block break-all text-gray-500">{{ (string) ($channel['domain'] ?? '') }}</span>
+                                    @endif
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">{{ __('admin.articles.filters.distribution_channel_help') }}</p>
+                </div>
+            @endif
+        </x-admin.filter-bar>
+
 
         <div id="article-list" class="scroll-mt-24 bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">

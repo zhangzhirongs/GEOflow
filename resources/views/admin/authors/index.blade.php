@@ -66,23 +66,11 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-lg mb-6">
-            <div class="px-6 py-4">
-                <form method="GET" class="flex items-center gap-4">
-                    <div class="flex-1 min-w-0">
-                        <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('admin.authors.search_placeholder') }}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
-                    <button type="submit" class="inline-flex shrink-0 whitespace-nowrap items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
-                        <i data-lucide="search" class="w-4 h-4 mr-2"></i>
-                        {{ __('admin.button.search') }}
-                    </button>
-                    <a href="{{ route('admin.authors.index') }}" class="inline-flex shrink-0 whitespace-nowrap items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        <i data-lucide="x" class="w-4 h-4 mr-2"></i>
-                        {{ __('admin.button.clear') }}
-                    </a>
-                </form>
-            </div>
-        </div>
+        <x-admin.filter-bar :reset-url="route('admin.authors.index')">
+            <x-admin.filter-field width="280">
+                <input type="text" name="search" value="{{ $search }}" placeholder="{{ __('admin.authors.search_placeholder') }}" class="admin-filter-control">
+            </x-admin.filter-field>
+        </x-admin.filter-bar>
 
         <div class="bg-white shadow rounded-lg">
             <div class="px-6 py-4 border-b border-gray-200">
