@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Admin;
+use App\Support\AdminWeb;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class AuthenticateAdminWeb
     {
         $guard = Auth::guard('admin');
         if (! $guard->check()) {
-            return redirect()->route('admin.login');
+            return redirect()->guest(AdminWeb::routePath('admin.login'));
         }
 
         $adminId = (int) ($guard->id() ?? 0);
@@ -29,12 +30,13 @@ class AuthenticateAdminWeb
             return $this->logout($request);
         }
 
+        $currentVersion = (int) ($admin->auth_version ?: 1);
         $sessionVersion = $request->session()->get(Admin::AUTH_VERSION_SESSION_KEY);
         if ($sessionVersion === null && $guard->viaRemember()) {
-            $sessionVersion = (int) $admin->auth_version;
+            $sessionVersion = $currentVersion;
             $request->session()->put(Admin::AUTH_VERSION_SESSION_KEY, $sessionVersion);
         }
-        if ($sessionVersion === null || (int) $sessionVersion !== $admin->auth_version) {
+        if ($sessionVersion === null || (int) $sessionVersion !== $currentVersion) {
             return $this->logout($request);
         }
 
@@ -49,6 +51,6 @@ class AuthenticateAdminWeb
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect()->guest(AdminWeb::routePath('admin.login'));
     }
 }

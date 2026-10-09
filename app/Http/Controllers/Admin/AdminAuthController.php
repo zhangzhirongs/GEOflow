@@ -75,7 +75,7 @@ class AdminAuthController extends Controller
         /** @var Admin $admin */
         $admin = Auth::guard('admin')->user();
         $request->session()->regenerate();
-        $request->session()->put(Admin::AUTH_VERSION_SESSION_KEY, (int) $admin->auth_version);
+        $request->session()->put(Admin::AUTH_VERSION_SESSION_KEY, (int) ($admin->auth_version ?: 1));
         $this->adminLoginLockService->clearFailedAttempts((string) $admin->username, $ipAddress);
 
         $admin->forceFill(['last_login' => now()])->save();
@@ -84,7 +84,28 @@ class AdminAuthController extends Controller
         ]);
         defer(fn () => $this->anonymousUsageTelemetry->reportAdminLogin($admin, 'web'));
 
-        return redirect()->intended(route('admin.dashboard'));
+        return $this->redirectAfterLogin($request);
+    }
+
+
+    private function redirectAfterLogin(Request $request): RedirectResponse
+    {
+        $fallback = AdminWeb::routePath('admin.dashboard');
+        $intended = $request->session()->pull('url.intended', $fallback);
+        if (! is_string($intended) || trim($intended) === '') {
+            return redirect()->to($fallback);
+        }
+
+        if (preg_match('#^https?://#i', $intended) === 1) {
+            $path = (string) (parse_url($intended, PHP_URL_PATH) ?: '');
+            $query = parse_url($intended, PHP_URL_QUERY);
+            $intended = $path !== '' ? $path : $fallback;
+            if (is_string($query) && $query !== '') {
+                $intended .= '?'.$query;
+            }
+        }
+
+        return redirect()->to($intended);
     }
 
     private function temporaryLockoutResponse(string $username, string $ipAddress): RedirectResponse
@@ -110,7 +131,7 @@ class AdminAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect()->to(AdminWeb::routePath('admin.login'));
     }
 
     public function switchLocale(Request $request, string $locale): RedirectResponse

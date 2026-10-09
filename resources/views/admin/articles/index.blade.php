@@ -271,7 +271,11 @@
             </div>
         @endif
         <x-admin.filter-bar :reset-url="$isTrashView ? route('admin.articles.index', ['trashed' => 1]) : route('admin.articles.index')">
-            @if($isTrashView)<x-slot:hidden><input type="hidden" name="trashed" value="1"></x-slot:hidden>@endif
+            <x-slot:hidden>
+                @if($isTrashView)
+                    <input type="hidden" name="trashed" value="1">
+                @endif
+            </x-slot:hidden>
             <x-admin.filter-field :label="__('admin.articles.filters.task')" width="180">
                 <select name="task_id" class="admin-filter-control">
                     <option value="">{{ __('admin.articles.filters.all_tasks') }}</option>

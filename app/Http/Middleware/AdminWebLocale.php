@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Support\AdminWeb;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,6 +18,11 @@ class AdminWebLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $root = rtrim($request->root(), '/');
+        if ($root !== '') {
+            URL::forceRootUrl($root);
+        }
+
         $locale = (string) $request->session()->get('locale', '');
         if (! AdminWeb::isSupportedLocale($locale)) {
             $locale = 'zh_CN';

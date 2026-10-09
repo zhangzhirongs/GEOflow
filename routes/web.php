@@ -49,6 +49,7 @@ use App\Http\Controllers\Site\ArticleController as SiteArticleController;
 use App\Http\Controllers\Site\CategoryController as SiteCategoryController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\LeadFormController as SiteLeadFormController;
+use App\Support\AdminWeb;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -75,8 +76,8 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
 
     Route::get('/', function () {
         return Auth::guard('admin')->check()
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('admin.login');
+            ? redirect()->to(AdminWeb::routePath('admin.dashboard'))
+            : redirect()->to(AdminWeb::routePath('admin.login'));
     })->name('entry');
 
     // 访客认证路由

@@ -156,4 +156,47 @@ class AdminLoginSecurityTest extends TestCase
         $this->assertDatabaseMissing('cache', ['key' => 'expired-login-limit']);
         $this->assertDatabaseHas('cache', ['key' => 'active-login-limit']);
     }
+
+    public function test_successful_login_stays_on_the_request_host_when_app_url_differs(): void
+    {
+        config(['app.url' => 'http://configured.example:18080']);
+
+        Admin::query()->create([
+            'username' => 'host-admin',
+            'password' => 'correct-password',
+            'email' => 'host-admin@example.com',
+            'display_name' => 'Host Admin',
+            'role' => 'super_admin',
+            'status' => 'active',
+        ]);
+
+        $this->withServerVariables(['HTTP_HOST' => '127.0.0.1'])
+            ->post('http://127.0.0.1/geo_admin/login', [
+                'username' => 'host-admin',
+                'password' => 'correct-password',
+            ])
+            ->assertRedirect('/geo_admin/dashboard');
+    }
+
+    public function test_login_keeps_intended_path_when_stored_url_uses_a_different_host(): void
+    {
+        config(['app.url' => 'http://configured.example:18080']);
+
+        Admin::query()->create([
+            'username' => 'intended-admin',
+            'password' => 'correct-password',
+            'email' => 'intended-admin@example.com',
+            'display_name' => 'Intended Admin',
+            'role' => 'super_admin',
+            'status' => 'active',
+        ]);
+
+        $this->withSession(['url.intended' => 'http://configured.example:18080/geo_admin/articles'])
+            ->withServerVariables(['HTTP_HOST' => '127.0.0.1'])
+            ->post('http://127.0.0.1/geo_admin/login', [
+                'username' => 'intended-admin',
+                'password' => 'correct-password',
+            ])
+            ->assertRedirect('/geo_admin/articles');
+    }
 }
