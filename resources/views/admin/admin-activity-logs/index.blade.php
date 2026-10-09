@@ -99,11 +99,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($logs as $log)
                             @php
-                                $rawDetails = trim((string) ($log->details ?? ''));
-                                $decodedDetails = $rawDetails !== '' ? json_decode($rawDetails, true) : null;
-                                $detailsText = is_array($decodedDetails)
-                                    ? json_encode($decodedDetails, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
-                                    : $rawDetails;
+                                $presented = \App\Support\AdminActivityLogPresenter::present($log);
                                 $roleRaw = strtolower(trim((string) ($log->admin_role ?? 'admin')));
                                 $isSuperAdmin = in_array($roleRaw, ['super_admin', 'superadmin'], true);
                                 $adminDisplayName = trim((string) ($log->admin?->display_name ?? ''));
@@ -118,20 +114,14 @@
                                     <div class="text-sm text-gray-500">{{ $log->admin_username }}</div>
                                     <div class="text-xs text-gray-400">{{ $isSuperAdmin ? __('admin.activity_logs.role_super_admin') : __('admin.activity_logs.role_admin') }}</div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $log->action }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">{{ $presented['action'] }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    <div>{{ $log->page ?: '-' }}</div>
-                                    <div class="text-xs text-gray-400">{{ $log->request_method ?: 'GET' }}</div>
+                                    <div>{{ $presented['page'] }}</div>
+                                    <div class="text-xs text-gray-400">{{ $presented['method'] }}</div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    @if (! empty($log->target_type))
-                                        {{ $log->target_type }}@if (! empty($log->target_id)) #{{ (int) $log->target_id }} @endif
-                                    @else
-                                        -
-                                    @endif
-                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ $presented['target'] }}</td>
                                 <td class="px-6 py-4 text-xs text-gray-600">
-                                    <pre class="whitespace-pre-wrap break-words max-w-xl">{{ $detailsText !== '' ? \Illuminate\Support\Str::limit($detailsText, 500) : '-' }}</pre>
+                                    <pre class="whitespace-pre-wrap break-words max-w-xl">{{ \Illuminate\Support\Str::limit($presented['details'], 500) }}</pre>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{ $log->ip_address ?: '-' }}</td>
                             </tr>

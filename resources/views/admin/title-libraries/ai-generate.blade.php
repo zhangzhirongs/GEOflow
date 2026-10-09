@@ -17,7 +17,7 @@
                 <h3 class="text-lg font-medium text-gray-900">{{ __('admin.title_ai_generate.section.config') }}</h3>
                 <p class="mt-1 text-sm text-gray-600">{{ __('admin.title_ai_generate.section.config_desc') }}</p>
             </div>
-            <form method="POST" action="{{ route('admin.title-libraries.ai-generate.submit', ['libraryId' => (int) $library->id]) }}" class="p-6 space-y-6">
+            <form id="title-ai-generate-form" method="POST" action="{{ route('admin.title-libraries.ai-generate.submit', ['libraryId' => (int) $library->id]) }}" class="p-6 space-y-6">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -62,9 +62,14 @@
                     <textarea name="custom_prompt" rows="4" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm" placeholder="{{ __('admin.title_ai_generate.placeholder.custom_prompt') }}">{{ old('custom_prompt') }}</textarea>
                 </div>
                 <div class="flex justify-end">
-                    <button type="submit" class="inline-flex items-center px-5 py-2.5 border border-transparent rounded-md text-sm font-medium text-white bg-purple-600 hover:bg-purple-700">
-                        <i data-lucide="sparkles" class="w-4 h-4 mr-2"></i>
-                        {{ __('admin.title_ai_generate.button.sync') }}
+                    <button type="submit" id="title-ai-generate-submit" class="inline-flex items-center px-5 py-2.5 border border-transparent rounded-md text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-purple-400 disabled:hover:bg-purple-400">
+                        <span data-idle-icon class="inline-flex">
+                            <i data-lucide="sparkles" class="w-4 h-4 mr-2"></i>
+                        </span>
+                        <span data-loading-icon class="hidden inline-flex">
+                            <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i>
+                        </span>
+                        <span data-submit-label>{{ __('admin.title_ai_generate.button.sync') }}</span>
                     </button>
                 </div>
             </form>
@@ -83,3 +88,53 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            const form = document.getElementById('title-ai-generate-form');
+            const button = document.getElementById('title-ai-generate-submit');
+            if (!form || !button) {
+                return;
+            }
+
+            let submitting = false;
+            const loadingText = @json(__('admin.title_ai_generate.progress.sync_loading'));
+
+            const lockSubmit = function () {
+                submitting = true;
+                button.setAttribute('aria-busy', 'true');
+                const idleIcon = button.querySelector('[data-idle-icon]');
+                const loadingIcon = button.querySelector('[data-loading-icon]');
+                const label = button.querySelector('[data-submit-label]');
+                if (idleIcon) {
+                    idleIcon.classList.add('hidden');
+                }
+                if (loadingIcon) {
+                    loadingIcon.classList.remove('hidden');
+                }
+                if (label) {
+                    label.textContent = loadingText;
+                }
+                window.setTimeout(function () {
+                    button.disabled = true;
+                }, 0);
+            };
+
+            button.addEventListener('click', function (event) {
+                if (submitting) {
+                    event.preventDefault();
+                }
+            });
+
+            form.addEventListener('submit', function (event) {
+                if (submitting) {
+                    event.preventDefault();
+                    return;
+                }
+
+                lockSubmit();
+            });
+        })();
+    </script>
+@endpush

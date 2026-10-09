@@ -1547,6 +1547,36 @@ class AdminMaterialsPagesTest extends TestCase
         ])->assertSessionHasErrors();
     }
 
+    public function test_ai_title_generate_page_locks_sync_button_after_click(): void
+    {
+        $admin = Admin::query()->create([
+            'username' => 'title_ai_lock_admin',
+            'password' => 'secret-123',
+            'email' => 'title-ai-lock-admin@example.com',
+            'display_name' => 'Title AI Lock Admin',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $titleLibrary = TitleLibrary::query()->create([
+            'name' => 'AI Title Lock Library',
+            'description' => 'desc',
+            'title_count' => 0,
+            'generation_type' => 'manual',
+            'generation_rounds' => 1,
+            'is_ai_generated' => 0,
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.title-libraries.ai-generate', ['libraryId' => (int) $titleLibrary->id]))
+            ->assertOk()
+            ->assertSee('id="title-ai-generate-form"', false)
+            ->assertSee('id="title-ai-generate-submit"', false)
+            ->assertSee('data-loading-icon', false)
+            ->assertSee('animate-spin', false)
+            ->assertSee(__('admin.title_ai_generate.progress.sync_loading'));
+    }
+
     public function test_admin_can_upload_image_and_knowledge_file_from_detail_flow(): void
     {
         Storage::fake('public');

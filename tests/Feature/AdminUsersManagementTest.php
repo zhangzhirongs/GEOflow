@@ -35,6 +35,40 @@ class AdminUsersManagementTest extends TestCase
             ->assertDontSee(route('admin.admin-users.delete', ['adminId' => $superAdmin->id]), false);
     }
 
+    public function test_create_admin_form_shows_password_length_hint_on_the_password_field(): void
+    {
+        $superAdmin = $this->createAdmin('root_admin', 'super_admin');
+
+        $this->actingAs($superAdmin, 'admin')
+            ->get(route('admin.admin-users.index'))
+            ->assertOk()
+            ->assertSee('id="create-password-hint"', false)
+            ->assertSee('id="password"', false)
+            ->assertSee('minlength="8"', false)
+            ->assertSee(__('admin.admin_users.error.password_too_short'));
+    }
+
+    public function test_creating_admin_rejects_password_shorter_than_eight_characters(): void
+    {
+        $superAdmin = $this->createAdmin('root_admin', 'super_admin');
+
+        $this->actingAs($superAdmin, 'admin')
+            ->from(route('admin.admin-users.index'))
+            ->post(route('admin.admin-users.store'), [
+                'username' => 'new_editor',
+                'display_name' => 'New Editor',
+                'email' => 'new-editor@example.com',
+                'password' => 'short',
+                'confirm_password' => 'short',
+            ])
+            ->assertRedirect(route('admin.admin-users.index'))
+            ->assertSessionHasErrors(['password']);
+
+        $this->assertDatabaseMissing('admins', [
+            'username' => 'new_editor',
+        ]);
+    }
+
     public function test_current_super_admin_can_update_own_profile_and_password_without_disabling_self(): void
     {
         $superAdmin = $this->createAdmin('root_admin', 'super_admin');

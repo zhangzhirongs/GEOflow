@@ -203,11 +203,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.admin_users.field_password') }}</label>
-                            <input type="password" name="password" id="password" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="password" name="password" id="password" required minlength="8" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-describedby="create-password-hint" title="{{ __('admin.admin_users.error.password_too_short') }}">
+                            <p id="create-password-hint" class="mt-1 text-xs text-gray-500">{{ __('admin.admin_users.error.password_too_short') }}</p>
                         </div>
                         <div>
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.admin_users.field_confirm_password') }}</label>
-                            <input type="password" name="confirm_password" id="confirm_password" required class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="password" name="confirm_password" id="confirm_password" required minlength="8" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" title="{{ __('admin.admin_users.error.password_too_short') }}">
                         </div>
                     </div>
 
@@ -262,11 +263,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="edit_password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.admin_users.field_new_password') }}</label>
-                            <input type="password" name="password" id="edit_password" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="password" name="password" id="edit_password" minlength="8" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" aria-describedby="edit-password-hint" title="{{ __('admin.admin_users.error.password_too_short') }}">
+                            <p id="edit-password-hint" class="mt-1 text-xs text-gray-500">{{ __('admin.admin_users.error.password_too_short') }}</p>
                         </div>
                         <div>
                             <label for="edit_confirm_password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('admin.admin_users.field_confirm_new_password') }}</label>
-                            <input type="password" name="confirm_password" id="edit_confirm_password" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="password" name="confirm_password" id="edit_confirm_password" minlength="8" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" title="{{ __('admin.admin_users.error.password_too_short') }}">
                         </div>
                     </div>
 
@@ -288,6 +290,38 @@
     <script>
         const updateAdminRouteTemplate = @json(route('admin.admin-users.update', ['adminId' => '__ADMIN_ID__']));
         const currentAdminId = @json($currentAdminId);
+
+        const passwordMinLength = 8;
+
+        function updatePasswordLengthHint(input, hint) {
+            if (!input) {
+                return;
+            }
+
+            const value = input.value || '';
+            const tooShort = value.length > 0 && value.length < passwordMinLength;
+            const message = hint ? hint.textContent.trim() : '';
+
+            if (hint) {
+                hint.classList.toggle('text-red-600', tooShort);
+                hint.classList.toggle('text-gray-500', !tooShort);
+            }
+
+            input.setCustomValidity(tooShort ? message : '');
+        }
+
+        function bindPasswordLengthHint(inputId, hintId) {
+            const input = document.getElementById(inputId);
+            const hint = document.getElementById(hintId);
+            if (!input) {
+                return;
+            }
+
+            const refresh = () => updatePasswordLengthHint(input, hint);
+            input.addEventListener('input', refresh);
+            input.addEventListener('blur', refresh);
+            refresh();
+        }
 
         function showCreateAdminModal() {
             document.getElementById('create-admin-modal').classList.remove('hidden');
@@ -312,11 +346,15 @@
             statusHidden.value = admin.status || 'active';
             document.getElementById('edit_password').value = '';
             document.getElementById('edit_confirm_password').value = '';
+            document.getElementById('edit_password').dispatchEvent(new Event('input'));
             document.getElementById('edit-admin-modal').classList.remove('hidden');
         }
 
         function hideEditAdminModal() {
             document.getElementById('edit-admin-modal').classList.add('hidden');
         }
+
+        bindPasswordLengthHint('password', 'create-password-hint');
+        bindPasswordLengthHint('edit_password', 'edit-password-hint');
     </script>
 @endpush
