@@ -49,6 +49,7 @@ class ManualPublicationAccount extends Model
         'publish_auth_type' => 'none',
         'publish_status' => 'idle',
         'publish_attempt_count' => 0,
+        'session_status' => 'missing',
     ];
 
     protected $fillable = [
@@ -80,6 +81,9 @@ class ManualPublicationAccount extends Model
         'last_remote_url',
         'is_active',
         'created_by_admin_id',
+        'executor_node_id',
+        'session_status',
+        'session_checked_at',
     ];
 
     protected function casts(): array
@@ -93,6 +97,8 @@ class ManualPublicationAccount extends Model
             'publish_profile_json' => 'array',
             'last_published_at' => 'datetime',
             'next_publish_at' => 'datetime',
+            'executor_node_id' => 'integer',
+            'session_checked_at' => 'datetime',
         ];
     }
 
@@ -114,6 +120,11 @@ class ManualPublicationAccount extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'created_by_admin_id');
+    }
+
+    public function executorNode(): BelongsTo
+    {
+        return $this->belongsTo(ExecutorNode::class, 'executor_node_id');
     }
 
     public function platformLabelKey(): string
@@ -156,10 +167,14 @@ class ManualPublicationAccount extends Model
             ->where('is_active', true)
             ->where('auto_publish_enabled', true)
             ->where(function (Builder $builder): void {
-                $builder->whereNotNull('publish_endpoint_url')
+                $builder->whereNotNull('executor_node_id')
+                    ->orWhereNotNull('publish_endpoint_url')
                     ->orWhereNotNull('publish_session_ciphertext')
                     ->orWhereNotNull('publish_secret_ciphertext');
             })
-            ->whereRaw("TRIM(COALESCE(publish_endpoint_url, '')) <> ''");
+            ->where(function (Builder $builder): void {
+                $builder->whereNotNull('executor_node_id')
+                    ->orWhereRaw("TRIM(COALESCE(publish_endpoint_url, '')) <> ''");
+            });
     }
 }

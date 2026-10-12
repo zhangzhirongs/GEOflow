@@ -189,3 +189,40 @@ $COMPOSE_PROD up -d --build
 ```bash
 $COMPOSE_PROD up -d --force-recreate app web queue knowledge-queue system-update-queue scheduler reverb
 ```
+
+## 六、登录后报 419（Page Expired / CSRF Token Mismatch）
+
+419 是会话 Cookie 没有在浏览器与服务端之间正确往返，导致 CSRF 校验失败。Docker 反代部署下最常见的三类原因：
+
+1. **协议识别错误（反代场景的根因）**：应用容器在 nginx 后面，必须信任上游代理才能根据 `X-Forwarded-Proto` 正确识别 https。本项目已在 `bootstrap/app.php` 通过 `trustProxies(at: '*')` 开启（容器内应用只经 nginx 暴露，信任全部代理是安全的）。若仍自建中间层，确保透传 `X-Forwarded-Proto/Host/Port`（见 `docker/nginx/default.conf`）。
+
+2. **`SESSION_SECURE_COOKIE` 与访问协议不一致**：
+   - HTTPS 域名访问：`SESSION_SECURE_COOKIE=true`
+   - 直接用 `http://IP:端口` 访问：必须 `SESSION_SECURE_COOKIE=false`（或不设置）。否则浏览器在 HTTP 下不会回传 Secure Cookie，每次 POST 都 419。
+   - `APP_URL` 的协议要与实际访问方式一致。
+
+3. **改了 `.env` 但配置缓存是旧的**：`php artisan optimize` 会缓存 `config`。改完 `.env.prod` 必须清缓存并重建：
+
+```bash
+$COMPOSE_PROD run --rm app php artisan optimize:clear
+$COMPOSE_PROD up -d --force-recreate app web
+```
+
+4. **浏览器残留重名会话 Cookie（升级后最隐蔽的一类）**：如果历史版本曾把会话 Cookie 种在非根 path（如 `/geo_admin`），升级到 `SESSION_PATH=/` 后，浏览器会同时持有两个同名 `laravel-session`（不同 path）。请求头里 `Cookie: laravel-session=旧; laravel-session=新` 时 PHP 可能取到失效的旧值 → 会话读不到 → 每次登录 419，且**用新开的无痕窗口能登录、普通窗口不行**。本项目已把会话 Cookie 固定为 `SESSION_COOKIE=geoflow_session`，旧的 `laravel-session` 残留会被直接忽略；无需用户手动清 Cookie。自检登录页返回的 `Set-Cookie` 名应为 `geoflow_session`。
+
+快速自检（在 `app` 容器内，确认运行时真实生效的值）：
+
+```bash
+$COMPOSE_PROD exec app php artisan tinker --execute="echo config('app.url'), PHP_EOL, var_export(config('session.secure'), true), PHP_EOL, config('session.same_site');"
+```
+
+`database` 会话驱动还需确认 `sessions` 表已迁移、`storage/framework/sessions` 可写。
+
+## 七、executor_nodes 迁移报“already exists / duplicate key”
+
+若 `migrate` 对 `executor_nodes`/`executor_jobs` 报 `42P07 relation already exists` 或 `23505 duplicate key ... _id_seq`，通常是上一次迁移中断或重复执行留下的残留对象。建表迁移已加 `hasTable` 守卫，正常重跑会跳过已建的表。若库里残留了“有序列无表”的半成品，需一次性清理（确认无数据后）：
+
+```bash
+$COMPOSE_PROD exec postgres psql -U "$DB_USERNAME" -d "$DB_DATABASE" -c "DROP SEQUENCE IF EXISTS executor_nodes_id_seq CASCADE;"
+$COMPOSE_PROD run --rm app php artisan migrate --force
+```

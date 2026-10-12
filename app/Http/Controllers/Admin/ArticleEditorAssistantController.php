@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiModel;
 use App\Models\KnowledgeBase;
+use App\Models\ManualPublicationAccount;
 use App\Models\Prompt;
 use App\Models\Title;
 use App\Services\GeoFlow\ArticleContentGenerationService;
@@ -99,6 +100,7 @@ final class ArticleEditorAssistantController extends Controller
                         ->orWhere('model_type', '')
                         ->orWhere('model_type', 'chat'))),
             ],
+            'platform' => ['nullable', 'string', Rule::in(ManualPublicationAccount::PLATFORMS)],
         ]);
 
         $knowledgeBase = KnowledgeBase::query()
@@ -133,6 +135,7 @@ final class ArticleEditorAssistantController extends Controller
             trim((string) ($validated['keyword'] ?? '')),
             (string) $prompt->content,
             $knowledgeContext,
+            trim((string) ($validated['platform'] ?? '')),
         );
 
         try {

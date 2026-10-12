@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\DistributionChannel;
 use App\Models\ImageLibrary;
 use App\Models\KnowledgeBase;
+use App\Models\ManualPublicationAccount;
 use App\Models\Prompt;
 use App\Models\Task;
 use App\Models\TitleLibrary;
@@ -251,6 +252,7 @@ class TaskController extends Controller
                 'title_library_id' => (string) ($task['title_library_id'] ?? ''),
                 'prompt_id' => (string) ($task['prompt_id'] ?? ''),
                 'ai_model_id' => (string) ($task['ai_model_id'] ?? ''),
+                'target_platform' => (string) ($task['target_platform'] ?? ''),
                 'author_id' => (string) (($task['author_id'] ?? 0) ?: 0),
                 'image_library_id' => (string) (($task['image_library_id'] ?? '') ?: ''),
                 'image_count' => (string) ($task['image_count'] ?? 0),
@@ -566,6 +568,13 @@ class TaskController extends Controller
             'authors' => $authors,
             'categories' => $categories,
             'distributionChannels' => $distributionChannels,
+            'platforms' => array_map(
+                static fn (string $code): array => [
+                    'code' => $code,
+                    'name' => (string) __('manual_publications.platform.'.$code),
+                ],
+                ManualPublicationAccount::PLATFORMS,
+            ),
         ];
     }
 
@@ -597,6 +606,7 @@ class TaskController extends Controller
             'title_library_id' => ['required', 'integer', 'min:1'],
             'prompt_id' => ['required', 'integer', 'min:1'],
             'ai_model_id' => ['required', 'integer', 'min:1'],
+            'target_platform' => ['nullable', 'string', 'in:'.implode(',', ManualPublicationAccount::PLATFORMS)],
             'author_id' => ['nullable', 'integer', 'min:0'],
             'image_library_id' => ['nullable', 'integer', 'min:1'],
             'image_count' => ['nullable', 'integer', 'min:0', 'max:5'],
@@ -638,6 +648,7 @@ class TaskController extends Controller
             'image_count' => (int) ($payload['image_count'] ?? 0),
             'prompt_id' => (int) $payload['prompt_id'],
             'ai_model_id' => (int) $payload['ai_model_id'],
+            'target_platform' => ! empty($payload['target_platform']) ? (string) $payload['target_platform'] : null,
             'author_id' => isset($payload['author_id']) && (int) $payload['author_id'] > 0 ? (int) $payload['author_id'] : null,
             'knowledge_base_id' => $knowledgeBaseIds[0] ?? null,
             'knowledge_base_ids' => $knowledgeBaseIds,

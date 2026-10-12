@@ -49,6 +49,7 @@ class AdminArticlesPageTest extends TestCase
             ->get(route('admin.articles.index', ['status' => 'draft']))
             ->assertOk()
             ->assertSee(__('admin.articles.page_title'))
+            ->assertSee(__('admin.button.more_filters'))
             ->assertViewHas('articles')
             ->assertViewHas('filters');
     }

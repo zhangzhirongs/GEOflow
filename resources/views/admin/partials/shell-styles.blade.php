@@ -356,6 +356,16 @@
     .admin-filter-btn--primary:hover { background: #2f5fe0; }
     .admin-filter-btn--ghost { background: #fff; color: var(--qdk-text); border-color: #d5d9e0; }
     .admin-filter-btn--ghost:hover { background: #f6f7f9; }
+    .admin-filter-btn--more { background: #fff; color: var(--qdk-text); border-color: #d5d9e0; }
+    .admin-filter-btn--more:hover { background: #f6f7f9; }
+    .admin-filter-more-caret { transition: transform .15s ease; }
+    .admin-filter-btn--more[aria-expanded="true"] .admin-filter-more-caret { transform: rotate(180deg); }
+    .admin-filter-advanced {
+        display: none; flex-basis: 100%; width: 100%; order: 99;
+        flex-wrap: wrap; align-items: center; gap: 12px 16px;
+        margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--qdk-border);
+    }
+    .admin-filter-advanced.is-open { display: flex; }
     @media (max-width: 768px) {
         .admin-filter-bar__row { flex-direction: column; align-items: stretch; }
         .admin-filter-field { display: flex; }

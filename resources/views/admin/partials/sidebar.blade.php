@@ -21,6 +21,7 @@
                 ['label' => __('admin.nav.tasks'), 'icon' => 'list-checks', 'route' => 'admin.tasks.index', 'match' => ['admin.tasks.']],
                 ['label' => __('admin.nav.articles'), 'icon' => 'file-text', 'route' => 'admin.articles.index', 'match' => ['admin.articles.']],
                 ['label' => __('admin.ai_configurator.groups.content.manual_publications'), 'icon' => 'send', 'route' => 'admin.manual-publications.index', 'match' => ['admin.manual-publications.']],
+                ['label' => __('georank.nav.executor_nodes'), 'icon' => 'monitor', 'route' => 'admin.executor-nodes.index', 'match' => ['admin.executor-nodes.']],
             ],
         ],
         [

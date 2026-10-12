@@ -70,6 +70,23 @@ class AdminTasksPageTest extends TestCase
             ->assertSee(__('admin.task_create.page_heading'));
     }
 
+    public function test_admin_can_create_task_with_target_platform(): void
+    {
+        $admin = $this->createTaskFormAdmin('tasks_platform_create_admin');
+        $dependencies = $this->createTaskFormDependencies();
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.tasks.store'), $this->validTaskPayload($dependencies, [
+                'task_name' => '小红书任务',
+                'target_platform' => 'xiaohongshu',
+            ]))
+            ->assertRedirect(route('admin.tasks.index'))
+            ->assertSessionHasNoErrors();
+
+        $task = Task::query()->where('name', '小红书任务')->firstOrFail();
+        $this->assertSame('xiaohongshu', (string) $task->target_platform);
+    }
+
     public function test_task_create_and_edit_forms_use_full_admin_content_width(): void
     {
         $admin = Admin::query()->create([
@@ -99,6 +116,8 @@ class AdminTasksPageTest extends TestCase
             ->assertSee('data-task-form-shell', false)
             ->assertSee('xl:grid-cols-12', false)
             ->assertSee('lg:grid-cols-3', false)
+            ->assertSee('id="target_platform"', false)
+            ->assertSee('xiaohongshu', false)
             ->assertDontSee('max-w-4xl mx-auto', false);
 
         $this->actingAs($admin, 'admin')

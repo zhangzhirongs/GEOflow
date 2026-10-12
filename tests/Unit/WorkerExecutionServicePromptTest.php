@@ -72,6 +72,20 @@ class WorkerExecutionServicePromptTest extends TestCase
         $this->assertStringContainsString('证据不足时不要编造来源或结论', $prompt);
     }
 
+    public function test_worker_prompt_injects_platform_style_when_provided(): void
+    {
+        $prompt = $this->renderContentPrompt(
+            '小红书种草文',
+            'GEO',
+            '请写一篇文章。',
+            '',
+            'xiaohongshu',
+        );
+
+        $this->assertStringContainsString('平台适配（小红书）', $prompt);
+        $this->assertStringContainsString('#话题标签', $prompt);
+    }
+
     public function test_unknown_template_blocks_are_preserved_for_future_extensions(): void
     {
         $prompt = $this->renderContentPrompt(
@@ -85,12 +99,12 @@ class WorkerExecutionServicePromptTest extends TestCase
         $this->assertStringContainsString('标题：AI CRM 到底是什么？', $prompt);
     }
 
-    private function renderContentPrompt(string $title, string $keyword, ?string $promptContent, string $knowledgeContext): string
+    private function renderContentPrompt(string $title, string $keyword, ?string $promptContent, string $knowledgeContext, string $platform = ''): string
     {
         $service = app(WorkerExecutionService::class);
         $method = new ReflectionMethod($service, 'buildContentPrompt');
         $method->setAccessible(true);
 
-        return (string) $method->invoke($service, $title, $keyword, $promptContent, $knowledgeContext);
+        return (string) $method->invoke($service, $title, $keyword, $promptContent, $knowledgeContext, $platform);
     }
 }

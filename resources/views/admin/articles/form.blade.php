@@ -75,6 +75,7 @@
         'is_featured' => old('is_featured', !empty($articleForm['is_featured']) ? '1' : '0'),
         'source_title_id' => old('source_title_id', ''),
         'is_ai_generated' => old('is_ai_generated', '0'),
+        'target_platform' => old('target_platform', (string) ($articleForm['target_platform'] ?? '')),
     ];
     $qualityChecks = [
         'has_title' => trim((string) $formData['title']) !== '',
@@ -292,6 +293,7 @@
                         </div>
                         <div class="px-6 py-4">
                             <textarea id="content-textarea" name="content" class="hidden">{{ $formData['content'] }}</textarea>
+                            <input type="hidden" id="article-target-platform" name="target_platform" value="{{ $formData['target_platform'] ?? '' }}">
                             @if(! $isEdit)
                                 <section
                                     id="article-create-assistant"
@@ -310,7 +312,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="grid gap-3 border-t border-gray-200 bg-white/70 px-4 py-4 md:grid-cols-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                                    <div class="grid gap-3 border-t border-gray-200 bg-white/70 px-4 py-4 md:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
                                         <div class="min-w-0">
                                             <label for="article-ai-knowledge-base" class="block text-xs font-semibold text-gray-700">{{ __('admin.article_assistant.generate.knowledge_label') }}</label>
                                             <div class="relative mt-1">
@@ -336,6 +338,18 @@
                                             </div>
                                         </div>
                                         <div class="min-w-0">
+                                            <label for="article-ai-platform" class="block text-xs font-semibold text-gray-700">{{ __('admin.article_assistant.generate.platform_label') }}</label>
+                                            <div class="relative mt-1">
+                                                <select id="article-ai-platform" class="block w-full appearance-none truncate rounded-md border-gray-300 bg-white py-2 pl-3 pr-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                                    <option value="">{{ __('admin.article_assistant.generate.platform_placeholder') }}</option>
+                                                    @foreach(($formOptions['platforms'] ?? []) as $platformOption)
+                                                        <option value="{{ $platformOption['code'] }}" @selected(($formData['target_platform'] ?? '') === $platformOption['code'])>{{ $platformOption['name'] }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <i data-lucide="chevron-down" aria-hidden="true" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"></i>
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0">
                                             <label for="article-ai-model" class="block text-xs font-semibold text-gray-700">{{ __('admin.article_assistant.generate.model_label') }}</label>
                                             <div class="relative mt-1">
                                                 <select id="article-ai-model" class="block w-full appearance-none truncate rounded-md border-gray-300 bg-white py-2 pl-3 pr-10 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -347,7 +361,7 @@
                                                 <i data-lucide="chevron-down" aria-hidden="true" class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"></i>
                                             </div>
                                         </div>
-                                        <div class="flex items-end md:col-span-3 xl:col-span-1">
+                                        <div class="flex items-end md:col-span-2 xl:col-span-1">
                                             <button
                                                 type="button"
                                                 id="article-ai-generate"

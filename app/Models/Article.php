@@ -27,6 +27,7 @@ class Article extends Model
         'original_keyword',
         'keywords',
         'meta_description',
+        'target_platform',
         'status',
         'review_status',
         'view_count',

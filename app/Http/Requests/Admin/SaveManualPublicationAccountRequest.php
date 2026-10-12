@@ -48,11 +48,17 @@ class SaveManualPublicationAccountRequest extends FormRequest
             'profile_url' => ['nullable', 'url:http,https', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:5000'],
             'auto_publish_enabled' => ['nullable', 'boolean'],
+            'executor_node_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('executor_nodes', 'id'),
+            ],
             'publish_endpoint_url' => [
                 'nullable',
                 'url:http,https',
                 'max:1000',
-                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')),
+                Rule::requiredIf(fn (): bool => (bool) $this->boolean('auto_publish_enabled')
+                    && ! $this->filled('executor_node_id')),
             ],
             'publish_method' => ['nullable', 'string', Rule::in(['POST', 'PUT', 'PATCH'])],
             'publish_auth_type' => ['nullable', 'string', Rule::in(['none', 'bearer', 'basic', 'header_key'])],

@@ -47,49 +47,71 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div>
                 <label for="analytics-date-from" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_from') }}</label>
-                <input id="analytics-date-from" type="date" name="date_from" value="{{ $filterData['date_from'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <input id="analytics-date-from" type="date" name="date_from" value="{{ $filterData['date_from'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
             </div>
             <div>
                 <label for="analytics-date-to" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_to') }}</label>
-                <input id="analytics-date-to" type="date" name="date_to" value="{{ $filterData['date_to'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <input id="analytics-date-to" type="date" name="date_to" value="{{ $filterData['date_to'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
             </div>
-            @if ($canManageProtectedWorkflows ?? false)
-            <div>
-                <label for="analytics-channel-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.channel') }}</label>
-                <select id="analytics-channel-id" name="channel_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">{{ __('admin.analytics.filters.all') }}</option>
-                    @foreach ($filterOptions['channels'] as $channel)
-                        <option value="{{ $channel->id }}" @selected((int) $filterData['channel_id'] === (int) $channel->id)>{{ $channel->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @endif
-            <div>
-                <label for="analytics-task-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.task') }}</label>
-                <select id="analytics-task-id" name="task_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">{{ __('admin.analytics.filters.all') }}</option>
-                    @foreach ($filterOptions['tasks'] as $task)
-                        <option value="{{ $task->id }}" @selected((int) $filterData['task_id'] === (int) $task->id)>{{ $task->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="analytics-category-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.category') }}</label>
-                <select id="analytics-category-id" name="category_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">{{ __('admin.analytics.filters.all') }}</option>
-                    @foreach ($filterOptions['categories'] as $category)
-                        <option value="{{ $category->id }}" @selected((int) $filterData['category_id'] === (int) $category->id)>{{ $category->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="analytics-article-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.article') }}</label>
-                <select id="analytics-article-id" name="article_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">{{ __('admin.analytics.filters.all') }}</option>
-                    @foreach ($filterOptions['articles'] as $article)
-                        <option value="{{ $article->id }}" @selected((int) $filterData['article_id'] === (int) $article->id)>{{ $article->title }}</option>
-                    @endforeach
-                </select>
+        </div>
+
+        @php
+            $analyticsMoreOpen = (int) ($filterData['task_id'] ?? 0) > 0
+                || (int) ($filterData['category_id'] ?? 0) > 0
+                || (int) ($filterData['article_id'] ?? 0) > 0
+                || (int) ($filterData['channel_id'] ?? 0) > 0;
+        @endphp
+        <div>
+            <button type="button"
+                    class="admin-filter-btn admin-filter-btn--more"
+                    data-filter-more-toggle
+                    aria-controls="analytics-more-filters"
+                    aria-expanded="{{ $analyticsMoreOpen ? 'true' : 'false' }}">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                {{ __('admin.button.more_filters') }}
+                <i data-lucide="chevron-down" class="w-4 h-4 admin-filter-more-caret"></i>
+            </button>
+        </div>
+        <div id="analytics-more-filters" class="admin-filter-advanced {{ $analyticsMoreOpen ? 'is-open' : '' }}" data-filter-advanced>
+            <div class="grid w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                @if ($canManageProtectedWorkflows ?? false)
+                <div>
+                    <label for="analytics-channel-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.channel') }}</label>
+                    <select id="analytics-channel-id" name="channel_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                        <option value="">{{ __('admin.analytics.filters.all') }}</option>
+                        @foreach ($filterOptions['channels'] as $channel)
+                            <option value="{{ $channel->id }}" @selected((int) $filterData['channel_id'] === (int) $channel->id)>{{ $channel->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                <div>
+                    <label for="analytics-task-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.task') }}</label>
+                    <select id="analytics-task-id" name="task_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                        <option value="">{{ __('admin.analytics.filters.all') }}</option>
+                        @foreach ($filterOptions['tasks'] as $task)
+                            <option value="{{ $task->id }}" @selected((int) $filterData['task_id'] === (int) $task->id)>{{ $task->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="analytics-category-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.category') }}</label>
+                    <select id="analytics-category-id" name="category_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                        <option value="">{{ __('admin.analytics.filters.all') }}</option>
+                        @foreach ($filterOptions['categories'] as $category)
+                            <option value="{{ $category->id }}" @selected((int) $filterData['category_id'] === (int) $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="analytics-article-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.article') }}</label>
+                    <select id="analytics-article-id" name="article_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                        <option value="">{{ __('admin.analytics.filters.all') }}</option>
+                        @foreach ($filterOptions['articles'] as $article)
+                            <option value="{{ $article->id }}" @selected((int) $filterData['article_id'] === (int) $article->id)>{{ $article->title }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
 

@@ -9,6 +9,7 @@ use App\Models\Author;
 use App\Models\Category;
 use App\Models\ImageLibrary;
 use App\Models\KnowledgeBase;
+use App\Models\ManualPublicationAccount;
 use App\Models\Prompt;
 use App\Models\Task;
 use App\Models\TaskRun;
@@ -82,6 +83,7 @@ class TaskLifecycleService
                 'image_count' => $normalized['image_count'],
                 'prompt_id' => $normalized['prompt_id'],
                 'ai_model_id' => $normalized['ai_model_id'],
+                'target_platform' => $normalized['target_platform'],
                 'need_review' => $normalized['need_review'],
                 'publish_interval' => $normalized['publish_interval'],
                 'author_id' => $normalized['author_id'],
@@ -594,6 +596,19 @@ class TaskLifecycleService
             }
         } elseif (! $isUpdate) {
             $output['distribution_strategy'] = TaskDistributionChannelSelector::STRATEGY_BROADCAST;
+        }
+
+        if (array_key_exists('target_platform', $data)) {
+            $platform = strtolower(trim((string) $data['target_platform']));
+            if ($platform === '') {
+                $output['target_platform'] = null;
+            } elseif (! in_array($platform, ManualPublicationAccount::PLATFORMS, true)) {
+                $fieldErrors['target_platform'] = '目标平台无效';
+            } else {
+                $output['target_platform'] = $platform;
+            }
+        } elseif (! $isUpdate) {
+            $output['target_platform'] = null;
         }
 
         $effectiveCategoryMode = $output['category_mode'] ?? (($data['category_mode'] ?? 'smart') ?: 'smart');

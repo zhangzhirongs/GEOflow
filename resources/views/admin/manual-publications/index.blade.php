@@ -57,19 +57,23 @@
                 @endforeach
             </select>
         </x-admin.filter-field>
-        <x-admin.filter-field :label="__('admin.manual_publications.filter.type')" width="140">
-            <select id="type" name="type" class="admin-filter-control">
-                <option value="">{{ __('admin.manual_publications.filter.all') }}</option>
-                @foreach(\App\Models\ManualPublication::TYPES as $type)
-                    <option value="{{ $type }}" @selected(($filters['type'] ?? '') === $type)>{{ __('admin.manual_publications.type.'.$type) }}</option>
-                @endforeach
-            </select>
-        </x-admin.filter-field>
         <x-admin.filter-field :label="__('admin.manual_publications.filter.platform')" width="150">
             <select id="platform" name="platform" class="admin-filter-control">
                 <option value="">{{ __('admin.manual_publications.filter.all') }}</option>
                 @foreach($platforms as $platform)
                     <option value="{{ $platform }}" @selected(($filters['platform'] ?? '') === $platform)>{{ __('admin.manual_publications.platform.'.$platform) }}</option>
+                @endforeach
+            </select>
+        </x-admin.filter-field>
+        <x-admin.filter-field :label="__('admin.manual_publications.filter.search')" width="200">
+            <input id="search" type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-filter-control" placeholder="{{ __('admin.manual_publications.filter.search_placeholder') }}">
+        </x-admin.filter-field>
+        <x-slot:advanced>
+        <x-admin.filter-field :label="__('admin.manual_publications.filter.type')" width="140">
+            <select id="type" name="type" class="admin-filter-control">
+                <option value="">{{ __('admin.manual_publications.filter.all') }}</option>
+                @foreach(\App\Models\ManualPublication::TYPES as $type)
+                    <option value="{{ $type }}" @selected(($filters['type'] ?? '') === $type)>{{ __('admin.manual_publications.type.'.$type) }}</option>
                 @endforeach
             </select>
         </x-admin.filter-field>
@@ -87,9 +91,7 @@
         <x-admin.filter-field :label="__('admin.manual_publications.filter.scheduled_to')" width="150">
             <input id="scheduled_to" type="date" name="scheduled_to" value="{{ $filters['scheduled_to'] ?? '' }}" class="admin-filter-control">
         </x-admin.filter-field>
-        <x-admin.filter-field :label="__('admin.manual_publications.filter.search')" width="200">
-            <input id="search" type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-filter-control" placeholder="{{ __('admin.manual_publications.filter.search_placeholder') }}">
-        </x-admin.filter-field>
+        </x-slot:advanced>
     </x-admin.filter-bar>
 
     <div class="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">

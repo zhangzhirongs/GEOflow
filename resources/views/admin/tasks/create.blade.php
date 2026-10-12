@@ -164,6 +164,15 @@
                                 </select>
                                 <p class="mt-1 text-sm text-gray-500">{!! $t('task_create.help.model_selection_mode') !!}</p>
                             </div>
+                            <div>
+                                <label for="target_platform" class="block text-sm font-medium text-gray-700">{{ __('admin.article_assistant.generate.platform_label') }}</label>
+                                <select name="target_platform" id="target_platform" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">{{ __('admin.article_assistant.generate.platform_placeholder') }}</option>
+                                    @foreach (($formOptions['platforms'] ?? []) as $platformOption)
+                                        <option value="{{ $platformOption['code'] }}" @selected((string) old('target_platform', (string) ($taskForm['target_platform'] ?? '')) === (string) $platformOption['code'])>{{ $platformOption['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="lg:col-span-3">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <div>

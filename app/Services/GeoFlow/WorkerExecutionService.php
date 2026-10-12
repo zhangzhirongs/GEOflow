@@ -85,7 +85,7 @@ class WorkerExecutionService
 
         $keyword = (string) ($titleRow->keyword ?? '');
         $knowledgeContext = $this->resolveKnowledgeContext($task, (string) $titleRow->title, $keyword);
-        $contentPrompt = $this->buildContentPrompt((string) $titleRow->title, $keyword, $prompt?->content, $knowledgeContext);
+        $contentPrompt = $this->buildContentPrompt((string) $titleRow->title, $keyword, $prompt?->content, $knowledgeContext, (string) ($task->target_platform ?? ''));
         $generation = $this->generateContentWithModelSelection($task, $contentPrompt);
         $aiModel = $generation['model'];
         $generatedContent = $generation['content'];
@@ -125,6 +125,7 @@ class WorkerExecutionService
                 'original_keyword' => $keyword,
                 'keywords' => $keyword,
                 'meta_description' => mb_substr($excerpt, 0, 120),
+                'target_platform' => ($task->target_platform ?: null),
                 'status' => $pendingWorkflow['status'],
                 'review_status' => $pendingWorkflow['review_status'],
                 'is_ai_generated' => 1,
@@ -517,9 +518,9 @@ class WorkerExecutionService
     /**
      * 构造正文提示词：优先精确替换变量；无变量的自定义提示词自动补齐任务上下文。
      */
-    private function buildContentPrompt(string $title, string $keyword, ?string $promptContent, string $knowledgeContext): string
+    private function buildContentPrompt(string $title, string $keyword, ?string $promptContent, string $knowledgeContext, string $platform = ''): string
     {
-        return $this->articleContentPromptRenderer->renderForWorker($title, $keyword, $promptContent, $knowledgeContext);
+        return $this->articleContentPromptRenderer->renderForWorker($title, $keyword, $promptContent, $knowledgeContext, $platform);
     }
 
     /**

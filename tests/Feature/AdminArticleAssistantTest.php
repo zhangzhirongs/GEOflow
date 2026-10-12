@@ -46,6 +46,7 @@ class AdminArticleAssistantTest extends TestCase
             ->assertSee(AdminWeb::routePath('admin.articles.editor.titles'), false)
             ->assertSee(AdminWeb::routePath('admin.articles.editor.generate'), false)
             ->assertSee('id="article-ai-knowledge-base"', false)
+            ->assertSee('id="article-ai-platform"', false)
             ->assertSee('value="'.$knowledgeBase->id.'"', false)
             ->assertSee('value="'.$prompt->id.'"', false)
             ->assertSee('value="'.$model->id.'"', false)
@@ -428,6 +429,52 @@ class AdminArticleAssistantTest extends TestCase
             ->assertJsonPath('message', __('admin.article_assistant.generate.knowledge_unavailable'));
 
         MarkdownContentWriterAgent::assertNeverPrompted();
+    }
+
+    public function test_ai_generation_injects_platform_style_instruction(): void
+    {
+        MarkdownContentWriterAgent::fake(['## 小红书风格正文'])->preventStrayPrompts();
+
+        $admin = $this->createAdmin('assistant_platform');
+        $prompt = $this->createPrompt();
+        $knowledgeBase = $this->createKnowledgeBase();
+        $model = $this->createModel();
+
+        $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.generate'), [
+                'title' => '适配平台测试',
+                'keyword' => 'GEO',
+                'knowledge_base_id' => $knowledgeBase->id,
+                'prompt_id' => $prompt->id,
+                'ai_model_id' => $model->id,
+                'platform' => 'xiaohongshu',
+            ])
+            ->assertOk()
+            ->streamedContent();
+
+        MarkdownContentWriterAgent::assertPrompted(
+            fn ($prompt): bool => str_contains($prompt->prompt, '平台适配（小红书）')
+                && str_contains($prompt->prompt, '#话题标签'),
+        );
+    }
+
+    public function test_ai_generation_rejects_unknown_platform(): void
+    {
+        $admin = $this->createAdmin('assistant_bad_platform');
+        $prompt = $this->createPrompt();
+        $knowledgeBase = $this->createKnowledgeBase();
+        $model = $this->createModel();
+
+        $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.generate'), [
+                'title' => '测试文章',
+                'knowledge_base_id' => $knowledgeBase->id,
+                'prompt_id' => $prompt->id,
+                'ai_model_id' => $model->id,
+                'platform' => 'not-a-platform',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('platform');
     }
 
     private function createAdmin(string $suffix): Admin

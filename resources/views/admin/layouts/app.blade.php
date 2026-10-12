@@ -68,6 +68,34 @@
 @if (is_array($anonymousUsageTelemetryPayload ?? null))
     <script src="{{ asset('js/geoflow-pulse.js') }}" defer></script>
 @endif
+<script>
+    (function () {
+        var openPanel = function (panel, btn, open) {
+            if (!panel) { return; }
+            panel.classList.toggle('is-open', open);
+            if (btn) { btn.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+        };
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-filter-more-toggle]');
+            if (!btn) { return; }
+            var panel = document.getElementById(btn.getAttribute('aria-controls'));
+            if (!panel) { return; }
+            openPanel(panel, btn, !panel.classList.contains('is-open'));
+        });
+        document.querySelectorAll('[data-filter-advanced]').forEach(function (panel) {
+            if (panel.classList.contains('is-open')) { return; }
+            var active = Array.prototype.some.call(panel.querySelectorAll('input, select'), function (el) {
+                if (el.type === 'hidden') { return false; }
+                if (el.type === 'checkbox' || el.type === 'radio') { return el.checked; }
+                return el.value !== null && String(el.value).trim() !== '';
+            });
+            if (active) {
+                var btn = document.querySelector('[data-filter-more-toggle][aria-controls="' + panel.id + '"]');
+                openPanel(panel, btn, true);
+            }
+        });
+    })();
+</script>
 @stack('scripts')
 </body>
 </html>

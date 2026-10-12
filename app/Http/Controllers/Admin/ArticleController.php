@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\DistributionChannel;
 use App\Models\KnowledgeBase;
 use App\Models\ManualPublication;
+use App\Models\ManualPublicationAccount;
 use App\Models\Prompt;
 use App\Models\Task;
 use App\Models\Title;
@@ -29,6 +30,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Throwable;
 
@@ -292,6 +294,7 @@ class ArticleController extends Controller
                     'category_id' => (int) $payload['category_id'],
                     'author_id' => (int) $payload['author_id'],
                     'source_title_id' => $sourceTitle?->id,
+                    'target_platform' => $payload['target_platform'] ?? null,
                     'status' => 'draft',
                     'review_status' => 'pending',
                     'published_at' => null,
@@ -367,6 +370,7 @@ class ArticleController extends Controller
                 'content' => (string) $article->content,
                 'keywords' => (string) ($article->keywords ?? ''),
                 'meta_description' => (string) ($article->meta_description ?? ''),
+                'target_platform' => (string) ($article->target_platform ?? ''),
                 'status' => (string) $article->status,
                 'review_status' => (string) $article->review_status,
                 'category_id' => (string) $article->category_id,
@@ -475,6 +479,7 @@ class ArticleController extends Controller
                     'meta_description' => $payload['meta_description'],
                     'category_id' => (int) $payload['category_id'],
                     'author_id' => (int) $payload['author_id'],
+                    'target_platform' => $payload['target_platform'] ?? null,
                     'status' => 'draft',
                     'review_status' => 'pending',
                     'published_at' => null,
@@ -820,6 +825,7 @@ class ArticleController extends Controller
                 'knowledge_bases' => [],
                 'content_prompts' => [],
                 'ai_models' => [],
+                'platforms' => [],
             ];
         }
 
@@ -891,6 +897,14 @@ class ArticleController extends Controller
             $aiModels = [];
         }
 
+        $platforms = array_map(
+            static fn (string $code): array => [
+                'code' => $code,
+                'name' => (string) __('manual_publications.platform.'.$code),
+            ],
+            ManualPublicationAccount::PLATFORMS,
+        );
+
         return [
             'categories' => $categories,
             'authors' => $authors,
@@ -898,6 +912,7 @@ class ArticleController extends Controller
             'knowledge_bases' => $knowledgeBases,
             'content_prompts' => $contentPrompts,
             'ai_models' => $aiModels,
+            'platforms' => $platforms,
         ];
     }
 
@@ -938,6 +953,7 @@ class ArticleController extends Controller
             'is_featured' => ['nullable', 'boolean'],
             'source_title_id' => ['nullable', 'integer', 'min:1', 'exists:titles,id'],
             'is_ai_generated' => ['nullable', 'boolean'],
+            'target_platform' => ['nullable', 'string', Rule::in(ManualPublicationAccount::PLATFORMS)],
         ], [
             'title.required' => __($keyPrefix.'.title_required'),
             'content.required' => __($keyPrefix.'.content_required'),

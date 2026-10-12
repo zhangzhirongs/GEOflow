@@ -293,6 +293,12 @@
                     <option value="private" @selected($selectedStatus === 'private')>{{ __('admin.articles.status.private') }}</option>
                 </select>
             </x-admin.filter-field>
+            @endif
+            <x-admin.filter-field :label="__('admin.articles.filters.search')" width="220">
+                <input type="text" name="search" value="{{ $selectedSearch }}" placeholder="{{ __('admin.articles.filters.search_placeholder') }}" class="admin-filter-control">
+            </x-admin.filter-field>
+            <x-slot:advanced>
+            @if(!$isTrashView)
             <x-admin.filter-field :label="__('admin.articles.filters.review_status')" width="150">
                 <select name="review_status" class="admin-filter-control">
                     <option value="">{{ __('admin.articles.filters.all_review') }}</option>
@@ -316,9 +322,6 @@
             </x-admin.filter-field>
             <x-admin.filter-field :label="__('admin.articles.filters.date_to')" width="150">
                 <input type="date" name="date_to" value="{{ $selectedDateTo }}" class="admin-filter-control">
-            </x-admin.filter-field>
-            <x-admin.filter-field :label="__('admin.articles.filters.search')" width="220">
-                <input type="text" name="search" value="{{ $selectedSearch }}" placeholder="{{ __('admin.articles.filters.search_placeholder') }}" class="admin-filter-control">
             </x-admin.filter-field>
             @if(!empty($distributionChannels))
                 <div class="w-full">
@@ -362,6 +365,7 @@
                     <p class="mt-2 text-xs text-gray-500">{{ __('admin.articles.filters.distribution_channel_help') }}</p>
                 </div>
             @endif
+            </x-slot:advanced>
         </x-admin.filter-bar>
 
 

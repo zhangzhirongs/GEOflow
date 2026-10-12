@@ -69,6 +69,7 @@
             <x-admin.filter-field :label="__('admin.activity_logs.search')" width="260">
                 <input type="text" name="search" id="search" value="{{ $filters['search'] }}" class="admin-filter-control" placeholder="{{ __('admin.activity_logs.search_placeholder') }}">
             </x-admin.filter-field>
+            <x-slot:advanced>
             <x-admin.filter-field :label="__('admin.activity_logs.admin')" width="180">
                 <select name="admin_id" id="admin_id" class="admin-filter-control">
                     <option value="0">{{ __('admin.activity_logs.all_admins') }}</option>
@@ -77,6 +78,7 @@
                     @endforeach
                 </select>
             </x-admin.filter-field>
+            </x-slot:advanced>
         </x-admin.filter-bar>
 
         <div class="bg-white shadow rounded-lg overflow-hidden">

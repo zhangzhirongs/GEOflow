@@ -6,6 +6,7 @@ use App\Jobs\ProcessSocialPublicationJob;
 use App\Models\Article;
 use App\Models\ManualPublicationAccount;
 use App\Models\SocialPublication;
+use App\Support\GeoFlow\ArticlePublishContentNormalizer;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -13,6 +14,7 @@ class SocialPublicationOrchestrator
 {
     public function __construct(
         private readonly SocialPublishAdapterManager $adapterManager,
+        private readonly ExecutorJobService $executorJobs,
     ) {}
 
     public function enqueueForArticle(int|Article $article): void
@@ -97,8 +99,35 @@ class SocialPublicationOrchestrator
             'publish_adapter' => $account->resolvedPublishAdapter(),
         ])->save();
 
+        if ($account->executor_node_id) {
+            $payload = $this->buildPayload($lockedPublication);
+            $article = is_array($payload['article'] ?? null) ? $payload['article'] : [];
+            $job = $this->executorJobs->enqueuePublish($account, [
+                'title' => (string) ($article['title'] ?? ''),
+                'content' => (string) ($article['content'] ?? ''),
+                'excerpt' => (string) ($article['excerpt'] ?? ''),
+                'images' => is_array($article['images'] ?? null) ? array_values($article['images']) : [],
+                'autoPublish' => false,
+            ], $lockedPublication);
+            SocialPublication::query()->whereKey($lockedPublication->id)->update([
+                'status' => 'sending',
+                'remote_meta' => ['executor_job_id' => $job->id, 'mode' => 'executor_handoff'],
+            ]);
+
+            return true;
+        }
+
         $adapter = $this->adapterManager->forAccount($account);
         $response = $adapter->publish($account, $this->buildPayload($lockedPublication));
+
+        if (! empty($response['pending'])) {
+            SocialPublication::query()->whereKey($lockedPublication->id)->update([
+                'status' => 'sending',
+                'remote_meta' => $response['remote_meta'] ?? ['pending' => true],
+            ]);
+
+            return true;
+        }
 
         DB::transaction(function () use ($lockedPublication, $account, $response): void {
             $lockedPublication = SocialPublication::query()->whereKey($lockedPublication->id)->lockForUpdate()->first();
@@ -212,12 +241,16 @@ class SocialPublicationOrchestrator
     {
         $article->loadMissing(['author:id,name', 'category:id,name']);
 
+        $normalized = ArticlePublishContentNormalizer::normalize((string) $article->content);
+
         return [
             'id' => (int) $article->id,
             'title' => (string) $article->title,
             'slug' => (string) $article->slug,
             'excerpt' => (string) ($article->excerpt ?? ''),
-            'content' => (string) $article->content,
+            'content' => $normalized['content'],
+            'images' => $normalized['images'],
+            'asset_base_url' => rtrim((string) config('app.url'), '/'),
             'status' => (string) $article->status,
             'review_status' => (string) $article->review_status,
             'category' => $article->category ? [

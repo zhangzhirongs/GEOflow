@@ -19,6 +19,7 @@ class Task extends Model
         'prompt_id',
         'ai_model_id',
         'author_id',
+        'target_platform',
         'need_review',
         'publish_interval',
         'author_type',

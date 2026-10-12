@@ -35,6 +35,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // 容器部署时应用只经 nginx 反代暴露（php-fpm/artisan serve 不直接对外），
+        // 信任全部上游代理，使 Laravel 据 X-Forwarded-Proto/Host 正确识别 https 与域名。
+        // 否则 HTTPS 下仍判定为 http，Secure 会话 Cookie 不会下发，登录后每次 POST 触发 419。
+        $middleware->trustProxies(at: '*');
+
         $middleware->appendToGroup('web', AssignApiRequestId::class);
 
         $middleware->alias([

@@ -106,6 +106,7 @@ final class WorkbenchStudioService
             'task_name' => __('admin.ai_configurator.defaults.task_name'),
             'title_library_id' => $this->firstId(TitleLibrary::query()->select(['id'])->orderBy('name')->get()),
             'prompt_id' => $this->firstId(Prompt::query()->select(['id'])->where('type', 'content')->orderBy('name')->get()),
+            'target_platform' => '',
             'ai_model_id' => $this->firstId(AiModel::query()
                 ->select(['id'])
                 ->where('status', 'active')

@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\SaveManualPublicationAccountRequest;
 use App\Http\Requests\Admin\SaveManualPublicationPersonaRequest;
 use App\Models\ManualPublicationAccount;
 use App\Models\ManualPublicationPersona;
+use App\Models\ExecutorNode;
+use App\Services\GeoFlow\ExecutorJobService;
 use App\Services\GeoFlow\SocialGatewayClient;
 use App\Support\AdminWeb;
 use App\Support\GeoFlow\ApiKeyCrypto;
@@ -19,6 +21,7 @@ class ManualPublicationSettingsController extends Controller
     public function __construct(
         private readonly ApiKeyCrypto $apiKeyCrypto,
         private readonly SocialGatewayClient $socialGatewayClient,
+        private readonly ExecutorJobService $executorJobs,
     ) {}
 
     public function index(): View
@@ -28,7 +31,8 @@ class ManualPublicationSettingsController extends Controller
             'activeMenu' => 'articles',
             'adminSiteName' => AdminWeb::siteName(),
             'personas' => ManualPublicationPersona::query()->withCount('accounts')->orderByDesc('is_active')->orderBy('name')->get(),
-            'accounts' => ManualPublicationAccount::query()->with('persona:id,name')->orderByDesc('is_active')->orderBy('account_name')->get(),
+            'accounts' => ManualPublicationAccount::query()->with(['persona:id,name', 'executorNode:id,name,slug,online,last_heartbeat_at'])->orderByDesc('is_active')->orderBy('account_name')->get(),
+            'executorNodes' => ExecutorNode::query()->where('enabled', true)->orderBy('name')->get(),
             'platforms' => ManualPublicationAccount::PLATFORMS,
             'publishMethods' => ['POST', 'PUT', 'PATCH'],
             'publishAuthTypes' => ['none', 'bearer', 'basic', 'header_key'],
@@ -124,6 +128,32 @@ class ManualPublicationSettingsController extends Controller
         return back()->with('message', '小红书登录态状态：'.$status);
     }
 
+
+    public function startExecutorLogin(int $accountId): RedirectResponse
+    {
+        $account = ManualPublicationAccount::query()->whereKey($accountId)->firstOrFail();
+        try {
+            $this->executorJobs->enqueueLogin($account);
+        } catch (Throwable $e) {
+            return back()->withErrors(['executor_login' => $e->getMessage()]);
+        }
+        $account->forceFill(['session_status' => 'login_in_progress'])->save();
+
+        return back()->with('message', __('georank.accounts.login_queued'));
+    }
+
+    public function startExecutorCheck(int $accountId): RedirectResponse
+    {
+        $account = ManualPublicationAccount::query()->whereKey($accountId)->firstOrFail();
+        try {
+            $this->executorJobs->enqueueCheck($account);
+        } catch (Throwable $e) {
+            return back()->withErrors(['executor_login' => $e->getMessage()]);
+        }
+
+        return back()->with('message', __('georank.accounts.check_queued'));
+    }
+
     /** @return array<string, mixed> */
     private function personaPayload(SaveManualPublicationPersonaRequest $request): array
     {
@@ -183,6 +213,7 @@ class ManualPublicationSettingsController extends Controller
             'last_remote_id' => null,
             'last_remote_url' => null,
             'is_active' => $request->boolean('is_active'),
+            'executor_node_id' => filled($data['executor_node_id'] ?? null) ? (int) $data['executor_node_id'] : null,
         ];
     }
 

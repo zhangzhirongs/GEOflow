@@ -36,6 +36,8 @@ if (assistantRoot) {
     const knowledgeBaseSelect = document.getElementById('article-ai-knowledge-base');
     const promptSelect = document.getElementById('article-ai-prompt');
     const modelSelect = document.getElementById('article-ai-model');
+    const platformSelect = document.getElementById('article-ai-platform');
+    const targetPlatformInput = document.getElementById('article-target-platform');
     const generateButton = document.getElementById('article-ai-generate');
     const statusRow = document.getElementById('article-ai-status-row');
     const statusIcon = document.getElementById('article-ai-status-icon');
@@ -368,8 +370,15 @@ if (assistantRoot) {
             window.sessionStorage.setItem('geoflow.articleAssistant.knowledgeBaseId', knowledgeBaseSelect?.value || '');
             window.sessionStorage.setItem('geoflow.articleAssistant.promptId', promptSelect?.value || '');
             window.sessionStorage.setItem('geoflow.articleAssistant.modelId', modelSelect?.value || '');
+            window.sessionStorage.setItem('geoflow.articleAssistant.platform', platformSelect?.value || '');
         } catch {
             // 会话存储不可用时继续使用当前页面选择。
+        }
+    };
+
+    const syncTargetPlatform = () => {
+        if (targetPlatformInput) {
+            targetPlatformInput.value = platformSelect?.value || '';
         }
     };
 
@@ -378,6 +387,7 @@ if (assistantRoot) {
             const knowledgeBaseId = window.sessionStorage.getItem('geoflow.articleAssistant.knowledgeBaseId') || '';
             const promptId = window.sessionStorage.getItem('geoflow.articleAssistant.promptId') || '';
             const modelId = window.sessionStorage.getItem('geoflow.articleAssistant.modelId') || '';
+            const platform = window.sessionStorage.getItem('geoflow.articleAssistant.platform') || '';
             if (knowledgeBaseSelect?.querySelector(`option[value="${CSS.escape(knowledgeBaseId)}"]`)) {
                 knowledgeBaseSelect.value = knowledgeBaseId;
             }
@@ -387,6 +397,10 @@ if (assistantRoot) {
             if (modelSelect?.querySelector(`option[value="${CSS.escape(modelId)}"]`)) {
                 modelSelect.value = modelId;
             }
+            if (platform && platformSelect?.querySelector(`option[value="${CSS.escape(platform)}"]`)) {
+                platformSelect.value = platform;
+            }
+            syncTargetPlatform();
         } catch {
             // 会话存储不可用时保留默认选项。
         }
@@ -428,6 +442,9 @@ if (assistantRoot) {
         knowledgeBaseSelect.disabled = active;
         promptSelect.disabled = active;
         modelSelect.disabled = active;
+        if (platformSelect) {
+            platformSelect.disabled = active;
+        }
         generateButton.classList.toggle('bg-blue-600', !active);
         generateButton.classList.toggle('hover:bg-blue-700', !active);
         generateButton.classList.toggle('bg-amber-500', active);
@@ -550,6 +567,7 @@ if (assistantRoot) {
                     knowledge_base_id: Number(knowledgeBaseSelect.value),
                     prompt_id: Number(promptSelect.value),
                     ai_model_id: Number(modelSelect.value),
+                    platform: platformSelect?.value || '',
                 }),
                 signal: generationController.signal,
             });
@@ -594,6 +612,10 @@ if (assistantRoot) {
     knowledgeBaseSelect?.addEventListener('change', saveAssistantPreference);
     promptSelect?.addEventListener('change', saveAssistantPreference);
     modelSelect?.addEventListener('change', saveAssistantPreference);
+    platformSelect?.addEventListener('change', () => {
+        saveAssistantPreference();
+        syncTargetPlatform();
+    });
     generateButton?.addEventListener('click', startGeneration);
     window.addEventListener('beforeunload', (event) => {
         if (!generationController) {

@@ -64,15 +64,17 @@
                     @endforeach
                 </select>
             </x-admin.filter-field>
+            <x-admin.filter-field :label="__('admin.leads.filter.search')" width="200">
+                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-filter-control" placeholder="{{ __('admin.leads.filter.search_placeholder') }}">
+            </x-admin.filter-field>
+            <x-slot:advanced>
             <x-admin.filter-field :label="__('admin.leads.filter.date_from')" width="150">
                 <input type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="admin-filter-control">
             </x-admin.filter-field>
             <x-admin.filter-field :label="__('admin.leads.filter.date_to')" width="150">
                 <input type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="admin-filter-control">
             </x-admin.filter-field>
-            <x-admin.filter-field :label="__('admin.leads.filter.search')" width="200">
-                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" class="admin-filter-control" placeholder="{{ __('admin.leads.filter.search_placeholder') }}">
-            </x-admin.filter-field>
+            </x-slot:advanced>
         </x-admin.filter-bar>
 
         <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
