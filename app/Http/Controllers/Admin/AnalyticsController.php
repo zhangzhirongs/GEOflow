@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Admin\Analytics\GrowthAiProbeService;
 use App\Services\Admin\Analytics\GrowthOverviewService;
 use App\Support\AdminWeb;
 use Illuminate\Http\RedirectResponse;
@@ -29,7 +30,10 @@ class AnalyticsController extends Controller
         'article_id',
     ];
 
-    public function __construct(private readonly GrowthOverviewService $overview) {}
+    public function __construct(
+        private readonly GrowthOverviewService $overview,
+        private readonly GrowthAiProbeService $probes,
+    ) {}
 
     public function index(Request $request): View|RedirectResponse
     {
@@ -58,6 +62,9 @@ class AnalyticsController extends Controller
             'adminSiteName' => AdminWeb::siteName(),
             'canManageProtectedWorkflows' => $canManageProtectedWorkflows,
             'overview' => $this->overview->snapshot($canManageProtectedWorkflows),
+            'growthProbes' => $this->probes->recent(),
+            'growthProbeConfigured' => $this->probes->configured(),
+            'growthProbeChannels' => $this->probes->channels(),
         ]);
     }
 }

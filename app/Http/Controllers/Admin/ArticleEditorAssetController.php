@@ -7,12 +7,15 @@ use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\Image;
 use App\Models\ImageLibrary;
+use App\Models\ManualPublicationAccount;
 use App\Services\GeoFlow\ManagedImageFileService;
+use App\Support\Admin\ArticlePlatformCopyFormatter;
 use App\Support\Admin\WeChatArticleHtmlExporter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
 class ArticleEditorAssetController extends Controller
@@ -41,6 +44,27 @@ class ArticleEditorAssetController extends Controller
             'html' => $html,
             'plain' => $exporter->toPlainText($html),
         ]);
+    }
+
+    public function exportPlatformCopy(Request $request, ArticlePlatformCopyFormatter $formatter): JsonResponse
+    {
+        $payload = $request->validate([
+            'content' => ['required', 'string', 'max:1000000'],
+            'platform' => ['required', 'string', Rule::in(ManualPublicationAccount::PLATFORMS)],
+        ], [
+            'content.required' => __('admin.article_editor.copy.empty'),
+            'platform.required' => __('admin.article_editor.platform_copy.missing_platform'),
+            'platform.in' => __('admin.article_editor.platform_copy.missing_platform'),
+        ]);
+
+        $result = $formatter->format((string) $payload['content'], (string) $payload['platform']);
+        if ($result['html'] === '' && $result['text'] === '') {
+            return response()->json([
+                'message' => __('admin.article_editor.copy.empty'),
+            ], 422);
+        }
+
+        return response()->json($result);
     }
 
     public function uploadImage(Request $request, int $articleId): JsonResponse

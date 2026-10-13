@@ -23,6 +23,8 @@ class AiVisibilityRun extends Model
 
     public const PROVIDER_DEEPSEEK_ANALYSIS = 'deepseek_analysis';
 
+    public const PROVIDER_CHAT_COMPLETION = 'chat_completion';
+
     protected $fillable = [
         'uuid',
         'keyword',

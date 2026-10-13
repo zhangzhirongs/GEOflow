@@ -9,6 +9,17 @@
         ? \App\Support\AdminWeb::routePath('admin.articles.editor.images.upload', ['articleId' => (int) $articleId])
         : '';
     $articleWechatHtmlUrl = \App\Support\AdminWeb::routePath('admin.articles.editor.wechat-html');
+    $articlePlatformCopyUrl = \App\Support\AdminWeb::routePath('admin.articles.editor.platform-copy');
+    $articleCopyPlatforms = $formOptions['platforms'] ?? [];
+    if ($articleCopyPlatforms === []) {
+        $articleCopyPlatforms = array_map(
+            static fn (string $code): array => [
+                'code' => $code,
+                'name' => (string) __('manual_publications.platform.'.$code),
+            ],
+            \App\Models\ManualPublicationAccount::PLATFORMS,
+        );
+    }
     $vditorLocaleMap = [
         'zh_CN' => 'zh_CN',
         'en' => 'en_US',
@@ -279,17 +290,30 @@
                                         <i data-lucide="copy" class="mr-1.5 h-4 w-4"></i>
                                         {{ __('admin.article_editor.copy.button') }}
                                     </button>
-                                    <button
-                                        type="button"
-                                        id="article-editor-copy-wechat-html"
-                                        class="inline-flex items-center rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm hover:border-emerald-300 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    >
-                                        <i data-lucide="copy-check" class="mr-1.5 h-4 w-4"></i>
-                                        {{ __('admin.article_editor.wechat.button') }}
-                                    </button>
+                                    <div class="inline-flex items-stretch overflow-hidden rounded-md border border-emerald-200 bg-emerald-50 shadow-sm">
+                                        <label for="article-editor-copy-platform" class="sr-only">{{ __('admin.article_editor.platform_copy.label') }}</label>
+                                        <select
+                                            id="article-editor-copy-platform"
+                                            class="min-w-[10.5rem] max-w-[12rem] border-0 bg-transparent py-1.5 pl-3 pr-8 text-xs font-semibold text-emerald-800 focus:ring-0"
+                                        >
+                                            <option value="">{{ __('admin.article_editor.platform_copy.placeholder') }}</option>
+                                            @foreach($articleCopyPlatforms as $platformOption)
+                                                <option value="{{ $platformOption['code'] }}" @selected(($formData['target_platform'] ?? '') === $platformOption['code'])>{{ $platformOption['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button
+                                            type="button"
+                                            id="article-editor-copy-platform-button"
+                                            class="inline-flex items-center border-l border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            <i data-lucide="copy-check" class="mr-1.5 h-4 w-4"></i>
+                                            {{ __('admin.article_editor.platform_copy.button') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <p class="mt-2 text-sm text-gray-600">{{ __('admin.article_editor.editor_desc') }}</p>
+                            <p class="mt-1 text-xs text-gray-500">{{ __('admin.article_editor.platform_copy.hint') }}</p>
                         </div>
                         <div class="px-6 py-4">
                             <textarea id="content-textarea" name="content" class="hidden">{{ $formData['content'] }}</textarea>
@@ -410,6 +434,7 @@
                                 data-upload-url="{{ $articleImageUploadUrl }}"
                                 data-upload-enabled="{{ $isEdit ? '1' : '0' }}"
                                 data-wechat-html-url="{{ $articleWechatHtmlUrl }}"
+                                data-platform-copy-url="{{ $articlePlatformCopyUrl }}"
                             ></div>
                             <input id="article-editor-quick-image-input" type="file" accept="image/*" class="hidden">
                             <div id="article-editor-context-menu" class="article-editor-context-menu" hidden>
@@ -914,6 +939,7 @@
             const uploadUrl = editorNode?.dataset.uploadUrl || '';
             const uploadEnabled = editorNode?.dataset.uploadEnabled === '1' && uploadUrl !== '';
             const wechatHtmlUrl = editorNode?.dataset.wechatHtmlUrl || '';
+            const platformCopyUrl = editorNode?.dataset.platformCopyUrl || wechatHtmlUrl;
             const cropperScriptUrl = @json(asset('vendor/cropperjs/cropper.min.js'));
             const modal = document.getElementById('article-image-modal');
             const cropTarget = document.getElementById('article-image-crop-target');
@@ -921,7 +947,8 @@
             const cropEnabledInput = document.getElementById('article-image-crop-enabled');
             const statusNode = document.getElementById('article-image-status');
             const copyMarkdownButton = document.getElementById('article-editor-copy-markdown');
-            const copyWechatHtmlButton = document.getElementById('article-editor-copy-wechat-html');
+            const copyPlatformSelect = document.getElementById('article-editor-copy-platform');
+            const copyPlatformButton = document.getElementById('article-editor-copy-platform-button');
             const uploadOriginalButton = document.getElementById('article-image-upload-original');
             const uploadCroppedButton = document.getElementById('article-image-upload-cropped');
             const quickImageInput = document.getElementById('article-editor-quick-image-input');
@@ -949,6 +976,9 @@
                 wechatCopying: @json(__('admin.article_editor.wechat.copying')),
                 wechatSuccess: @json(__('admin.article_editor.wechat.success')),
                 wechatFailed: @json(__('admin.article_editor.wechat.failed')),
+                platformCopying: @json(__('admin.article_editor.platform_copy.copying')),
+                platformFailed: @json(__('admin.article_editor.platform_copy.failed')),
+                platformMissing: @json(__('admin.article_editor.platform_copy.missing_platform')),
             };
             const snippets = {
                 heading: @json(__('admin.article_editor.snippets.heading')),
@@ -1060,6 +1090,16 @@
                 }
             }
 
+            async function copyPlainText(value) {
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext) {
+                    await navigator.clipboard.writeText(value);
+                    return;
+                }
+                if (!copyWithFallback(value)) {
+                    throw new Error(messages.copyFailed);
+                }
+            }
+
             async function copyArticleMarkdown() {
                 const markdown = getCurrentMarkdown();
                 textarea.value = markdown;
@@ -1070,12 +1110,7 @@
                 }
 
                 try {
-                    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext) {
-                        await navigator.clipboard.writeText(markdown);
-                    } else if (!copyWithFallback(markdown)) {
-                        throw new Error(messages.copyFailed);
-                    }
-
+                    await copyPlainText(markdown);
                     showEditorTip(messages.copySuccess);
                 } catch (error) {
                     showEditorTip(error.message || messages.copyFailed);
@@ -1124,35 +1159,41 @@
                 }
 
                 if (!copyHtmlWithFallback(html)) {
-                    throw new Error(messages.wechatFailed);
+                    throw new Error(messages.platformFailed || messages.copyFailed);
                 }
             }
 
-            async function copyWeChatHtml() {
+            async function copyForPlatform() {
                 const markdown = getCurrentMarkdown();
                 textarea.value = markdown;
+                const platform = copyPlatformSelect?.value || '';
 
                 if (!markdown.trim()) {
                     showEditorTip(messages.copyEmpty);
                     return;
                 }
-                if (!wechatHtmlUrl) {
-                    showEditorTip(messages.wechatFailed);
+                if (!platform) {
+                    showEditorTip(messages.platformMissing);
+                    copyPlatformSelect?.focus();
+                    return;
+                }
+                if (!platformCopyUrl) {
+                    showEditorTip(messages.platformFailed);
                     return;
                 }
 
-                const originalHtml = copyWechatHtmlButton?.innerHTML || '';
-                if (copyWechatHtmlButton) {
-                    copyWechatHtmlButton.disabled = true;
-                    copyWechatHtmlButton.setAttribute('aria-busy', 'true');
-                    copyWechatHtmlButton.innerHTML = '<i data-lucide="loader-2" class="mr-1.5 h-4 w-4 animate-spin"></i>' + messages.wechatCopying;
+                const originalHtml = copyPlatformButton?.innerHTML || '';
+                if (copyPlatformButton) {
+                    copyPlatformButton.disabled = true;
+                    copyPlatformButton.setAttribute('aria-busy', 'true');
+                    copyPlatformButton.innerHTML = '<i data-lucide="loader-2" class="mr-1.5 h-4 w-4 animate-spin"></i>' + messages.platformCopying;
                     if (window.lucide) {
                         window.lucide.createIcons();
                     }
                 }
 
                 try {
-                    const response = await fetch(wechatHtmlUrl, {
+                    const response = await fetch(platformCopyUrl, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -1160,24 +1201,31 @@
                             'X-CSRF-TOKEN': csrfToken,
                             'X-Requested-With': 'XMLHttpRequest',
                         },
-                        body: JSON.stringify({ content: markdown }),
+                        body: JSON.stringify({ content: markdown, platform: platform }),
                     });
                     const payload = await response.json().catch(function () {
                         return {};
                     });
-                    if (!response.ok || !payload.html) {
-                        throw new Error(payload.message || messages.wechatFailed);
+                    const format = String(payload.format || '');
+                    const html = String(payload.html || '');
+                    const plain = String(payload.text || payload.plain || markdown);
+                    if (!response.ok || (format === 'html' ? html === '' : plain.trim() === '')) {
+                        throw new Error(payload.message || messages.platformFailed);
                     }
 
-                    await copyRichHtml(String(payload.html), String(payload.plain || markdown));
-                    showEditorTip(payload.message || messages.wechatSuccess);
+                    if (format === 'html') {
+                        await copyRichHtml(html, plain);
+                    } else {
+                        await copyPlainText(plain);
+                    }
+                    showEditorTip(payload.message || messages.copySuccess);
                 } catch (error) {
-                    showEditorTip(error.message || messages.wechatFailed);
+                    showEditorTip(error.message || messages.platformFailed);
                 } finally {
-                    if (copyWechatHtmlButton) {
-                        copyWechatHtmlButton.disabled = false;
-                        copyWechatHtmlButton.removeAttribute('aria-busy');
-                        copyWechatHtmlButton.innerHTML = originalHtml;
+                    if (copyPlatformButton) {
+                        copyPlatformButton.disabled = false;
+                        copyPlatformButton.removeAttribute('aria-busy');
+                        copyPlatformButton.innerHTML = originalHtml;
                         if (window.lucide) {
                             window.lucide.createIcons();
                         }
@@ -1496,7 +1544,13 @@
             });
 
             copyMarkdownButton?.addEventListener('click', copyArticleMarkdown);
-            copyWechatHtmlButton?.addEventListener('click', copyWeChatHtml);
+            copyPlatformButton?.addEventListener('click', copyForPlatform);
+            document.getElementById('article-ai-platform')?.addEventListener('change', function () {
+                const value = this.value || '';
+                if (copyPlatformSelect && (value === '' || copyPlatformSelect.querySelector('option[value="' + CSS.escape(value) + '"]'))) {
+                    copyPlatformSelect.value = value;
+                }
+            });
 
             document.addEventListener('click', function (event) {
                 if (!contextMenu || contextMenu.hidden) {

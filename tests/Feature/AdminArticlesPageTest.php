@@ -200,13 +200,21 @@ class AdminArticlesPageTest extends TestCase
             ->assertSee('vendor/cropperjs/cropper.min.js', false)
             ->assertSee(AdminWeb::routePath('admin.articles.editor.images.upload', ['articleId' => (int) $article->id]), false)
             ->assertSee(AdminWeb::routePath('admin.articles.editor.wechat-html'), false)
+            ->assertSee(AdminWeb::routePath('admin.articles.editor.platform-copy'), false)
             ->assertSee('id="content-editor"', false)
             ->assertSee('id="article-editor-copy-markdown"', false)
-            ->assertSee('id="article-editor-copy-wechat-html"', false)
+            ->assertSee('id="article-editor-copy-platform"', false)
+            ->assertSee('id="article-editor-copy-platform-button"', false)
+            ->assertSee('value="wechat"', false)
+            ->assertSee('value="xiaohongshu"', false)
+            ->assertSee('value="zhihu"', false)
+            ->assertSee(__('manual_publications.platform.wechat'), false)
+            ->assertSee(__('manual_publications.platform.xiaohongshu'), false)
             ->assertSee('id="article-editor-quick-image-input"', false)
             ->assertSee('id="article-editor-context-menu"', false)
             ->assertSee(__('admin.article_editor.copy.button'), false)
-            ->assertSee(__('admin.article_editor.wechat.button'), false)
+            ->assertSee(__('admin.article_editor.platform_copy.button'), false)
+            ->assertSee(__('admin.article_editor.platform_copy.hint'), false)
             ->assertSee(__('admin.articles.quality_scorecard.title'))
             ->assertSee(__('admin.articles.quality_scorecard.dynamic_title'))
             ->assertSee(__('admin.articles.quality_scorecard.structure_title'))
@@ -335,6 +343,67 @@ class AdminArticlesPageTest extends TestCase
         $this->assertStringContainsString('<strong', $html);
         $this->assertStringContainsString('<table', $html);
         $this->assertStringNotContainsString('<script', $html);
+    }
+
+    public function test_admin_can_export_article_editor_platform_copy_for_wechat_and_xiaohongshu(): void
+    {
+        $admin = Admin::query()->create([
+            'username' => 'articles_platform_copy_admin',
+            'password' => 'secret-123',
+            'email' => 'articles-platform-copy@example.com',
+            'display_name' => 'Articles Platform Copy Admin',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $markdown = "## 小节\n\n正文 **重点**\n\n- 要点一\n\n![封面](https://example.com/cover.png)";
+
+        $wechat = $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.platform-copy'), [
+                'content' => $markdown,
+                'platform' => 'wechat',
+            ]);
+
+        $wechat->assertOk()
+            ->assertJsonPath('format', 'html')
+            ->assertJsonPath('message', __('admin.article_editor.platform_copy.success.wechat'));
+        $this->assertStringContainsString('data-geoflow-export="wechat-article"', (string) $wechat->json('html'));
+        $this->assertStringContainsString('style="', (string) $wechat->json('html'));
+
+        $xiaohongshu = $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.platform-copy'), [
+                'content' => $markdown,
+                'platform' => 'xiaohongshu',
+            ]);
+
+        $xiaohongshu->assertOk()
+            ->assertJsonPath('format', 'plain')
+            ->assertJsonPath('html', '')
+            ->assertJsonPath('message', __('admin.article_editor.platform_copy.success.xiaohongshu'));
+        $this->assertStringContainsString('小节', (string) $xiaohongshu->json('text'));
+        $this->assertStringContainsString('重点', (string) $xiaohongshu->json('text'));
+        $this->assertStringNotContainsString('**', (string) $xiaohongshu->json('text'));
+        $this->assertStringNotContainsString('##', (string) $xiaohongshu->json('text'));
+    }
+
+    public function test_platform_copy_requires_a_supported_platform(): void
+    {
+        $admin = Admin::query()->create([
+            'username' => 'articles_platform_copy_invalid_admin',
+            'password' => 'secret-123',
+            'email' => 'articles-platform-copy-invalid@example.com',
+            'display_name' => 'Articles Platform Copy Invalid Admin',
+            'role' => 'admin',
+            'status' => 'active',
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.platform-copy'), [
+                'content' => '正文',
+                'platform' => 'not-a-platform',
+            ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['platform']);
     }
 
     public function test_admin_can_upload_article_editor_image_and_receive_markdown(): void

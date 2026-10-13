@@ -791,7 +791,8 @@ class ArticleController extends Controller
      *     title_libraries: array<int, array{id: int, name: string, count: int}>,
      *     knowledge_bases: array<int, array{id: int, name: string}>,
      *     content_prompts: array<int, array{id: int, name: string}>,
-     *     ai_models: array<int, array{id: int, name: string, model_id: string}>
+     *     ai_models: array<int, array{id: int, name: string, model_id: string}>,
+     *     platforms: array<int, array{code: string, name: string}>
      * }
      */
     private function loadFormOptions(bool $includeAssistantOptions): array
@@ -817,6 +818,14 @@ class ArticleController extends Controller
             $categories = [];
         }
 
+        $platforms = array_map(
+            static fn (string $code): array => [
+                'code' => $code,
+                'name' => (string) __('manual_publications.platform.'.$code),
+            ],
+            ManualPublicationAccount::PLATFORMS,
+        );
+
         if (! $includeAssistantOptions) {
             return [
                 'categories' => $categories,
@@ -825,7 +834,7 @@ class ArticleController extends Controller
                 'knowledge_bases' => [],
                 'content_prompts' => [],
                 'ai_models' => [],
-                'platforms' => [],
+                'platforms' => $platforms,
             ];
         }
 
@@ -896,14 +905,6 @@ class ArticleController extends Controller
         } catch (QueryException) {
             $aiModels = [];
         }
-
-        $platforms = array_map(
-            static fn (string $code): array => [
-                'code' => $code,
-                'name' => (string) __('manual_publications.platform.'.$code),
-            ],
-            ManualPublicationAccount::PLATFORMS,
-        );
 
         return [
             'categories' => $categories,

@@ -377,8 +377,16 @@ if (assistantRoot) {
     };
 
     const syncTargetPlatform = () => {
+        const value = platformSelect?.value || '';
         if (targetPlatformInput) {
-            targetPlatformInput.value = platformSelect?.value || '';
+            targetPlatformInput.value = value;
+        }
+        const copyPlatformSelect = document.getElementById('article-editor-copy-platform');
+        if (!copyPlatformSelect) {
+            return;
+        }
+        if (value === '' || copyPlatformSelect.querySelector(`option[value="${CSS.escape(value)}"]`)) {
+            copyPlatformSelect.value = value;
         }
     };
 

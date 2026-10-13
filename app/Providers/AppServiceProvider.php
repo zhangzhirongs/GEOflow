@@ -104,6 +104,11 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perMinute(5)->by('admin-sensitive:admin-ip:'.$adminId.'|'.$request->ip()),
             ];
         });
+        RateLimiter::for('admin-growth-probe', function (Request $request): Limit {
+            $adminId = (int) ($request->user('admin')?->getAuthIdentifier() ?? 0);
+
+            return Limit::perMinute(6)->by('admin-growth-probe:'.$adminId.'|'.$request->ip());
+        });
 
         $adminGuard = Auth::guard('admin');
         if (method_exists($adminGuard, 'setRememberDuration')) {

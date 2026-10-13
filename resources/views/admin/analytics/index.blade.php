@@ -88,7 +88,7 @@
 @endphp
 
 @section('content')
-    <div class="px-4 sm:px-0">
+    <div class="px-4 sm:px-0" data-overview-refresh="30000">
         @include('admin.analytics._page-header', [
             'title' => __('admin.analytics.overview.title'),
             'subtitle' => __('admin.analytics.overview.subtitle'),
@@ -126,6 +126,8 @@
                 </a>
             </aside>
         @endif
+
+        @include('admin.analytics._growth-probe')
 
         <section class="grid grid-cols-1 gap-4 lg:grid-cols-12" aria-label="{{ __('admin.analytics.overview.modules_label') }}">
             @foreach ($modules as $module)

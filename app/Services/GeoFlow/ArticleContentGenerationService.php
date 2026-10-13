@@ -19,9 +19,9 @@ final class ArticleContentGenerationService
         private readonly AiUsageQuotaService $usageQuota,
     ) {}
 
-    public function generate(AiModel $aiModel, string $prompt): AgentResponse
+    public function generate(AiModel $aiModel, string $prompt, ?string $instructions = null): AgentResponse
     {
-        [$agent, $providerName, $modelId, $providerUrl] = $this->resolveRuntime($aiModel, 'article_content');
+        [$agent, $providerName, $modelId, $providerUrl] = $this->resolveRuntime($aiModel, 'article_content', $instructions);
 
         $reservation = $this->reserveDailyUsage($aiModel);
         if ($reservation === null) {
@@ -148,7 +148,7 @@ final class ArticleContentGenerationService
     /**
      * @return array{MarkdownContentWriterAgent, string, string, string}
      */
-    private function resolveRuntime(AiModel $aiModel, string $registrySlot): array
+    private function resolveRuntime(AiModel $aiModel, string $registrySlot, ?string $instructions = null): array
     {
         $providerUrl = OpenAiRuntimeProvider::resolveChatBaseUrl((string) ($aiModel->api_url ?? ''));
         if ($providerUrl === '') {
@@ -168,8 +168,12 @@ final class ArticleContentGenerationService
         $driver = OpenAiRuntimeProvider::resolveChatDriver($providerUrl, $modelId);
         $providerName = OpenAiRuntimeProvider::registerProvider($registrySlot, $driver, $providerUrl, $apiKey);
 
+        $agent = is_string($instructions) && trim($instructions) !== ''
+            ? new MarkdownContentWriterAgent(instructions: trim($instructions), maxTokens: $this->maxTokens($aiModel))
+            : new MarkdownContentWriterAgent(maxTokens: $this->maxTokens($aiModel));
+
         return [
-            new MarkdownContentWriterAgent(maxTokens: $this->maxTokens($aiModel)),
+            $agent,
             $providerName,
             $modelId,
             $providerUrl,

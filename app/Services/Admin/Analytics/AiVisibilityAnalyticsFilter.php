@@ -23,6 +23,7 @@ class AiVisibilityAnalyticsFilter
             AiVisibilityRun::PROVIDER_DOUBAO_ARK_RESPONSES,
             AiVisibilityRun::PROVIDER_DOUBAO_SEARCH_CUSTOM,
             AiVisibilityRun::PROVIDER_DEEPSEEK_ANALYSIS,
+            AiVisibilityRun::PROVIDER_CHAT_COMPLETION,
         ], true)) {
             $provider = 'all';
         }
