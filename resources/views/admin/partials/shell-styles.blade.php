@@ -154,10 +154,15 @@
     /* ===== 主内容区 ===== */
     .admin-main {
         flex: 1;
+        display: flex;
+        flex-direction: column;
         overflow-y: auto;
         background: var(--qdk-bg);
         min-width: 0;
+        min-height: 0;
     }
+
+    .admin-main-inner { width: 100%; flex: 1 0 auto; }
 
     /* ===== 移动端抽屉 ===== */
     .admin-sidebar-overlay { display: none; }

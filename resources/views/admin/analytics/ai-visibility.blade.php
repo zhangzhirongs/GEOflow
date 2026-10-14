@@ -16,23 +16,23 @@
             'subtitle' => __('admin.analytics.pages.ai_visibility.subtitle'),
         ])
 
-        <section class="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-            <form method="GET" action="{{ route('admin.analytics.ai-visibility') }}" class="space-y-4">
-                <div class="flex flex-wrap gap-2">
+        <section class="mb-5 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+            <form method="GET" action="{{ route('admin.analytics.ai-visibility') }}" class="space-y-3">
+                <div class="flex flex-wrap gap-1.5">
                     @foreach (['14d', '30d', '60d', '90d'] as $preset)
-                        <button type="submit" name="ai_preset" value="{{ $preset }}" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-violet-600 bg-violet-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-violet-300 hover:text-violet-700' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">
+                        <button type="submit" name="ai_preset" value="{{ $preset }}" class="inline-flex min-h-8 items-center rounded-md border px-2.5 py-1 text-xs font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-violet-600 bg-violet-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-violet-300 hover:text-violet-700' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">
                             {{ __('admin.analytics.filters.'.$preset) }}
                         </button>
                     @endforeach
                 </div>
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
                     <div>
-                        <label for="ai-date-from" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_from') }}</label>
-                        <input id="ai-date-from" type="date" name="ai_date_from" value="{{ $filterData['ai_date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-violet-500 focus:ring-violet-500">
+                        <label for="ai-date-from" class="sr-only">{{ __('admin.analytics.filters.date_from') }}</label>
+                        <input id="ai-date-from" type="date" name="ai_date_from" value="{{ $filterData['ai_date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-9 w-full rounded-md border-gray-300 text-xs focus:border-violet-500 focus:ring-violet-500">
                     </div>
                     <div>
-                        <label for="ai-date-to" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_to') }}</label>
-                        <input id="ai-date-to" type="date" name="ai_date_to" value="{{ $filterData['ai_date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-violet-500 focus:ring-violet-500">
+                        <label for="ai-date-to" class="sr-only">{{ __('admin.analytics.filters.date_to') }}</label>
+                        <input id="ai-date-to" type="date" name="ai_date_to" value="{{ $filterData['ai_date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-9 w-full rounded-md border-gray-300 text-xs focus:border-violet-500 focus:ring-violet-500">
                     </div>
                     <div>
                         <label for="ai-keyword" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.ai_visibility.keyword') }}</label>

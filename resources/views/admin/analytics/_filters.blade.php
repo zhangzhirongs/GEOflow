@@ -12,16 +12,16 @@
     ];
 @endphp
 
-<section class="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-    <div class="mb-5 flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.analytics.filters.title') }}</h2>
+<section class="mb-5 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <div class="mb-3 flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-gray-900">{{ __('admin.analytics.filters.title') }}</h2>
         <a href="{{ $analyticsFilterRoute ?? route('admin.analytics.content') }}" class="text-sm font-medium text-gray-500 hover:text-blue-600">{{ __('admin.analytics.filters.reset') }}</a>
     </div>
-    <form id="analytics-filter-form" method="GET" action="{{ $analyticsFilterRoute ?? route('admin.analytics.content') }}" class="space-y-5" data-analytics-filter-form>
+    <form id="analytics-filter-form" method="GET" action="{{ $analyticsFilterRoute ?? route('admin.analytics.content') }}" class="space-y-3" data-analytics-filter-form>
         <input type="hidden" name="preset" value="{{ $filterData['preset'] }}">
         <fieldset>
-            <legend class="mb-2 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.preset') }}</legend>
-            <div class="flex flex-wrap gap-2">
+            <legend class="sr-only">{{ __('admin.analytics.filters.preset') }}</legend>
+            <div class="flex flex-wrap gap-1.5">
                 @foreach ($presetOptions as $preset)
                     @php
                         $presetClass = $filterData['preset'] === $preset
@@ -31,7 +31,7 @@
                     @endphp
                     <button
                         type="button"
-                        class="inline-flex min-h-10 cursor-pointer items-center rounded-md border px-3 py-2 text-sm font-medium transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $presetClass }}"
+                        class="inline-flex min-h-8 cursor-pointer items-center rounded-md border px-2.5 py-1 text-xs font-medium transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $presetClass }}"
                         data-preset="{{ $preset }}"
                         data-date-from="{{ $presetFrom }}"
                         data-date-to="{{ $presetTo }}"
@@ -44,14 +44,14 @@
             </div>
         </fieldset>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
             <div>
-                <label for="analytics-date-from" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_from') }}</label>
-                <input id="analytics-date-from" type="date" name="date_from" value="{{ $filterData['date_from'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                <label for="analytics-date-from" class="sr-only">{{ __('admin.analytics.filters.date_from') }}</label>
+                <input id="analytics-date-from" type="date" name="date_from" value="{{ $filterData['date_from'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-9 w-full rounded-md border-gray-300 text-xs shadow-sm">
             </div>
             <div>
-                <label for="analytics-date-to" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_to') }}</label>
-                <input id="analytics-date-to" type="date" name="date_to" value="{{ $filterData['date_to'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm">
+                <label for="analytics-date-to" class="sr-only">{{ __('admin.analytics.filters.date_to') }}</label>
+                <input id="analytics-date-to" type="date" name="date_to" value="{{ $filterData['date_to'] }}" max="{{ now()->toDateString() }}" data-analytics-custom-date class="block min-h-9 w-full rounded-md border-gray-300 text-xs shadow-sm">
             </div>
         </div>
 
@@ -116,7 +116,7 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex min-h-10 items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition duration-[120ms] motion-reduce:transition-none hover:bg-blue-700 active:scale-[.98] motion-reduce:active:scale-100">
+            <button type="submit" class="inline-flex min-h-8 items-center rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white transition duration-[120ms] motion-reduce:transition-none hover:bg-blue-700 active:scale-[.98] motion-reduce:active:scale-100">
                 <i data-lucide="filter" class="mr-1.5 h-4 w-4"></i>
                 {{ __('admin.analytics.filters.apply') }}
             </button>

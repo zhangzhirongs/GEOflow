@@ -55,6 +55,14 @@
         <p class="text-xs leading-5 text-gray-500">{{ __('admin.analytics.overview.probe.hint') }} {{ __('admin.analytics.overview.probe.auto_refresh_hint') }}</p>
     </form>
 
+    <form method="POST" action="{{ route('admin.analytics.ai-probes.schedule.update') }}" class="mt-5 rounded-md border border-violet-100 bg-violet-50/40 p-4 space-y-3">
+        @csrf
+        <label class="flex items-center gap-2 text-sm font-medium text-gray-800"><input type="checkbox" name="enabled" value="1" @checked(($growthAiSchedule['enabled'] ?? false))> 启用自动定时提问</label>
+        <input name="question" value="{{ $growthAiSchedule['question'] ?? '' }}" maxlength="2000" required class="block w-full rounded-md border-gray-300 text-sm" placeholder="自动提问内容">
+        <div class="grid gap-3 sm:grid-cols-3"><select name="provider_type" class="rounded-md border-gray-300 text-sm">@foreach (($growthProbeChannels ?? []) as $channel)<option value="{{ $channel['value'] }}" @selected(($growthAiSchedule['provider_type'] ?? 'auto') === $channel['value'])>{{ $channel['label'] }}</option>@endforeach</select><input type="number" name="interval_minutes" min="1" max="10080" value="{{ $growthAiSchedule['interval_minutes'] ?? 60 }}" class="rounded-md border-gray-300 text-sm"><button class="rounded-md bg-violet-600 px-4 py-2 text-sm font-semibold text-white">保存自动分析设置</button></div>
+        <p class="text-xs text-gray-500">按分钟设置周期，后台调度器会自动入队并在本页保留分析结果。</p>
+    </form>
+
     <div class="mt-6 space-y-4" data-growth-probe-list>
         @forelse ($growthProbes as $probe)
             @php
@@ -234,6 +242,7 @@
                 document.getElementById('growth-ai-probe')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
+            return;
             const root = document.querySelector('[data-overview-refresh]');
             if (!root) return;
             const interval = Math.max(5000, Number(root.getAttribute('data-overview-refresh') || 30000));

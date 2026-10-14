@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\Analytics\GrowthAiProbeService;
 use App\Services\Admin\Analytics\GrowthOverviewService;
+use App\Http\Requests\Admin\UpdateGrowthAiScheduleRequest;
 use App\Support\AdminWeb;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,6 +66,18 @@ class AnalyticsController extends Controller
             'growthProbes' => $this->probes->recent(),
             'growthProbeConfigured' => $this->probes->configured(),
             'growthProbeChannels' => $this->probes->channels(),
+            'growthAiSchedule' => $this->probes->scheduleSettings(),
         ]);
+    }
+
+    public function updateAiSchedule(UpdateGrowthAiScheduleRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $data['admin_id'] = $request->user('admin')->id;
+        if (! $this->probes->configured() || ! in_array($data['provider_type'], array_column($this->probes->channels(), 'value'), true)) {
+            return redirect()->route('admin.analytics')->withErrors(['provider_type' => __('admin.analytics.overview.probe.errors.channel_unavailable')])->withInput();
+        }
+        $this->probes->saveSchedule($data);
+        return redirect()->route('admin.analytics')->with('message', 'AI 自动分析计划已保存');
     }
 }

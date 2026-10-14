@@ -12,11 +12,11 @@
             'subtitle' => __('admin.analytics.pages.distribution.subtitle'),
         ])
 
-        <section class="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-            <form method="GET" action="{{ route('admin.analytics.distribution') }}" class="space-y-4">
+        <section class="mb-5 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+            <form method="GET" action="{{ route('admin.analytics.distribution') }}" class="space-y-3">
                 <input type="hidden" name="preset" value="{{ $filters->preset }}">
                 <div class="flex flex-wrap gap-2">@foreach (['7d', '30d', '90d'] as $preset)<button type="submit" name="preset" value="{{ $preset }}" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-slate-700 bg-slate-700 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-slate-400' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">{{ __('admin.analytics.filters.'.$preset) }}</button>@endforeach</div>
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div class="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-8">
                     <div><label for="distribution-date-from" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_from') }}</label><input id="distribution-date-from" type="date" name="date_from" value="{{ $filterData['date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-slate-500 focus:ring-slate-500"></div>
                     <div><label for="distribution-date-to" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_to') }}</label><input id="distribution-date-to" type="date" name="date_to" value="{{ $filterData['date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-slate-500 focus:ring-slate-500"></div>
                     <div><label for="distribution-channel" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.channel') }}</label><select id="distribution-channel" name="channel_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm"><option value="">{{ __('admin.analytics.filters.all') }}</option>@foreach ($filterOptions['channels'] as $channel)<option value="{{ $channel->id }}" @selected($filters->channelId === (int) $channel->id)>{{ $channel->name }}</option>@endforeach</select></div>

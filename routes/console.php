@@ -68,6 +68,8 @@ Schedule::command('geoflow:schedule-tasks')
     ->onOneServer()
     ->withoutOverlapping(10);
 
+Schedule::command('geoflow:ai-probes:schedule')->everyMinute()->onOneServer()->withoutOverlapping(2);
+
 Schedule::command('geoflow:recover-knowledge-syncs')
     ->everyFiveMinutes()
     ->onOneServer()

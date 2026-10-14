@@ -103,6 +103,7 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
             Route::post('ai-probes', [GrowthAiProbeController::class, 'store'])
                 ->middleware('throttle:admin-growth-probe')
                 ->name('ai-probes.store');
+            Route::post('ai-probes/schedule', [AnalyticsController::class, 'updateAiSchedule'])->name('ai-probes.schedule.update');
             Route::get('ai-probes/{probe}', [GrowthAiProbeController::class, 'show'])->name('ai-probes.show');
             Route::get('leads', LeadAnalyticsController::class)->name('leads');
             Route::get('distribution', DistributionAnalyticsController::class)

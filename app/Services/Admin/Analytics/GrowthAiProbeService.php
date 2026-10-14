@@ -6,6 +6,8 @@ use App\Jobs\ProcessGrowthAiProbeJob;
 use App\Models\Admin;
 use App\Models\AiGrowthProbe;
 use App\Models\AiVisibilityRun;
+use App\Models\Keyword;
+use App\Models\KeywordLibrary;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
@@ -21,6 +23,17 @@ class GrowthAiProbeService
     public function configured(): bool
     {
         return $this->channels() !== [];
+    }
+
+    public function scheduleSettings(): array
+    {
+        $values = \App\Models\SiteSetting::query()->whereIn('setting_key', ['growth_ai_schedule_enabled','growth_ai_schedule_admin_id','growth_ai_schedule_question','growth_ai_schedule_provider','growth_ai_schedule_interval_minutes','growth_ai_schedule_next_run_at'])->pluck('setting_value','setting_key');
+        return ['enabled' => (bool) ((int) $values->get('growth_ai_schedule_enabled', 0)), 'question' => (string) $values->get('growth_ai_schedule_question', ''), 'provider_type' => (string) $values->get('growth_ai_schedule_provider', AiGrowthProbe::CHANNEL_AUTO), 'interval_minutes' => max(1, (int) $values->get('growth_ai_schedule_interval_minutes', 60)), 'next_run_at' => $values->get('growth_ai_schedule_next_run_at')];
+    }
+
+    public function saveSchedule(array $data): void
+    {
+        foreach (['growth_ai_schedule_enabled' => ((int) !empty($data['enabled'])), 'growth_ai_schedule_admin_id' => (string) ((int) ($data['admin_id'] ?? 0)), 'growth_ai_schedule_question' => trim((string) $data['question']), 'growth_ai_schedule_provider' => (string) $data['provider_type'], 'growth_ai_schedule_interval_minutes' => (string) ((int) $data['interval_minutes']), 'growth_ai_schedule_next_run_at' => now()->addMinutes((int) $data['interval_minutes'])->toDateTimeString()] as $key => $value) \App\Models\SiteSetting::query()->updateOrCreate(['setting_key' => $key], ['setting_value' => $value]);
     }
 
     /**
@@ -84,6 +97,7 @@ class GrowthAiProbeService
 
             $run->loadMissing('sources');
             $analysis = $this->analyzer->analyze($probe->question, $run);
+            $this->syncKeywords($analysis);
             $probe->forceFill([
                 'ai_visibility_run_id' => $run->id,
                 'status' => AiGrowthProbe::STATUS_COMPLETED,
@@ -106,6 +120,41 @@ class GrowthAiProbeService
         }
 
         return $probe->fresh() ?? $probe;
+    }
+
+    /** Persist extracted terms into reusable, separately classified keyword libraries. */
+    private function syncKeywords(array $analysis): void
+    {
+        if (! Schema::hasTable('keywords') || ! Schema::hasTable('keyword_libraries')) {
+            return;
+        }
+
+        $groups = [
+            'AI分析｜自有内容关键词' => collect((array) ($analysis['owned_keywords'] ?? []))
+                ->map(fn (mixed $item): string => is_array($item) ? trim((string) ($item['term'] ?? '')) : trim((string) $item)),
+            'AI分析｜回答关键词' => collect((array) ($analysis['answer_keywords'] ?? []))
+                ->map(fn (mixed $item): string => is_array($item) ? trim((string) ($item['term'] ?? '')) : trim((string) $item)),
+        ];
+
+        foreach ($groups as $name => $terms) {
+            $terms = $terms->filter(fn (string $term): bool => mb_strlen($term) >= 2)
+                ->unique(fn (string $term): string => mb_strtolower($term))->values();
+            if ($terms->isEmpty()) {
+                continue;
+            }
+
+            $library = KeywordLibrary::query()->firstOrCreate(
+                ['name' => $name],
+                ['description' => '由 AI 分析自动提取，可用于标题和内容生成', 'keyword_count' => 0],
+            );
+            foreach ($terms as $term) {
+                Keyword::query()->firstOrCreate(
+                    ['library_id' => $library->id, 'keyword' => $term],
+                    ['used_count' => 0, 'usage_count' => 0],
+                );
+            }
+            $library->forceFill(['keyword_count' => Keyword::query()->where('library_id', $library->id)->count()])->save();
+        }
     }
 
     /**

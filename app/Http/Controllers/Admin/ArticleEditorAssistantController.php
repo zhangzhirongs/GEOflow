@@ -84,9 +84,9 @@ final class ArticleEditorAssistantController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:500'],
             'keyword' => ['nullable', 'string', 'max:200'],
-            'knowledge_base_id' => ['required', 'integer', 'min:1', Rule::exists('knowledge_bases', 'id')],
+            'knowledge_base_id' => ['nullable', 'integer', 'min:1', Rule::exists('knowledge_bases', 'id')],
             'prompt_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists('prompts', 'id')->where(fn ($query) => $query->where('type', 'content')),
             ],
@@ -103,10 +103,12 @@ final class ArticleEditorAssistantController extends Controller
             'platform' => ['nullable', 'string', Rule::in(ManualPublicationAccount::PLATFORMS)],
         ]);
 
-        $knowledgeBase = KnowledgeBase::query()
-            ->whereKey((int) $validated['knowledge_base_id'])
-            ->firstOrFail(['id']);
-        $prompt = Prompt::query()->whereKey((int) $validated['prompt_id'])->where('type', 'content')->firstOrFail();
+        $knowledgeBase = ! empty($validated['knowledge_base_id'])
+            ? KnowledgeBase::query()->whereKey((int) $validated['knowledge_base_id'])->firstOrFail(['id'])
+            : null;
+        $prompt = ! empty($validated['prompt_id'])
+            ? Prompt::query()->whereKey((int) $validated['prompt_id'])->where('type', 'content')->firstOrFail()
+            : null;
         $aiModel = AiModel::query()
             ->whereKey((int) $validated['ai_model_id'])
             ->where('status', 'active')
@@ -115,25 +117,22 @@ final class ArticleEditorAssistantController extends Controller
             })
             ->firstOrFail();
 
-        $knowledgeContext = $this->knowledgeRetrievalService->retrieveContext(
-            (int) $knowledgeBase->id,
-            implode("\n", array_filter([
-                trim((string) $validated['title']),
-                trim((string) ($validated['keyword'] ?? '')),
-            ])),
-            5,
-            3200,
-        );
-        if ($knowledgeContext === '') {
-            return response()->json([
-                'message' => __('admin.article_assistant.generate.knowledge_unavailable'),
-            ], 422);
-        }
+        $knowledgeContext = $knowledgeBase
+            ? $this->knowledgeRetrievalService->retrieveContext(
+                (int) $knowledgeBase->id,
+                implode("\n", array_filter([
+                    trim((string) $validated['title']),
+                    trim((string) ($validated['keyword'] ?? '')),
+                ])),
+                5,
+                3200,
+            )
+            : '';
 
         $contentPrompt = $this->promptRenderer->renderForEditor(
             trim((string) $validated['title']),
             trim((string) ($validated['keyword'] ?? '')),
-            (string) $prompt->content,
+            $prompt?->content,
             $knowledgeContext,
             trim((string) ($validated['platform'] ?? '')),
         );
@@ -149,6 +148,9 @@ final class ArticleEditorAssistantController extends Controller
         }
 
         $stream->then(function (StreamedAgentResponse $response) use ($aiModel, $knowledgeBase): void {
+            if (! $knowledgeBase) {
+                return;
+            }
             if (trim((string) ($response->text ?? '')) === '') {
                 return;
             }

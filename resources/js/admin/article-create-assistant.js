@@ -533,16 +533,6 @@ if (assistantRoot) {
             editorBridge()?.tip?.(messages.titleRequired);
             return;
         }
-        if (!knowledgeBaseSelect?.value) {
-            knowledgeBaseSelect?.focus();
-            editorBridge()?.tip?.(messages.knowledgeRequired);
-            return;
-        }
-        if (!promptSelect?.value) {
-            promptSelect?.focus();
-            editorBridge()?.tip?.(messages.promptRequired);
-            return;
-        }
         if (!modelSelect?.value) {
             modelSelect?.focus();
             editorBridge()?.tip?.(messages.modelRequired);
@@ -572,8 +562,8 @@ if (assistantRoot) {
                 body: JSON.stringify({
                     title,
                     keyword: keywordInput?.value.trim() || '',
-                    knowledge_base_id: Number(knowledgeBaseSelect.value),
-                    prompt_id: Number(promptSelect.value),
+                    knowledge_base_id: knowledgeBaseSelect?.value ? Number(knowledgeBaseSelect.value) : null,
+                    prompt_id: promptSelect?.value ? Number(promptSelect.value) : null,
                     ai_model_id: Number(modelSelect.value),
                     platform: platformSelect?.value || '',
                 }),

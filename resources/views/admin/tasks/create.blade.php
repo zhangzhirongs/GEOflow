@@ -34,7 +34,7 @@
 @endphp
 
 @section('content')
-    <div class="px-4 sm:px-0">
+    <div class="px-4 sm:px-0" data-task-create-page>
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center space-x-4">
                 <a href="{{ route('admin.tasks.index') }}" class="text-gray-400 hover:text-gray-600">
@@ -139,8 +139,8 @@
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                             <div>
-                                <label for="prompt_id" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.content_prompt') }} *</label>
-                                <select name="prompt_id" id="prompt_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <label for="prompt_id" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.content_prompt') }}</label>
+                                <select name="prompt_id" id="prompt_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">{{ $t('task_create.option.select_prompt') }}</option>
                                     @foreach ($formOptions['prompts'] as $prompt)
                                         <option value="{{ $prompt['id'] }}" @selected((string) old('prompt_id', (string) ($taskForm['prompt_id'] ?? '')) === (string) $prompt['id'])>{{ $prompt['name'] }}</option>
@@ -843,12 +843,6 @@
 
                 if (!document.getElementById('title_library_id').value) {
                     alert(@json(__('admin.task_create.error.title_library_required')));
-                    event.preventDefault();
-                    return;
-                }
-
-                if (!document.getElementById('prompt_id').value) {
-                    alert(@json(__('admin.task_create.error.prompt_required')));
                     event.preventDefault();
                     return;
                 }

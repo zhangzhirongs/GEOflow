@@ -604,7 +604,7 @@ class TaskController extends Controller
         return $request->validate([
             'task_name' => ['required', 'string', 'max:200'],
             'title_library_id' => ['required', 'integer', 'min:1'],
-            'prompt_id' => ['required', 'integer', 'min:1'],
+            'prompt_id' => ['nullable', 'integer', 'min:1'],
             'ai_model_id' => ['required', 'integer', 'min:1'],
             'target_platform' => ['nullable', 'string', 'in:'.implode(',', ManualPublicationAccount::PLATFORMS)],
             'author_id' => ['nullable', 'integer', 'min:0'],
@@ -646,7 +646,7 @@ class TaskController extends Controller
             'title_library_id' => (int) $payload['title_library_id'],
             'image_library_id' => isset($payload['image_library_id']) ? (int) $payload['image_library_id'] : null,
             'image_count' => (int) ($payload['image_count'] ?? 0),
-            'prompt_id' => (int) $payload['prompt_id'],
+            'prompt_id' => ! empty($payload['prompt_id']) ? (int) $payload['prompt_id'] : null,
             'ai_model_id' => (int) $payload['ai_model_id'],
             'target_platform' => ! empty($payload['target_platform']) ? (string) $payload['target_platform'] : null,
             'author_id' => isset($payload['author_id']) && (int) $payload['author_id'] > 0 ? (int) $payload['author_id'] : null,
