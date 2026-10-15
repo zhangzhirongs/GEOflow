@@ -4,10 +4,64 @@ namespace App\Services\GeoFlow\AiVisibility;
 
 use App\Models\AiVisibilityRun;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Support\Arrayable;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
+use League\CommonMark\Node\Inline\Text;
+use League\CommonMark\Parser\MarkdownParser;
 use Throwable;
 
 final class AiVisibilityResultNormalizer
 {
+    /**
+     * @param  iterable<mixed>  $citations
+     * @return list<AiVisibilitySourceData>
+     */
+    public function answerSources(string $answerText, iterable $citations = []): array
+    {
+        $sources = [];
+        foreach ($citations as $citation) {
+            $data = $citation instanceof Arrayable ? $citation->toArray() : $citation;
+            if (! is_array($data)) {
+                continue;
+            }
+            $source = $this->annotationToSource($data, count($sources) + 1);
+            if ($source !== null && $this->isWebUrl((string) $source->url)) {
+                $sources = $this->appendUniqueSource($sources, $source);
+            }
+        }
+
+        $document = (new MarkdownParser(Environment::createGFMEnvironment()))->parse($answerText);
+        $walker = $document->walker();
+        while ($event = $walker->next()) {
+            $node = $event->getNode();
+            if (! $event->isEntering() || ! $node instanceof Link || ! $this->isWebUrl($node->getUrl())) {
+                continue;
+            }
+
+            $label = '';
+            $children = $node->walker();
+            while ($child = $children->next()) {
+                if ($child->isEntering() && $child->getNode() instanceof Text) {
+                    $label .= $child->getNode()->getLiteral();
+                }
+            }
+            $domain = $this->domainFromUrl($node->getUrl());
+            $position = count($sources) + 1;
+            $sources = $this->appendUniqueSource($sources, new AiVisibilitySourceData(
+                sourceType: 'answer_link',
+                citationKey: 'L'.$position,
+                title: trim($label) !== '' ? trim($label) : ($node->getTitle() ?: $domain),
+                url: $node->getUrl(),
+                domain: $domain,
+                siteName: $domain,
+                rank: $position,
+            ));
+        }
+
+        return $sources;
+    }
+
     /**
      * @param  array<string,mixed>  $response
      * @param  array<string,mixed>  $request
@@ -79,6 +133,9 @@ final class AiVisibilityResultNormalizer
         $answerText = trim(implode("\n\n", array_filter($answerSegments, static fn (string $segment): bool => trim($segment) !== '')));
         if ($answerText === '' && $fallbackText !== '') {
             $answerText = $fallbackText;
+        }
+        foreach ($this->answerSources($answerText) as $source) {
+            $sources = $this->appendUniqueSource($sources, $source);
         }
 
         $usage = is_array($response['usage'] ?? null) ? $response['usage'] : [];
@@ -197,8 +254,9 @@ final class AiVisibilityResultNormalizer
     private function annotationToSource(array $annotation, int $position): ?AiVisibilitySourceData
     {
         $source = is_array($annotation['source'] ?? null) ? $annotation['source'] : [];
-        $url = $this->stringValue($annotation['url'] ?? $annotation['uri'] ?? ($source['url'] ?? ''));
-        $title = $this->stringValue($annotation['title'] ?? ($source['title'] ?? ''));
+        $citation = is_array($annotation['url_citation'] ?? null) ? $annotation['url_citation'] : [];
+        $url = $this->stringValue($annotation['url'] ?? $annotation['uri'] ?? $citation['url'] ?? ($source['url'] ?? ''));
+        $title = $this->stringValue($annotation['title'] ?? $citation['title'] ?? ($source['title'] ?? ''));
 
         if ($url === '' && $title === '') {
             return null;
@@ -210,11 +268,17 @@ final class AiVisibilityResultNormalizer
             title: $title !== '' ? $title : $this->domainFromUrl($url),
             url: $url !== '' ? $url : null,
             domain: $this->domainFromUrl($url),
-            siteName: $this->nullableString($annotation['site_name'] ?? ($source['site_name'] ?? null)),
+            siteName: $this->nullableString($annotation['site_name'] ?? $citation['site_name'] ?? ($source['site_name'] ?? null)),
             snippet: $this->nullableString($annotation['text'] ?? null),
             rank: $position,
             metadata: $annotation,
         );
+    }
+
+    private function isWebUrl(string $url): bool
+    {
+        return in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
+            && (string) parse_url($url, PHP_URL_HOST) !== '';
     }
 
     /**

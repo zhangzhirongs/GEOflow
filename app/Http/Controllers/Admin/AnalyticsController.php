@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateGrowthAiScheduleRequest;
 use App\Services\Admin\Analytics\GrowthAiProbeService;
 use App\Services\Admin\Analytics\GrowthOverviewService;
-use App\Http\Requests\Admin\UpdateGrowthAiScheduleRequest;
 use App\Support\AdminWeb;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,6 +55,7 @@ class AnalyticsController extends Controller
         }
 
         $canManageProtectedWorkflows = auth('admin')->user()?->canManageProtectedWorkflows() === true;
+        $growthProbes = $this->probes->recent();
 
         return view('admin.analytics.index', [
             'pageTitle' => __('admin.analytics.page_title'),
@@ -63,7 +64,10 @@ class AnalyticsController extends Controller
             'adminSiteName' => AdminWeb::siteName(),
             'canManageProtectedWorkflows' => $canManageProtectedWorkflows,
             'overview' => $this->overview->snapshot($canManageProtectedWorkflows),
-            'growthProbes' => $this->probes->recent(),
+            'growthProbes' => $growthProbes,
+            'growthProbeData' => $growthProbes->mapWithKeys(fn ($probe): array => [
+                $probe->uuid => $this->probes->present($probe),
+            ])->all(),
             'growthProbeConfigured' => $this->probes->configured(),
             'growthProbeChannels' => $this->probes->channels(),
             'growthAiSchedule' => $this->probes->scheduleSettings(),
@@ -78,6 +82,7 @@ class AnalyticsController extends Controller
             return redirect()->route('admin.analytics')->withErrors(['provider_type' => __('admin.analytics.overview.probe.errors.channel_unavailable')])->withInput();
         }
         $this->probes->saveSchedule($data);
+
         return redirect()->route('admin.analytics')->with('message', 'AI 自动分析计划已保存');
     }
 }

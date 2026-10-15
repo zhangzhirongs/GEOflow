@@ -26,6 +26,8 @@ class AiGrowthProbe extends Model
 
     public const CHANNEL_AUTO = 'auto';
 
+    public const CHANNEL_ALL = 'all';
+
     public const CHANNEL_SEARCH_THEN_ANALYSIS = 'search_then_analysis';
 
     public const CHANNEL_SEARCH = 'doubao_search_custom';
@@ -38,6 +40,7 @@ class AiGrowthProbe extends Model
 
     public const CHANNELS = [
         self::CHANNEL_AUTO,
+        self::CHANNEL_ALL,
         self::CHANNEL_SEARCH_THEN_ANALYSIS,
         self::CHANNEL_SEARCH,
         self::CHANNEL_DEEPSEEK,

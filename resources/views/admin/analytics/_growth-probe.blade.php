@@ -66,7 +66,11 @@
     <div class="mt-6 space-y-4" data-growth-probe-list>
         @forelse ($growthProbes as $probe)
             @php
-                $analysis = is_array($probe->analysis_json) ? $probe->analysis_json : [];
+                $probeView = $growthProbeData[$probe->uuid] ?? [];
+                $analysis = is_array($probeView['analysis'] ?? null) ? $probeView['analysis'] : (is_array($probe->analysis_json) ? $probe->analysis_json : []);
+                $results = is_array($probeView['results'] ?? null) ? $probeView['results'] : [];
+                $answerText = (string) ($probeView['answer_text'] ?? $probe->answer_excerpt ?? '');
+                $sources = is_array($probeView['sources'] ?? null) ? $probeView['sources'] : [];
                 $ownedArticles = $analysis['owned_articles'] ?? [];
                 $ownedPosts = $analysis['owned_posts'] ?? [];
                 $ownedKeywords = $analysis['owned_keywords'] ?? [];
@@ -101,12 +105,27 @@
                 @elseif ($probe->isPending())
                     <p class="mt-3 text-sm text-amber-800">{{ __('admin.analytics.overview.probe.pending') }}</p>
                 @else
-                    <p class="mt-3 text-sm leading-6 text-gray-700">{{ $analysis['summary'] ?? $probe->answer_excerpt }}</p>
-                    @if ($probe->answer_excerpt)
-                        <details class="mt-3 rounded-md bg-white p-3">
+                    <p class="mt-3 text-sm leading-6 text-gray-700">{{ $analysis['summary'] ?? $answerText }}</p>
+                    @if ($answerText)
+                        <details open class="mt-3 rounded-md bg-white p-3">
                             <summary class="cursor-pointer text-sm font-medium text-gray-800">{{ __('admin.analytics.overview.probe.answer') }}</summary>
-                            <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-gray-600">{{ $probe->answer_excerpt }}</p>
+                            <p class="mt-2 max-h-96 overflow-y-auto whitespace-pre-wrap text-sm leading-6 text-gray-600">{{ $answerText }}</p>
                         </details>
+                    @endif
+
+                    @if ($results !== [])
+                        <div class="mt-4 space-y-3">
+                            <h3 class="text-sm font-semibold text-gray-900">{{ __('admin.analytics.overview.probe.platform_results') }}</h3>
+                            @foreach ($results as $result)
+                                @php $resultSources = is_array($result['sources'] ?? null) ? $result['sources'] : []; @endphp
+                                <details class="rounded-md border border-gray-200 bg-white p-3">
+                                    <summary class="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 text-sm font-semibold text-gray-900"><span>{{ $result['provider_label'] ?? $result['provider_type'] ?? __('admin.analytics.overview.probe.unknown_platform') }}</span><span class="text-xs font-medium text-gray-500">{{ __('admin.analytics.overview.probe.status.'.($result['status'] ?? 'failed')) }}</span></summary>
+                                    @if (! empty($result['error_message']))<p class="mt-3 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{{ $result['error_message'] }}</p>@endif
+                                    @if (! empty($result['answer_text']))<p class="mt-3 max-h-80 overflow-y-auto whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ $result['answer_text'] }}</p>@endif
+                                    @if ($resultSources !== [])<div class="mt-3 border-t border-gray-100 pt-3"><h4 class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('admin.analytics.overview.probe.sources') }}</h4><ul class="mt-2 space-y-2">@foreach ($resultSources as $source)<li class="text-sm">@if (! empty($source['url']))<a href="{{ $source['url'] }}" target="_blank" rel="noopener noreferrer" class="font-medium text-violet-700 hover:underline">{{ $source['title'] ?? $source['url'] }}</a>@else<span class="font-medium text-gray-800">{{ $source['title'] ?? __('admin.analytics.overview.probe.untitled_source') }}</span>@endif <span class="ml-1 text-xs text-gray-500">{{ $source['site_name'] ?? $source['domain'] ?? '' }}{{ ! empty($source['citation_key']) ? ' · '.$source['citation_key'] : '' }}</span>@if (! empty($source['snippet']))<p class="mt-0.5 text-xs leading-5 text-gray-500">{{ $source['snippet'] }}</p>@endif</li>@endforeach</ul></div>@endif
+                                </details>
+                            @endforeach
+                        </div>
                     @endif
 
                     @if ($ownedArticles !== [] || $ownedPosts !== [])
@@ -242,14 +261,15 @@
                 document.getElementById('growth-ai-probe')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            return;
             const root = document.querySelector('[data-overview-refresh]');
             if (!root) return;
             const interval = Math.max(5000, Number(root.getAttribute('data-overview-refresh') || 30000));
             const question = document.getElementById('growth-probe-question');
+            const schedule = document.querySelector('form[action*="ai-probes/schedule"]');
             const shouldSkip = () => {
                 if (document.hidden) return true;
                 if (question && (document.activeElement === question || question.value !== question.defaultValue)) return true;
+                if (schedule && [...schedule.elements].some((field) => field.name && field.value !== field.defaultValue)) return true;
                 return Boolean(document.querySelector('[data-probe-status="queued"], [data-probe-status="running"]'));
             };
             const tick = () => {

@@ -19,7 +19,7 @@ final class ArticleContentGenerationService
         private readonly AiUsageQuotaService $usageQuota,
     ) {}
 
-    public function generate(AiModel $aiModel, string $prompt, ?string $instructions = null): AgentResponse
+    public function generate(AiModel $aiModel, string $prompt, ?string $instructions = null, ?int $timeout = null): AgentResponse
     {
         [$agent, $providerName, $modelId, $providerUrl] = $this->resolveRuntime($aiModel, 'article_content', $instructions);
 
@@ -29,7 +29,7 @@ final class ArticleContentGenerationService
         }
 
         try {
-            $response = $agent->prompt($prompt, [], $providerName, $modelId);
+            $response = $agent->prompt($prompt, [], $providerName, $modelId, $timeout);
         } catch (Throwable $exception) {
             $this->releaseDailyUsage($reservation);
 

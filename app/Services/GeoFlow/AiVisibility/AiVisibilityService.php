@@ -8,6 +8,7 @@ use App\Models\AiVisibilityRun;
 use App\Models\AiVisibilitySource;
 use App\Services\GeoFlow\AiUsageQuotaService;
 use App\Services\GeoFlow\AiUsageReservation;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
@@ -54,7 +55,7 @@ final class AiVisibilityService
                 $this->usageQuota->releaseModel($reservation);
             }
             $this->failRun($run, $exception);
-            throw $exception;
+            throw $exception instanceof QueryException ? $exception : new AiVisibilityRunException($run, $exception);
         }
     }
 
@@ -92,7 +93,7 @@ final class AiVisibilityService
                 $this->usageQuota->releaseProvider($reservation);
             }
             $this->failRun($run, $exception);
-            throw $exception;
+            throw $exception instanceof QueryException ? $exception : new AiVisibilityRunException($run, $exception);
         }
     }
 
@@ -128,7 +129,7 @@ final class AiVisibilityService
                 $this->usageQuota->releaseModel($reservation);
             }
             $this->failRun($run, $exception);
-            throw $exception;
+            throw $exception instanceof QueryException ? $exception : new AiVisibilityRunException($run, $exception);
         }
     }
 
@@ -152,7 +153,11 @@ final class AiVisibilityService
             ? $analysisPrompt
             : $this->defaultAnalysisPrompt($keyword);
 
-        $analysisRun = $this->runDeepSeekAnalysis($analysisModel, $keyword, $prompt, $sources, $analysisOptions);
+        try {
+            $analysisRun = $this->runDeepSeekAnalysis($analysisModel, $keyword, $prompt, $sources, $analysisOptions);
+        } catch (AiVisibilityRunException $exception) {
+            throw new AiVisibilityRunException($exception->run, $exception, ['search_run' => $searchRun]);
+        }
 
         return [
             'search_run' => $searchRun->fresh('sources') ?? $searchRun,
@@ -165,6 +170,8 @@ final class AiVisibilityService
      */
     private function createRun(array $attributes): AiVisibilityRun
     {
+        $attributes['keyword'] = mb_substr((string) $attributes['keyword'], 0, 255, 'UTF-8');
+
         return AiVisibilityRun::query()->create(array_replace([
             'status' => AiVisibilityRun::STATUS_RUNNING,
             'started_at' => now(),

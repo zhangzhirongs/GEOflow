@@ -31,7 +31,7 @@ final class AiVisibilitySourceData
      */
     public function toDatabaseAttributes(): array
     {
-        return [
+        $attributes = [
             'source_type' => $this->sourceType,
             'citation_key' => $this->citationKey,
             'title' => $this->title,
@@ -47,5 +47,14 @@ final class AiVisibilitySourceData
             'authority_level' => $this->authorityLevel,
             'metadata_json' => $this->metadata !== [] ? $this->metadata : null,
         ];
+
+        foreach (['source_type' => 80, 'citation_key' => 40, 'title' => 500, 'domain' => 255, 'site_name' => 255, 'authority_level' => 80] as $field => $limit) {
+            if (is_string($attributes[$field]) && mb_strlen($attributes[$field], 'UTF-8') > $limit) {
+                $attributes['metadata_json']['original_fields'][$field] = $attributes[$field];
+                $attributes[$field] = mb_substr($attributes[$field], 0, $limit, 'UTF-8');
+            }
+        }
+
+        return $attributes;
     }
 }

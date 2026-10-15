@@ -46,6 +46,7 @@ class GrowthAiMentionAnalyzer
             'competitors' => $competitors,
             'answer_keywords' => $this->extractTerms($answerText, $brandAliases),
             'source_count' => count($sources),
+            'sources' => $sources,
             'provider_type' => (string) $run->provider_type,
             'summary' => $this->summary($verdict, $ownedArticles, $ownedPosts, $competitors),
         ];
@@ -69,25 +70,40 @@ class GrowthAiMentionAnalyzer
     /**
      * @return list<array<string, mixed>>
      */
-    private function sourceRows(AiVisibilityRun $run): array
+    public function sourceRows(AiVisibilityRun $run): array
     {
+        $run->loadMissing('sources');
+
         return $run->sources
             ->values()
             ->map(function (AiVisibilitySource $source, int $index): array {
                 $title = trim((string) $source->title);
-                $url = trim((string) $source->url);
+                $url = $this->webUrl((string) $source->url);
                 $domain = $this->normalizeHost((string) ($source->domain ?: parse_url($url, PHP_URL_HOST) ?: $source->site_name));
 
                 return [
+                    'source_type' => (string) $source->source_type,
+                    'citation_key' => (string) ($source->citation_key ?: 'S'.($index + 1)),
                     'title' => $title,
                     'url' => $url,
                     'domain' => $domain,
                     'site_name' => trim((string) $source->site_name),
                     'snippet' => trim((string) ($source->snippet ?: $source->summary ?: $source->content_excerpt)),
                     'rank' => (int) ($source->rank ?: $index + 1),
+                    'published_at' => $source->published_at?->toDateTimeString(),
                 ];
             })
             ->all();
+    }
+
+    public function webUrl(string $url): string
+    {
+        $url = trim($url);
+
+        return in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true)
+            && (string) parse_url($url, PHP_URL_HOST) !== ''
+            ? $url
+            : '';
     }
 
     /**

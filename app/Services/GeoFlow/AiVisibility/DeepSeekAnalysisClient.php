@@ -65,7 +65,13 @@ final class DeepSeekAnalysisClient
 
         $startedAt = hrtime(true);
         try {
-            $response = $agent->prompt($fullPrompt, [], $providerName, $modelId);
+            $response = $agent->prompt(
+                $fullPrompt,
+                [],
+                $providerName,
+                $modelId,
+                isset($options['timeout']) ? max(1, (int) $options['timeout']) : null,
+            );
         } catch (Throwable $exception) {
             throw new RuntimeException('DeepSeek 分析失败: '.OpenAiRuntimeProvider::normalizeApiException($exception, $providerUrl), 0, $exception);
         }
@@ -78,6 +84,11 @@ final class DeepSeekAnalysisClient
         }
 
         $usage = $this->extractUsage($response);
+        foreach ($this->normalizer->answerSources($answerText, $response->meta->citations->all()) as $source) {
+            if (! collect($sources)->contains(fn (AiVisibilitySourceData $existing): bool => $existing->url === $source->url)) {
+                $sources[] = $source;
+            }
+        }
 
         return $this->normalizer->normalizeTextAnalysis(
             providerType: AiVisibilityRun::PROVIDER_DEEPSEEK_ANALYSIS,
