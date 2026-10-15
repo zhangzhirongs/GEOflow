@@ -240,6 +240,30 @@ class AdminArticleAssistantTest extends TestCase
         );
     }
 
+    public function test_ai_generation_allows_empty_knowledge_base_and_prompt(): void
+    {
+        MarkdownContentWriterAgent::fake(['## 自由生成文章'])->preventStrayPrompts();
+
+        $admin = $this->createAdmin('assistant_without_context');
+        $model = $this->createModel();
+
+        $response = $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.articles.editor.generate'), [
+                'title' => '没有知识库也能生成文章',
+                'excerpt' => '这段摘要描述文章的写作方向。',
+                'keyword' => '自由生成',
+                'knowledge_base_id' => null,
+                'prompt_id' => null,
+                'ai_model_id' => $model->id,
+            ]);
+
+        $response->assertOk();
+        $this->assertStringContainsString('data: [DONE]', $response->streamedContent());
+        MarkdownContentWriterAgent::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '没有知识库也能生成文章')
+            && str_contains($prompt->prompt, '自由生成')
+            && str_contains($prompt->prompt, '这段摘要描述文章的写作方向。'));
+    }
+
     public function test_ai_generation_reserves_daily_quota_atomically(): void
     {
         $model = $this->createModel(['daily_limit' => 1]);

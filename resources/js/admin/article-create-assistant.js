@@ -561,6 +561,7 @@ if (assistantRoot) {
                 },
                 body: JSON.stringify({
                     title,
+                    excerpt: document.getElementById('excerpt')?.value.trim() || '',
                     keyword: keywordInput?.value.trim() || '',
                     knowledge_base_id: knowledgeBaseSelect?.value ? Number(knowledgeBaseSelect.value) : null,
                     prompt_id: promptSelect?.value ? Number(promptSelect.value) : null,

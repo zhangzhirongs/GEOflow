@@ -84,6 +84,7 @@ final class ArticleEditorAssistantController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:500'],
             'keyword' => ['nullable', 'string', 'max:200'],
+            'excerpt' => ['nullable', 'string', 'max:10000'],
             'knowledge_base_id' => ['nullable', 'integer', 'min:1', Rule::exists('knowledge_bases', 'id')],
             'prompt_id' => [
                 'nullable',
@@ -136,6 +137,11 @@ final class ArticleEditorAssistantController extends Controller
             $knowledgeContext,
             trim((string) ($validated['platform'] ?? '')),
         );
+
+        $excerpt = trim((string) ($validated['excerpt'] ?? ''));
+        if ($excerpt !== '') {
+            $contentPrompt .= "\n\nArticle summary / 文章摘要：\n".$excerpt;
+        }
 
         try {
             $stream = $this->generationService->stream($aiModel, $contentPrompt);
