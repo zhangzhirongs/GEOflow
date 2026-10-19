@@ -27,7 +27,13 @@ class SocialPublishAdapterManager
         $adapterKey = trim((string) ($account->publish_adapter ?: '')) ?: $this->defaultAdapterKey($account);
 
         foreach ($this->adapters as $adapter) {
-            if ($adapter->key() === $adapterKey || $adapter->supports($account)) {
+            if ($adapter->key() === $adapterKey) {
+                return $adapter;
+            }
+        }
+
+        foreach ($this->adapters as $adapter) {
+            if ($adapter->supports($account)) {
                 return $adapter;
             }
         }

@@ -64,13 +64,13 @@ abstract class AbstractSocialPublishAdapter implements SocialPublishAdapterInter
      * @param  array<string,mixed>  $payload
      * @return array<string,mixed>
      */
-    protected function sendJson(ManualPublicationAccount $account, string $endpoint, string $method, array $payload, int $timeout = 20): array
+    protected function sendJson(ManualPublicationAccount $account, string $endpoint, string $method, array $payload, int $timeout = 20, array $extraHeaders = []): array
     {
         $request = $this->http->timeout($timeout)
             ->connectTimeout(5)
             ->acceptJson()
             ->asJson()
-            ->withHeaders($this->commonHeaders($account));
+            ->withHeaders(array_merge($this->commonHeaders($account), $extraHeaders));
 
         $response = $this->safeHttp->send(
             $request,

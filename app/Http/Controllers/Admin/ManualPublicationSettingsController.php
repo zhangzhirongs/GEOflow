@@ -14,6 +14,7 @@ use App\Support\AdminWeb;
 use App\Support\GeoFlow\ApiKeyCrypto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Throwable;
 
 class ManualPublicationSettingsController extends Controller
@@ -30,13 +31,14 @@ class ManualPublicationSettingsController extends Controller
             'pageTitle' => __('admin.manual_publications.settings.title'),
             'activeMenu' => 'articles',
             'adminSiteName' => AdminWeb::siteName(),
-            'personas' => ManualPublicationPersona::query()->withCount('accounts')->orderByDesc('is_active')->orderBy('name')->get(),
-            'accounts' => ManualPublicationAccount::query()->with(['persona:id,name', 'executorNode:id,name,slug,online,last_heartbeat_at'])->orderByDesc('is_active')->orderBy('account_name')->get(),
+            'personas' => ManualPublicationPersona::query()->withCount('accounts')->orderByDesc('is_active')->orderBy('name')->paginate(20, ['*'], 'persona_page')->withQueryString(),
+            'accounts' => ManualPublicationAccount::query()->with(['persona:id,name', 'executorNode:id,name,slug,online,last_heartbeat_at'])->orderByDesc('is_active')->orderBy('account_name')->paginate(20, ['*'], 'account_page')->withQueryString(),
             'executorNodes' => ExecutorNode::query()->where('enabled', true)->orderBy('name')->get(),
             'platforms' => ManualPublicationAccount::PLATFORMS,
             'publishMethods' => ['POST', 'PUT', 'PATCH'],
             'publishAuthTypes' => ['none', 'bearer', 'basic', 'header_key'],
             'publishAdapters' => [
+                'georank_remote' => 'GeoRank local assistant',
                 'zhihu_login_session' => '知乎登录态发布',
                 'xiaohongshu_login_session' => '小红书托管登录发布',
                 'bilibili_login_session' => 'B站登录态发布',
@@ -68,6 +70,22 @@ class ManualPublicationSettingsController extends Controller
         ]);
 
         return back()->with('message', __('admin.manual_publications.settings.account_saved'));
+    }
+
+    public function destroyAccount(int $accountId): RedirectResponse
+    {
+        $account = ManualPublicationAccount::query()->findOrFail($accountId);
+        $hasActiveWork = $account->publications()
+            ->whereIn('status', ['ready', 'in_progress'])
+            ->exists();
+
+        if ($hasActiveWork) {
+            return back()->withErrors(['account' => __('admin.manual_publications.settings.account_delete_blocked')]);
+        }
+
+        $account->delete();
+
+        return back()->with('message', __('admin.manual_publications.settings.account_deleted'));
     }
 
     public function updateAccount(SaveManualPublicationAccountRequest $request, int $accountId): RedirectResponse
@@ -180,7 +198,7 @@ class ManualPublicationSettingsController extends Controller
         $gatewayAccountId = trim((string) ($data['publish_secret_key_id'] ?? '')) ?: null;
 
         return [
-            'persona_id' => (int) $data['persona_id'],
+            'persona_id' => $this->defaultPersonaId($data['persona_id'] ?? null),
             'platform' => $platform,
             'publish_adapter' => $publishAdapter,
             'custom_platform' => trim((string) ($data['custom_platform'] ?? '')) ?: null,
@@ -215,6 +233,25 @@ class ManualPublicationSettingsController extends Controller
             'is_active' => $request->boolean('is_active'),
             'executor_node_id' => filled($data['executor_node_id'] ?? null) ? (int) $data['executor_node_id'] : null,
         ];
+    }
+
+    private function defaultPersonaId(mixed $personaId): int
+    {
+        $id = (int) $personaId;
+        if ($id > 0 && ManualPublicationPersona::query()->whereKey($id)->exists()) {
+            return $id;
+        }
+
+        $persona = ManualPublicationPersona::query()->where('is_active', true)->oldest('id')->first();
+        if ($persona) {
+            return (int) $persona->id;
+        }
+
+        return (int) ManualPublicationPersona::query()->create([
+            'name' => '默认登录身份',
+            'is_active' => true,
+            'created_by_admin_id' => request()->user('admin')?->getAuthIdentifier(),
+        ])->id;
     }
 
     private function defaultAdapter(string $platform): string

@@ -14,7 +14,11 @@
 
     <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <section class="space-y-5">
-            <form method="POST" action="{{ route('admin.manual-publications.settings.personas.store') }}" class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm text-blue-900">
+                {{ __('admin.manual_publications.settings.identity_auto_managed') }}
+            </div>
+            {{-- Publishing identities are managed automatically from the logged-in account. --}}
+            <form method="POST" action="{{ route('admin.manual-publications.settings.personas.store') }}" class="hidden">
                 @csrf
                 <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.manual_publications.settings.new_persona') }}</h2>
                 <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -29,7 +33,7 @@
             </form>
 
             @foreach($personas as $persona)
-                <form method="POST" action="{{ route('admin.manual-publications.settings.personas.update', ['personaId' => $persona->id]) }}" class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <form method="POST" action="{{ route('admin.manual-publications.settings.personas.update', ['personaId' => $persona->id]) }}" class="hidden">
                     @csrf @method('PUT')
                     <div class="flex items-center justify-between gap-3"><h3 class="font-semibold text-gray-900">#{{ $persona->id }} · {{ $persona->name }}</h3><span class="text-xs text-gray-500">{{ __('admin.manual_publications.settings.account_count', ['count' => $persona->accounts_count]) }}</span></div>
                     <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -46,11 +50,11 @@
         </section>
 
         <section class="space-y-5">
-            <form method="POST" action="{{ route('admin.manual-publications.settings.accounts.store') }}" class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <form method="POST" action="{{ route('admin.manual-publications.settings.accounts.store') }}" class="rounded-lg border border-purple-200 bg-white p-6 shadow-sm ring-1 ring-purple-50">
                 @csrf
-                <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.manual_publications.settings.new_account') }}</h2>
+                <div class="flex items-start justify-between gap-3"><div><h2 class="text-lg font-semibold text-gray-900">{{ __('admin.manual_publications.settings.new_account') }}</h2><p class="mt-1 text-xs text-gray-500">账号用于登录、保持会话并提交发布任务。</p></div><span class="rounded-full bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">新账号</span></div>
                 <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div><label class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.persona') }} *</label><select name="persona_id" required class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm"><option value="">{{ __('admin.manual_publications.option.select_persona') }}</option>@foreach($personas as $persona)<option value="{{ $persona->id }}">{{ $persona->name }}</option>@endforeach</select></div>
+                    <input type="hidden" name="persona_id" value="{{ $personas->first()->id ?? '' }}">
                     <div><label class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.platform') }} *</label><select name="platform" required class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm">@foreach($platforms as $platform)<option value="{{ $platform }}">{{ __('admin.manual_publications.platform.'.$platform) }}</option>@endforeach</select></div>
                     <div><label class="block text-sm font-medium text-gray-700">{{ __('georank.publish.adapter_label') }}</label><select name="publish_adapter" class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm"><option value="">{{ __('georank.publish.adapter_auto') }}</option>@foreach($publishAdapters as $adapterKey => $adapterLabel)<option value="{{ $adapterKey }}">{{ $adapterLabel }}</option>@endforeach</select></div>
                     <div><label class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.account') }} *</label><input name="account_name" required maxlength="160" class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm"></div>
@@ -83,12 +87,12 @@
 
             @foreach($accounts as $account)
                 @php($profile = is_array($account->publish_profile_json) ? $account->publish_profile_json : [])
-                <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition hover:border-gray-300 hover:shadow-md">
                     <form method="POST" action="{{ route('admin.manual-publications.settings.accounts.update', ['accountId' => $account->id]) }}">
                         @csrf @method('PUT')
                         <h3 class="font-semibold text-gray-900">#{{ $account->id }} · {{ $account->account_name }}</h3>
                         <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            <select name="persona_id" required class="rounded-md border-gray-300 text-sm shadow-sm">@foreach($personas as $persona)<option value="{{ $persona->id }}" @selected($account->persona_id === $persona->id)>{{ $persona->name }}</option>@endforeach</select>
+                            <input type="hidden" name="persona_id" value="{{ $account->persona_id }}">
                             <select name="platform" required class="rounded-md border-gray-300 text-sm shadow-sm">@foreach($platforms as $platform)<option value="{{ $platform }}" @selected($account->platform === $platform)>{{ __('admin.manual_publications.platform.'.$platform) }}</option>@endforeach</select>
                             <select name="publish_adapter" class="rounded-md border-gray-300 text-sm shadow-sm"><option value="">{{ __('georank.publish.adapter_auto') }}</option>@foreach($publishAdapters as $adapterKey => $adapterLabel)<option value="{{ $adapterKey }}" @selected($account->publish_adapter === $adapterKey)>{{ $adapterLabel }}</option>@endforeach</select>
                             <input name="account_name" value="{{ $account->account_name }}" required maxlength="160" class="rounded-md border-gray-300 text-sm shadow-sm">
@@ -105,7 +109,7 @@
                                     <option value="{{ $node->id }}" @selected((int) $account->executor_node_id === (int) $node->id)>{{ $node->name }} ({{ $node->slug }})</option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-xs text-gray-500">{{ __('georank.session_status') }}: {{ $account->session_status ?: 'missing' }} @if($account->executorNode) / {{ $account->executorNode->slug }} @endif</p>
+                            <p class="mt-1 text-xs text-gray-500">{{ __('georank.session_status') }}: {{ $account->sessionStatusLabel() }} @if($account->executorNode) / {{ $account->executorNode->slug }} @endif</p>
                         </div>
                             <input type="url" name="publish_endpoint_url" value="{{ $account->publish_endpoint_url }}" maxlength="1000" class="rounded-md border-gray-300 text-sm shadow-sm" placeholder="{{ __('georank.publish.endpoint_url') }}">
                             <select name="publish_method" class="rounded-md border-gray-300 text-sm shadow-sm">@foreach($publishMethods as $method)<option value="{{ $method }}" @selected($account->publish_method === $method)>{{ $method }}</option>@endforeach</select>
@@ -119,11 +123,15 @@
                         </div>
                         <button class="mt-4 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">{{ __('admin.manual_publications.button.save') }}</button>
                     </form>
+                    <form method="POST" action="{{ route('admin.manual-publications.settings.accounts.destroy', ['accountId' => $account->id]) }}" class="mt-2" onsubmit="return confirm('{{ __('admin.manual_publications.settings.confirm_account_delete') }}')">
+                        @csrf @method('DELETE')
+                        <button class="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">{{ __('admin.button.delete') }}</button>
+                    </form>
                     @if($account->executor_node_id)
                         <div class="mt-4 flex flex-col gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div class="font-semibold">{{ __('georank.accounts.executor_box') }}</div>
-                                <div class="mt-1 text-xs">{{ __('georank.session_status') }}: {{ $account->session_status ?: 'missing' }}</div>
+                                <div class="mt-1 text-xs">{{ __('georank.session_status') }}: {{ $account->sessionStatusLabel() }}</div>
                             </div>
                             <div class="flex gap-2">
                                 <form method="POST" action="{{ route('admin.manual-publications.settings.accounts.executor-login', ['accountId' => $account->id]) }}">@csrf<button class="rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700">{{ __('georank.accounts.login') }}</button></form>
@@ -145,6 +153,7 @@
                     @endif
                 </div>
             @endforeach
+            <div class="mt-4">{{ $accounts->links() }}</div>
         </section>
     </div>
 </div>

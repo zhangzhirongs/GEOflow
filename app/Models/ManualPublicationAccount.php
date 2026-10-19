@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ManualPublicationAccount extends Model
 {
+    public const SESSION_STATUS_LABELS = [
+        'missing' => '未登录', 'not_logged_in' => '未登录', 'logged_out' => '未登录',
+        'login_in_progress' => '登录中', 'logging_in' => '登录中', 'checking' => '检查中',
+        'authenticated' => '已登录', 'logged_in' => '已登录', 'ready' => '已登录', 'valid' => '已登录',
+        'expired' => '已过期', 'invalid' => '已失效', 'needs_login' => '需要登录',
+        'failed' => '检查失败', 'unknown' => '待检查',
+    ];
     public const PLATFORM_ZHIHU = 'zhihu';
 
     public const PLATFORM_XIAOHONGSHU = 'xiaohongshu';
@@ -140,6 +147,13 @@ class ManualPublicationAccount extends Model
     public function autoPublishSession(): string
     {
         return trim((string) $this->publish_session_ciphertext);
+    }
+
+    public function sessionStatusLabel(): string
+    {
+        $status = strtolower(trim((string) ($this->session_status ?: 'missing')));
+
+        return self::SESSION_STATUS_LABELS[$status] ?? ($status !== '' ? $status : '待检查');
     }
 
     public function resolvedPublishAdapter(): string

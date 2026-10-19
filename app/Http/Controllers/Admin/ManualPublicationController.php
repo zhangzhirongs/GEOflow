@@ -262,6 +262,7 @@ class ManualPublicationController extends Controller
             'personas' => ManualPublicationPersona::query()->where('is_active', true)->orderBy('name')->get(),
             'accounts' => ManualPublicationAccount::query()->where('is_active', true)->with('persona:id,name')->orderBy('account_name')->get(),
             'admins' => $this->activeAdmins(),
+            'currentAdminId' => (int) $this->admin($request)->id,
             'articles' => $articles,
             'articleSearch' => $articleSearch,
             'platforms' => ManualPublicationAccount::PLATFORMS,

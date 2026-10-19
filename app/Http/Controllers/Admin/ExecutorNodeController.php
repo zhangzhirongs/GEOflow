@@ -17,10 +17,11 @@ class ExecutorNodeController extends Controller
 
     public function index(): View
     {
-        $nodes = ExecutorNode::query()->orderByDesc('id')->get();
+        $nodes = ExecutorNode::query()->orderByDesc('id')->paginate(20, ['*'], 'node_page')->withQueryString();
         foreach ($nodes as $node) {
-            if ($node->online && ! $node->isFresh()) {
-                $node->forceFill(['online' => false])->save();
+            $fresh = $node->isFresh();
+            if ((bool) $node->online !== $fresh) {
+                $node->forceFill(['online' => $fresh])->save();
             }
         }
 
@@ -28,8 +29,8 @@ class ExecutorNodeController extends Controller
             'pageTitle' => __('georank.nav.executor_nodes'),
             'activeMenu' => 'articles',
             'adminSiteName' => AdminWeb::siteName(),
-            'nodes' => ExecutorNode::query()->orderByDesc('id')->get(),
-            'jobs' => ExecutorJob::query()->with('account:id,account_name,platform')->orderByDesc('id')->limit(30)->get(),
+            'nodes' => $nodes,
+            'jobs' => ExecutorJob::query()->with('account:id,account_name,platform')->orderByDesc('id')->paginate(30, ['*'], 'job_page')->withQueryString(),
             'pairing' => session('georank_pairing'),
         ]);
     }

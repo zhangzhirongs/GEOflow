@@ -54,6 +54,8 @@ class ExecutorNode extends Model
             return false;
         }
 
-        return $this->last_heartbeat_at->gt(now()->subSeconds($ttlSeconds));
+        // Use the database timestamp as the source of truth. The boolean `online`
+        // flag is a cached display value and may lag during a heartbeat race.
+        return $this->last_heartbeat_at->gte(now()->subSeconds($ttlSeconds));
     }
 }

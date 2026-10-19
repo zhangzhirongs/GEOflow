@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Models\ManualPublicationAccount;
 use App\Services\GeoFlow\BilibiliSocialPublishAdapter;
 use App\Services\GeoFlow\GenericSocialPublishAdapter;
+use App\Services\GeoFlow\GeoRankRemoteSocialPublishAdapter;
 use App\Services\GeoFlow\SocialPublishAdapterManager;
 use App\Services\GeoFlow\XiaohongshuSocialPublishAdapter;
 use App\Services\GeoFlow\ZhihuSocialPublishAdapter;
@@ -30,6 +31,15 @@ class SocialPublishAdapterManagerTest extends TestCase
         $account->publish_adapter = 'generic_http_api';
 
         $this->assertInstanceOf(GenericSocialPublishAdapter::class, $manager->forAccount($account));
+    }
+
+    public function test_it_prefers_explicit_georank_adapter_over_platform_default(): void
+    {
+        $manager = app(SocialPublishAdapterManager::class);
+        $account = $this->account(ManualPublicationAccount::PLATFORM_XIAOHONGSHU);
+        $account->publish_adapter = 'georank_remote';
+
+        $this->assertInstanceOf(GeoRankRemoteSocialPublishAdapter::class, $manager->forAccount($account));
     }
 
     private function account(string $platform): ManualPublicationAccount

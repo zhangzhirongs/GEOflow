@@ -100,7 +100,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         @foreach(['work_order', 'source', 'platform', 'assignee', 'schedule', 'status', 'action'] as $column)
-                            <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.manual_publications.column.'.$column) }}</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 @if($column === 'action') sticky right-0 z-20 bg-gray-50 shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.2)] @endif">{{ __('admin.manual_publications.column.'.$column) }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -134,7 +134,7 @@
                             </td>
                             <td class="px-5 py-4 text-sm text-gray-700">{{ $publication->assignee?->name ?? __('admin.manual_publications.unassigned') }}</td>
                             <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-600">{{ $publication->scheduled_at?->format('Y-m-d H:i') ?? __('admin.manual_publications.unscheduled') }}</td>
-                            <td class="px-5 py-4 text-sm">
+                            <td class="sticky right-0 z-10 whitespace-nowrap bg-white px-5 py-4 text-sm shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.12)]">
                                 <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $statusClass }}">{{ __('admin.manual_publications.status.'.$publication->status) }}</span>
                                 @if($publication->risk_status !== 'clean')
                                     <div class="mt-1 text-xs font-medium text-red-600">{{ __('admin.manual_publications.risk.'.$publication->risk_status) }}</div>

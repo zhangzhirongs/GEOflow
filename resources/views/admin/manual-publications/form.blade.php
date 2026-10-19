@@ -4,7 +4,7 @@
     $isEdit = $publication instanceof \App\Models\ManualPublication;
     $selectedArticleId = (string) old('article_id', $publication?->article_id ?? $selectedArticle?->id ?? '');
     $selectedType = (string) old('type', $publication?->type ?? ($selectedArticle ? 'post' : 'comment'));
-    $selectedPersonaId = (string) old('persona_id', $publication?->persona_id ?? '');
+    $selectedPersonaId = (string) old('persona_id', $publication?->persona_id ?? (($personas->first()->id ?? '')));
     $selectedAccountId = (string) old('account_id', $publication?->account_id ?? '');
     $selectedAssigneeId = (string) old('assigned_admin_id', $publication?->assigned_admin_id ?? '');
     $selectedPlatform = (string) old('platform', $publication?->platform ?? 'zhihu');
@@ -111,15 +111,7 @@
             <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.manual_publications.section.assignment') }}</h2>
                 <div class="mt-5 space-y-5">
-                    <div>
-                        <label for="persona_id" class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.persona') }} *</label>
-                        <select id="persona_id" name="persona_id" required class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">{{ __('admin.manual_publications.option.select_persona') }}</option>
-                            @foreach($personas as $persona)
-                                <option value="{{ $persona->id }}" @selected($selectedPersonaId === (string) $persona->id)>{{ $persona->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <input type="hidden" name="persona_id" value="{{ $selectedPersonaId }}">
                     <div>
                         <label for="platform" class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.platform') }} *</label>
                         <select id="platform" name="platform" required class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -146,7 +138,7 @@
                         <select id="assigned_admin_id" name="assigned_admin_id" class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">{{ __('admin.manual_publications.unassigned') }}</option>
                             @foreach($admins as $admin)
-                                <option value="{{ $admin->id }}" @selected($selectedAssigneeId === (string) $admin->id)>{{ $admin->name }}</option>
+                                <option value="{{ $admin->id }}" @selected($selectedAssigneeId === (string) $admin->id || ($selectedAssigneeId === '' && (int) $admin->id === (int) ($currentAdminId ?? 0)))>{{ $admin->name }}</option>
                             @endforeach
                         </select>
                     </div>

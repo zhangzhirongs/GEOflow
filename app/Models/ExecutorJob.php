@@ -13,6 +13,7 @@ class ExecutorJob extends Model
         'executor_node_id',
         'manual_publication_account_id',
         'social_publication_id',
+        'manual_publication_id',
         'platform',
         'recipe',
         'payload',
@@ -31,6 +32,7 @@ class ExecutorJob extends Model
             'executor_node_id' => 'integer',
             'manual_publication_account_id' => 'integer',
             'social_publication_id' => 'integer',
+            'manual_publication_id' => 'integer',
             'recipe' => 'array',
             'payload' => 'array',
             'logs' => 'array',
@@ -52,6 +54,11 @@ class ExecutorJob extends Model
     public function socialPublication(): BelongsTo
     {
         return $this->belongsTo(SocialPublication::class, 'social_publication_id');
+    }
+
+    public function manualPublication(): BelongsTo
+    {
+        return $this->belongsTo(ManualPublication::class, 'manual_publication_id');
     }
 
     public function toNodeJob(): array

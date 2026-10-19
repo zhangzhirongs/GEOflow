@@ -22,7 +22,7 @@ class SaveManualPublicationAccountRequest extends FormRequest
     {
         return [
             'persona_id' => [
-                'required',
+                'nullable',
                 'integer',
                 Rule::exists((new ManualPublicationPersona)->getTable(), 'id'),
             ],
@@ -36,6 +36,7 @@ class SaveManualPublicationAccountRequest extends FormRequest
                     'xiaohongshu_login_session',
                     'bilibili_login_session',
                     'generic_http_api',
+                    'georank_remote',
                 ]),
             ],
             'custom_platform' => [

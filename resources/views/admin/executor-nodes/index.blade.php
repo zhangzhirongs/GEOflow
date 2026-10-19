@@ -49,14 +49,14 @@
     </form>
 
     <div class="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="overflow-x-auto"><table class="min-w-[760px] divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
-                    <th class="px-4 py-3">{{ __('georank.nodes.name') }}</th>
-                    <th class="px-4 py-3">Slug</th>
-                    <th class="px-4 py-3">{{ __('georank.nodes.status') }}</th>
-                    <th class="px-4 py-3">{{ __('georank.nodes.heartbeat') }}</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="w-[190px] px-4 py-3">{{ __('georank.nodes.name') }}</th>
+                    <th class="w-[170px] px-4 py-3">Slug</th>
+                    <th class="w-[130px] px-4 py-3">{{ __('georank.nodes.status') }}</th>
+                    <th class="w-[180px] px-4 py-3">{{ __('georank.nodes.heartbeat') }}</th>
+                    <th class="sticky right-0 z-20 w-[190px] bg-gray-50 px-4 py-3"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -72,7 +72,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-xs text-gray-500">{{ $node->last_heartbeat_at?->diffForHumans() ?: '-' }}</td>
-                        <td class="px-4 py-3 text-right">
+                        <td class="sticky right-0 z-10 whitespace-nowrap bg-white px-4 py-3 text-right shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.12)]">
                             <form method="POST" action="{{ route('admin.executor-nodes.reset-key', ['nodeId' => $node->id]) }}" class="inline">@csrf<button class="text-xs font-semibold text-blue-700 hover:underline">{{ __('georank.nodes.reset_key') }}</button></form>
                             <form method="POST" action="{{ route('admin.executor-nodes.destroy', ['nodeId' => $node->id]) }}" class="inline" onsubmit="return confirm('{{ __('georank.nodes.confirm_delete') }}')">@csrf @method('DELETE')<button class="ml-3 text-xs font-semibold text-red-600 hover:underline">{{ __('georank.nodes.delete') }}</button></form>
                         </td>
@@ -81,35 +81,37 @@
                     <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">{{ __('georank.nodes.empty') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
+        <div class="border-t border-gray-200 px-4 py-3">{{ $nodes->links() }}</div>
     </div>
 
     <div class="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         <div class="border-b border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900">{{ __('georank.jobs.recent') }}</div>
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="overflow-x-auto"><table class="min-w-[980px] table-fixed divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
-                    <th class="px-4 py-3">ID</th>
-                    <th class="px-4 py-3">{{ __('georank.jobs.type') }}</th>
-                    <th class="px-4 py-3">{{ __('georank.jobs.account') }}</th>
-                    <th class="px-4 py-3">{{ __('georank.jobs.status') }}</th>
-                    <th class="px-4 py-3">{{ __('georank.jobs.error') }}</th>
+                    <th class="w-[80px] px-4 py-3">ID</th>
+                    <th class="w-[240px] px-4 py-3">{{ __('georank.jobs.type') }}</th>
+                    <th class="w-[220px] px-4 py-3">{{ __('georank.jobs.account') }}</th>
+                    <th class="w-[150px] px-4 py-3">{{ __('georank.jobs.status') }}</th>
+                    <th class="w-[420px] px-4 py-3">{{ __('georank.jobs.error') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse($jobs as $job)
                     <tr>
                         <td class="px-4 py-3 font-mono text-xs">{{ $job->id }}</td>
-                        <td class="px-4 py-3">{{ $job->type }} / {{ $job->platform }}</td>
+                        <td class="px-4 py-3">{{ ['login' => '登录', 'check' => '检查', 'publish' => '发布'][$job->type] ?? $job->type }} / {{ __('admin.manual_publications.platform.'.$job->platform) }}</td>
                         <td class="px-4 py-3">{{ $job->account?->account_name ?: $job->manual_publication_account_id }}</td>
-                        <td class="px-4 py-3">{{ $job->status }}</td>
+                        <td class="px-4 py-3">{{ ['queued' => '排队中', 'running' => '执行中', 'completed' => '已完成', 'failed' => '失败'][$job->status] ?? $job->status }}</td>
                         <td class="px-4 py-3 text-xs text-red-600">{{ $job->error }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">{{ __('georank.jobs.empty') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
+        <div class="border-t border-gray-200 px-4 py-3">{{ $jobs->links() }}</div>
     </div>
 </div>
 @endsection

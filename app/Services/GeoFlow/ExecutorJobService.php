@@ -5,6 +5,7 @@ namespace App\Services\GeoFlow;
 use App\Models\ExecutorJob;
 use App\Models\ExecutorNode;
 use App\Models\ManualPublicationAccount;
+use App\Models\ManualPublication;
 use App\Models\SocialPublication;
 use App\Support\GeoRank\WireGuard;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +79,8 @@ class ExecutorJobService
             'last_heartbeat_at' => now(),
         ])->save();
 
+        $this->reconcileManualPublications($node);
+
         foreach (($payload['sessions'] ?? []) as $session) {
             if (! is_array($session)) {
                 continue;
@@ -117,7 +120,32 @@ class ExecutorJobService
                 'enabled' => (bool) $account->is_active,
                 'sessionStatus' => (string) ($account->session_status ?: 'missing'),
             ])->all(),
+            'heartbeatAt' => optional($node->last_heartbeat_at)->toAtomString(),
         ];
+    }
+
+    private function reconcileManualPublications(ExecutorNode $node): void
+    {
+        ManualPublication::query()
+            ->with(['account', 'article'])
+            ->where('status', ManualPublication::STATUS_IN_PROGRESS)
+            ->where('type', ManualPublication::TYPE_POST)
+            ->whereHas('account', fn ($query) => $query->where('executor_node_id', $node->id))
+            ->orderBy('id')
+            ->get()
+            ->each(function (ManualPublication $publication): void {
+                $exists = ExecutorJob::query()
+                    ->where('manual_publication_id', $publication->getKey())
+                    ->whereIn('status', ['queued', 'running'])
+                    ->exists();
+                if (! $exists) {
+                    try {
+                        $this->enqueueManualPublication($publication);
+                    } catch (RuntimeException $exception) {
+                        report($exception);
+                    }
+                }
+            });
     }
 
     public function claim(ExecutorNode $node): ?ExecutorJob
@@ -126,7 +154,6 @@ class ExecutorJobService
             $running = ExecutorJob::query()
                 ->where('executor_node_id', $node->id)
                 ->where('status', 'running')
-                ->lockForUpdate()
                 ->count();
             if ($running >= max(1, (int) $node->max_concurrency)) {
                 return null;
@@ -221,6 +248,32 @@ class ExecutorJobService
                 }
             }
 
+            if ($job->manual_publication_id) {
+                $manual = ManualPublication::query()->whereKey($job->manual_publication_id)->lockForUpdate()->first();
+                if ($manual) {
+                    $nextStatus = $status === 'succeeded'
+                        ? ManualPublication::STATUS_COMPLETED
+                        : ($status === 'needs_login' ? ManualPublication::STATUS_IN_PROGRESS : ManualPublication::STATUS_FAILED);
+                    $previousStatus = (string) $manual->status;
+                    $manual->forceFill([
+                        'status' => $nextStatus,
+                        'status_changed_at' => now(),
+                        'completed_at' => $status === 'succeeded' ? now() : null,
+                        'result_note' => $status === 'succeeded'
+                            ? 'executor completed'
+                            : mb_substr((string) ($report['error'] ?? ''), 0, 1000),
+                    ])->save();
+                    if ($previousStatus !== $nextStatus) {
+                        \App\Models\ManualPublicationTransition::query()->create([
+                            'manual_publication_id' => $manual->getKey(),
+                            'from_status' => $previousStatus,
+                            'to_status' => $nextStatus,
+                            'result_note' => $manual->result_note,
+                        ]);
+                    }
+                }
+            }
+
             return $job->refresh();
         });
     }
@@ -243,10 +296,38 @@ class ExecutorJobService
         return $this->enqueue($account, 'publish', $payload, $publication);
     }
 
+    public function enqueueManualPublication(ManualPublication $publication): ExecutorJob
+    {
+        if ($publication->type !== ManualPublication::TYPE_POST) {
+            throw new RuntimeException('manual comments are not supported by the browser publish executor');
+        }
+        $account = $publication->account;
+        if (! $account instanceof ManualPublicationAccount) {
+            throw new RuntimeException('manual publication account is missing');
+        }
+        if (! $account->executor_node_id) {
+            throw new RuntimeException('manual publication account is missing executor node');
+        }
+
+        $article = $publication->article;
+        $title = (string) ($article?->title ?: data_get($publication->source_snapshot, 'title', ''));
+        if ($title === '') {
+            throw new RuntimeException('manual publication title is missing');
+        }
+
+        return $this->enqueue($account, 'publish', [
+            'title' => $title,
+            'content' => (string) $publication->content,
+            'excerpt' => (string) ($publication->target_context ?? ''),
+            'images' => [],
+            'autoPublish' => false,
+        ], null, $publication);
+    }
+
     /**
      * @param  array<string,mixed>|null  $payload
      */
-    private function enqueue(ManualPublicationAccount $account, string $type, ?array $payload = null, ?SocialPublication $publication = null): ExecutorJob
+    private function enqueue(ManualPublicationAccount $account, string $type, ?array $payload = null, ?SocialPublication $publication = null, ?ManualPublication $manualPublication = null): ExecutorJob
     {
         if (! $account->executor_node_id) {
             throw new RuntimeException('account is not bound to an executor node');
@@ -259,6 +340,7 @@ class ExecutorJobService
             'executor_node_id' => $account->executor_node_id,
             'manual_publication_account_id' => $account->id,
             'social_publication_id' => $publication?->id,
+            'manual_publication_id' => $manualPublication?->id,
             'platform' => (string) $account->platform,
             'recipe' => $this->recipes->forPlatform((string) $account->platform),
             'payload' => $payload,

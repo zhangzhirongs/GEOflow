@@ -11,6 +11,7 @@ use App\Services\GeoFlow\AnonymousUsageTelemetry;
 use App\Services\GeoFlow\BilibiliSocialPublishAdapter;
 use App\Services\GeoFlow\ArticleGeoFlowService;
 use App\Services\GeoFlow\GenericSocialPublishAdapter;
+use App\Services\GeoFlow\GeoRankRemoteSocialPublishAdapter;
 use App\Services\GeoFlow\HorizonMetricsAdapter;
 use App\Services\GeoFlow\JobQueueService;
 use App\Services\GeoFlow\TaskLifecycleService;
@@ -73,17 +74,18 @@ class AppServiceProvider extends ServiceProvider
             XiaohongshuSocialPublishAdapter::class,
             BilibiliSocialPublishAdapter::class,
             GenericSocialPublishAdapter::class,
+            GeoRankRemoteSocialPublishAdapter::class,
         ], 'geo.social_publish_adapters');
         $this->app->bind(SocialPublishAdapterManager::class, function ($app): SocialPublishAdapterManager {
             return new SocialPublishAdapterManager($app->tagged('geo.social_publish_adapters'));
         });
-        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class, GeoRankRemoteSocialPublishAdapter::class])
             ->needs('$apiKeyCrypto')
             ->give(fn ($app) => $app->make(\App\Support\GeoFlow\ApiKeyCrypto::class));
-        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class, GeoRankRemoteSocialPublishAdapter::class])
             ->needs('$safeHttp')
             ->give(fn ($app) => $app->make(SafeOutboundHttpClient::class));
-        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class])
+        $this->app->when([ZhihuSocialPublishAdapter::class, XiaohongshuSocialPublishAdapter::class, BilibiliSocialPublishAdapter::class, GenericSocialPublishAdapter::class, GeoRankRemoteSocialPublishAdapter::class])
             ->needs('$http')
             ->give(fn ($app) => $app->make(HttpFactory::class));
     }

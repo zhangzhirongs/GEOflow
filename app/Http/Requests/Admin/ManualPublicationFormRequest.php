@@ -13,6 +13,22 @@ use Illuminate\Validation\Validator;
 
 abstract class ManualPublicationFormRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $admin = $this->user('admin');
+        $personaId = (int) $this->input('persona_id');
+        $assigneeId = (int) $this->input('assigned_admin_id');
+
+        $this->merge([
+            'persona_id' => $personaId > 0
+                ? $personaId
+                : (int) (ManualPublicationPersona::query()->where('is_active', true)->oldest('id')->value('id') ?? 0),
+            'assigned_admin_id' => $assigneeId > 0
+                ? $assigneeId
+                : ($admin instanceof Admin ? (int) $admin->getAuthIdentifier() : null),
+        ]);
+    }
+
     /** @return array<string, mixed> */
     protected function publicationRules(bool $includeStatus): array
     {

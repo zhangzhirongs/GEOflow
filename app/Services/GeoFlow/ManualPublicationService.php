@@ -21,6 +21,7 @@ class ManualPublicationService
     public function __construct(
         private readonly ArticleRiskScanner $riskScanner,
         private readonly ManualPublicationDuplicateDetector $duplicateDetector,
+        private readonly ExecutorJobService $executorJobs,
     ) {}
 
     /** @param array<string, mixed> $data */
@@ -136,6 +137,11 @@ class ManualPublicationService
                 $normalizedResultNote,
                 $transitionedAt,
             );
+
+            if ($targetStatus === ManualPublication::STATUS_IN_PROGRESS) {
+                $current->loadMissing(['account', 'article']);
+                $this->executorJobs->enqueueManualPublication($current);
+            }
 
             return $current->refresh();
         });
