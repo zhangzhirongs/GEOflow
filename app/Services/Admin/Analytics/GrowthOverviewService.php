@@ -195,4 +195,5 @@ class GrowthOverviewService
 
         return ['sql' => $parts === [] ? '1 = 0' : '('.implode(' OR ', $parts).')', 'bindings' => $bindings];
     }
+
 }

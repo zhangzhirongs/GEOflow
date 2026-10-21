@@ -1,12 +1,11 @@
 <section class="mb-8">
-    <div class="mb-5">
-        <h2 class="text-xl font-semibold text-gray-900">{{ __('admin.analytics.content_title') }}</h2>
-        <p class="mt-1 text-sm text-gray-600">{{ __('admin.analytics.content_desc') }}</p>
+    <div class="mb-4 flex items-baseline justify-between gap-3">
+        <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.analytics.content_title') }}</h2>
     </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">{{ __('admin.analytics.publication_trend') }}</h3>
+            <h3 class="mb-4 text-base font-semibold text-gray-900">{{ __('admin.analytics.publication_trend') }}</h3>
             @include('admin.analytics._interactive-trend', [
                 'series' => $publicationTrend,
                 'chartLabel' => __('admin.analytics.publication_trend'),
@@ -22,7 +21,7 @@
         </div>
 
         <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">{{ __('admin.analytics.task_trend') }}</h3>
+            <h3 class="mb-4 text-base font-semibold text-gray-900">{{ __('admin.analytics.task_trend') }}</h3>
             @include('admin.analytics._interactive-trend', [
                 'series' => $taskTrend,
                 'chartLabel' => __('admin.analytics.task_trend'),
@@ -42,12 +41,12 @@
         </div>
 
         <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">{{ __('admin.analytics.content_funnel') }}</h3>
+            <h3 class="mb-4 text-base font-semibold text-gray-900">{{ __('admin.analytics.content_funnel') }}</h3>
             @include('admin.analytics._funnel', ['funnel' => $contentFunnel])
         </div>
 
         <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-gray-200">
-            <h3 class="mb-4 text-lg font-semibold text-gray-900">{{ __('admin.analytics.ai_usage') }}</h3>
+            <h3 class="mb-4 text-base font-semibold text-gray-900">{{ __('admin.analytics.ai_usage') }}</h3>
             <div class="grid grid-cols-3 gap-3 text-center">
                 <div class="rounded-lg bg-indigo-50 px-3 py-4">
                     <div class="text-2xl font-bold text-indigo-700">{{ number_format((int) $aiUsageSummary['used_today']) }}</div>
@@ -82,7 +81,7 @@
         <div class="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
             <div class="border-b border-gray-100 px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('admin.dashboard.category_distribution') }}</h3>
+                    <h3 class="text-base font-semibold text-gray-900">{{ __('admin.dashboard.category_distribution') }}</h3>
                     <a href="{{ route('admin.categories.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">{{ __('admin.dashboard.manage_categories') }}</a>
                 </div>
             </div>
@@ -108,7 +107,7 @@
 
         <div class="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
             <div class="border-b border-gray-100 px-6 py-4">
-                <h3 class="text-lg font-semibold text-gray-900">{{ __('admin.dashboard.system_performance') }}</h3>
+                <h3 class="text-base font-semibold text-gray-900">{{ __('admin.dashboard.system_performance') }}</h3>
             </div>
             <div class="space-y-5 p-6">
                 <div>
@@ -144,7 +143,7 @@
         <div class="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
             <div class="border-b border-gray-100 px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('admin.dashboard.latest_articles') }}</h3>
+                    <h3 class="text-base font-semibold text-gray-900">{{ __('admin.dashboard.latest_articles') }}</h3>
                     <a href="{{ route('admin.articles.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">{{ __('admin.dashboard.view_all') }}</a>
                 </div>
             </div>
@@ -180,16 +179,16 @@
     <div class="mt-6">
         <div class="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
             <div class="border-b border-gray-100 px-6 py-4">
-                <h3 class="text-lg font-semibold text-gray-900">{{ __('admin.analytics.top_content') }}</h3>
+                <h3 class="text-base font-semibold text-gray-900">{{ __('admin.analytics.top_content') }}</h3>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="admin-table min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.article') }}</th>
-                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.category') }}</th>
-                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.views') }}</th>
-                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.status') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500">{{ __('admin.analytics.article') }}</th>
+                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-semibold text-gray-500">{{ __('admin.analytics.category') }}</th>
+                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-semibold text-gray-500">{{ __('admin.analytics.views') }}</th>
+                            <th class="whitespace-nowrap px-6 py-3 text-left text-xs font-semibold text-gray-500">{{ __('admin.analytics.status') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 bg-white">

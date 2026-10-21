@@ -2,10 +2,9 @@
 
 @section('content')
     <div class="px-4 sm:px-0">
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-5">
             <div>
                 <h1 class="qdk-page-title">{{ __('admin.ai_models.page_title') }}</h1>
-                <p class="qdk-page-sub">{{ __('admin.ai_models.page_subtitle') }}</p>
             </div>
             <button type="button" onclick="showCreateModelModal()" class="qdk-btn qdk-btn-primary">
                 <i data-lucide="plus" class="w-4 h-4"></i>
@@ -13,15 +12,14 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
             <div class="qdk-card">
                 <div class="qdk-card-head">
                     <h3 class="qdk-card-title">{{ __('admin.ai_models.vector_title') }}</h3>
-                    <p class="qdk-card-sub">{{ __('admin.ai_models.vector_desc') }}</p>
                 </div>
                 <div class="px-6 py-5 space-y-4">
                     <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">{{ __('admin.ai_models.pgvector') }}</span>
+                        <span class="text-sm text-gray-600">检索能力</span>
                         <span class="qdk-badge {{ $pgvectorEnabled ? 'qdk-badge-green' : 'qdk-badge-amber' }}">
                             {{ $pgvectorEnabled ? __('admin.ai_models.pgvector_enabled') : __('admin.ai_models.pgvector_fallback') }}
                         </span>
@@ -30,7 +28,7 @@
                     <form method="POST" action="{{ route('admin.ai-models.default-embedding') }}" class="space-y-3">
                         @csrf
                         <div>
-                            <label for="default_embedding_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_models.default_embedding') }}</label>
+                            <label for="default_embedding_model_id" class="block text-sm font-medium text-gray-700">知识库检索模型</label>
                             <select name="default_embedding_model_id" id="default_embedding_model_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
                                 <option value="0">{{ __('admin.ai_models.embedding_auto') }}</option>
                                 @foreach ($embeddingModels as $embeddingModel)
@@ -39,7 +37,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_models.embedding_help') }}</p>
+                            <p class="mt-1 text-xs text-gray-500">用于查找知识库资料。</p>
                         </div>
                         <div class="flex justify-end">
                             <button type="submit" class="qdk-btn qdk-btn-primary qdk-btn-sm">
@@ -52,49 +50,34 @@
 
             <div class="qdk-card">
                 <div class="qdk-card-head">
-                    <h3 class="qdk-card-title">{{ __('admin.ai_models.type_title') }}</h3>
-                    <p class="qdk-card-sub">{{ __('admin.ai_models.type_desc') }}</p>
-                </div>
-                <div class="px-6 py-5 space-y-3 text-sm text-gray-700">
-                    <p>{{ __('admin.ai_models.type_chat') }}</p>
-                    <p>{{ __('admin.ai_models.type_embedding') }}</p>
-                    <p>{{ __('admin.ai_models.type_rerank') }}</p>
-                    <p>{{ __('admin.ai_models.type_fallback') }}</p>
-                </div>
-            </div>
-
-            <div class="qdk-card">
-                <div class="qdk-card-head">
-                    <h3 class="qdk-card-title">{{ __('admin.ai_models.chunking_title') }}</h3>
-                    <p class="qdk-card-sub">{{ __('admin.ai_models.chunking_desc') }}</p>
+                    <h3 class="qdk-card-title">知识库处理</h3>
                 </div>
                 <div class="px-6 py-5">
                     <form method="POST" action="{{ route('admin.ai-models.chunking-config') }}" class="space-y-4">
                         @csrf
                         <div>
-                            <label for="knowledge_chunk_strategy" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_models.chunk_strategy') }}</label>
+                            <label for="knowledge_chunk_strategy" class="block text-sm font-medium text-gray-700">资料整理方式</label>
                             <select name="knowledge_chunk_strategy" id="knowledge_chunk_strategy" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
-                                <option value="rule" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'rule')>{{ __('admin.ai_models.chunk_strategy_rule') }}</option>
-                                <option value="auto" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'auto')>{{ __('admin.ai_models.chunk_strategy_auto') }}</option>
-                                <option value="semantic_llm" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'semantic_llm')>{{ __('admin.ai_models.chunk_strategy_semantic') }}</option>
+                                <option value="rule" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'rule')>按文档结构处理</option>
+                                <option value="auto" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'auto')>自动选择</option>
+                                <option value="semantic_llm" @selected(($chunkingConfig['strategy'] ?? 'rule') === 'semantic_llm')>使用聊天模型处理</option>
                             </select>
-                            <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_models.chunk_strategy_help') }}</p>
+                            <p class="mt-1 text-xs text-gray-500">默认按文档结构整理。</p>
                         </div>
                         <div>
-                            <label for="knowledge_chunking_model_id" class="block text-sm font-medium text-gray-700">{{ __('admin.ai_models.chunking_model') }}</label>
+                            <label for="knowledge_chunking_model_id" class="block text-sm font-medium text-gray-700">处理模型</label>
                             <select name="knowledge_chunking_model_id" id="knowledge_chunking_model_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm">
-                                <option value="0">{{ __('admin.ai_models.chunking_model_none') }}</option>
+                                <option value="0">不指定模型</option>
                                 @foreach ($chatModels as $chatModel)
                                     <option value="{{ (int) $chatModel['id'] }}" @selected((int) ($chunkingConfig['model_id'] ?? 0) === (int) $chatModel['id'])>
                                         {{ $chatModel['name'].' ('.$chatModel['model_id'].')' }}
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-xs text-gray-500">{{ __('admin.ai_models.chunking_model_help') }}</p>
                         </div>
                         <div class="flex justify-end">
                             <button type="submit" class="qdk-btn qdk-btn-primary qdk-btn-sm">
-                                {{ __('admin.ai_models.save_chunking') }}
+                                保存处理设置
                             </button>
                         </div>
                     </form>
@@ -105,7 +88,6 @@
         <div class="qdk-card">
             <div class="qdk-card-head">
                 <h3 class="qdk-card-title">{{ __('admin.ai_models.list_title') }}</h3>
-                <p class="qdk-card-sub">{{ __('admin.ai_models.list_desc') }}</p>
             </div>
 
             <div class="overflow-x-auto">
@@ -113,7 +95,6 @@
                     <thead class="bg-[#fafbfc]">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_models.column.info') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_models.column.version') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_models.column.usage') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_models.column.limit') }}</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('admin.ai_models.column.status') }}</th>
@@ -123,7 +104,7 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                     @if (empty($models))
                         <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">
                                 <i data-lucide="cpu" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
                                 <p>{{ __('admin.ai_models.empty') }}</p>
                                 <button type="button" onclick="showCreateModelModal()" class="mt-2 text-[color:var(--qdk-primary)] hover:underline">
@@ -147,17 +128,12 @@
                                         </div>
                                         <div class="text-sm text-gray-500">{{ $model['model_id'] }}</div>
                                         <div class="text-xs text-gray-400">{{ __('admin.ai_models.api_key_mask') }}: {{ $model['masked_api_key'] }}</div>
-                                        <div class="text-xs text-gray-400">{{ __('admin.ai_models.failover_priority_label', ['priority' => (int) $model['failover_priority']]) }}</div>
                                     </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $model['version'] !== '' ? $model['version'] : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">
                                         <div>{{ __('admin.ai_models.usage_tasks', ['count' => (string) $model['task_count']]) }}</div>
                                         <div>{{ __('admin.ai_models.usage_articles', ['count' => (string) $model['article_count']]) }}</div>
-                                        <div>{{ __('admin.ai_models.usage_total', ['count' => (string) number_format((int) $model['total_used'])]) }}</div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

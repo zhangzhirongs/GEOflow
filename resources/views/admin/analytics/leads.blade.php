@@ -13,19 +13,18 @@
         ])
 
         <section class="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-            <form method="GET" action="{{ route('admin.analytics.leads') }}" class="space-y-4">
-                <div class="flex flex-wrap gap-2">
+            <form method="GET" action="{{ route('admin.analytics.leads') }}" class="space-y-4" data-analytics-auto-submit>
+                <div class="flex flex-wrap gap-1.5">
                     @foreach (['7d', '30d', '90d'] as $preset)
-                        <button type="submit" name="lead_preset" value="{{ $preset }}" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-amber-600 bg-amber-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-amber-300 hover:text-amber-700' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">{{ __('admin.analytics.filters.'.$preset) }}</button>
+                        <button type="submit" name="lead_preset" value="{{ $preset }}" class="inline-flex min-h-8 items-center rounded-md border px-2.5 py-1 text-xs font-medium transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-amber-600 bg-amber-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-amber-300 hover:text-amber-700' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">{{ __('admin.analytics.filters.'.$preset) }}</button>
                     @endforeach
                 </div>
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 {{ $filters->preset === 'custom' ? '' : 'hidden' }}" data-analytics-custom-date-fields>
                     <div><label for="lead-date-from" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_from') }}</label><input id="lead-date-from" type="date" name="lead_date_from" value="{{ $filterData['lead_date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"></div>
                     <div><label for="lead-date-to" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.filters.date_to') }}</label><input id="lead-date-to" type="date" name="lead_date_to" value="{{ $filterData['lead_date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"></div>
                     <div><label for="lead-form-id" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.lead_analytics.form') }}</label><select id="lead-form-id" name="lead_form_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"><option value="">{{ __('admin.analytics.filters.all') }}</option>@foreach ($filterOptions['forms'] as $form)<option value="{{ $form->id }}" @selected($filters->formId === (int) $form->id)>{{ $form->name }}</option>@endforeach</select></div>
                     <div><label for="lead-status" class="mb-1 block text-sm font-medium text-gray-700">{{ __('admin.analytics.status') }}</label><select id="lead-status" name="lead_status" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"><option value="all">{{ __('admin.analytics.filters.all') }}</option>@foreach (\App\Models\LeadSubmission::STATUSES as $status)<option value="{{ $status }}" @selected($filters->status === $status)>{{ __('admin.leads.status.'.$status) }}</option>@endforeach</select></div>
                 </div>
-                <div class="flex justify-end"><button type="submit" name="lead_preset" value="custom" class="inline-flex min-h-10 items-center rounded-md bg-amber-600 px-4 text-sm font-semibold text-white hover:bg-amber-700"><i data-lucide="filter" class="mr-2 h-4 w-4"></i>{{ __('admin.analytics.filters.apply') }}</button></div>
             </form>
         </section>
 
@@ -37,7 +36,7 @@
                 ['key' => 'converted', 'icon' => 'badge-check'],
                 ['key' => 'conversion_rate', 'icon' => 'percent', 'suffix' => '%'],
             ] as $card)
-                <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">{{ __('admin.analytics.lead_analytics.kpi.'.$card['key']) }}</p><i data-lucide="{{ $card['icon'] }}" class="h-5 w-5 text-amber-600"></i></div><p class="mt-3 text-right font-mono text-3xl font-semibold tabular-nums text-gray-950">{{ $card['key'] === 'conversion_rate' ? number_format((float) ($kpis[$card['key']] ?? 0), 1) : number_format((int) ($kpis[$card['key']] ?? 0)) }}{{ $card['suffix'] ?? '' }}</p></article>
+                <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">{{ __('admin.analytics.lead_analytics.kpi.'.$card['key']) }}</p><i data-lucide="{{ $card['icon'] }}" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">{{ $card['key'] === 'conversion_rate' ? number_format((float) ($kpis[$card['key']] ?? 0), 1) : number_format((int) ($kpis[$card['key']] ?? 0)) }}{{ $card['suffix'] ?? '' }}</p></article>
             @endforeach
         </section>
 

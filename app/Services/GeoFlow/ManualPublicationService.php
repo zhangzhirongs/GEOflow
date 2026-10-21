@@ -173,10 +173,7 @@ class ManualPublicationService
         if (! in_array($platform, ManualPublicationAccount::PLATFORMS, true)) {
             throw new DomainException((string) __('admin.manual_publications.error.invalid_platform'));
         }
-        $customPlatform = trim((string) ($data['custom_platform'] ?? '')) ?: null;
-        if ($platform === ManualPublicationAccount::PLATFORM_CUSTOM && $customPlatform === null) {
-            throw new DomainException((string) __('admin.manual_publications.error.custom_platform_required'));
-        }
+        $customPlatform = null;
 
         $persona = ManualPublicationPersona::query()
             ->whereKey((int) $data['persona_id'])
@@ -194,10 +191,7 @@ class ManualPublicationService
                 ->first();
             if (! $account instanceof ManualPublicationAccount
                 || (int) $account->persona_id !== (int) $persona->getKey()
-                || $account->platform !== $platform
-                || ($platform === ManualPublicationAccount::PLATFORM_CUSTOM
-                    && $account->custom_platform !== null
-                    && trim((string) $account->custom_platform) !== $customPlatform)) {
+                || $account->platform !== $platform) {
                 throw new DomainException((string) __('admin.manual_publications.error.account_mismatch'));
             }
         }

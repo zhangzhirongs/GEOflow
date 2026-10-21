@@ -36,66 +36,60 @@
 @endphp
 
 <section id="log-attribution" class="mb-8 rounded-lg bg-white shadow-sm ring-1 ring-gray-200" data-analytics-log-section>
-    <div class="border-b border-gray-100 px-5 py-5 sm:px-6">
-        <h2 class="text-xl font-semibold text-gray-900">{{ __('admin.analytics.logs_title') }}</h2>
-        <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.analytics.self_log_desc') }}</p>
-        <div class="mt-4 rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
-            <div class="flex items-start gap-2">
-                <i data-lucide="info" class="mt-0.5 h-4 w-4 shrink-0"></i>
-                <p>{{ __('admin.analytics.logs_boundary_note') }}</p>
-            </div>
-        </div>
+    <div class="border-b border-gray-100 px-5 py-4 sm:px-6">
+        <h2 class="text-base font-semibold text-gray-900">{{ __('admin.analytics.logs_title') }}</h2>
+        <p class="mt-2 flex items-start gap-1.5 text-xs leading-5 text-amber-700">
+            <i data-lucide="info" class="mt-0.5 h-3.5 w-3.5 shrink-0"></i>
+            <span>{{ __('admin.analytics.logs_boundary_note') }}</span>
+        </p>
     </div>
 
-    <div class="border-b border-gray-100 bg-gray-50/70 px-5 py-5 sm:px-6">
-        <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <h3 class="text-base font-semibold text-gray-900">{{ __('admin.analytics.logs_filter_title') }}</h3>
-                <p class="mt-1 text-sm text-gray-500">{{ __('admin.analytics.logs_filter_desc') }}</p>
-            </div>
-            <div class="text-sm text-gray-500">
+    <div class="border-b border-gray-100 bg-gray-50/70 px-5 py-4 sm:px-6">
+        <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">{{ __('admin.analytics.logs_filter_title') }}</h3>
+            <div class="text-xs text-gray-500">
                 {{ __('admin.analytics.logs_current_source') }}
                 <span class="font-semibold text-gray-800">{{ $currentSourceLabel }}</span>
             </div>
         </div>
 
-        <form id="analytics-log-filter-form" method="GET" action="{{ $analyticsLogRoute ?? route('admin.analytics.traffic') }}" class="space-y-4">
+        <form id="analytics-log-filter-form" method="GET" action="{{ $analyticsLogRoute ?? route('admin.analytics.traffic') }}" class="space-y-4" data-analytics-auto-submit>
             @foreach (['preset', 'date_from', 'date_to', 'channel_id'] as $name)
                 <input type="hidden" name="{{ $name }}" value="{{ $contentFilterData[$name] ?? '' }}">
             @endforeach
 
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-end gap-2 {{ $logFilters->preset === 'custom' ? '' : 'hidden' }}" data-analytics-custom-date-fields>
                 @foreach ($logPresetOptions as $preset)
                     @php
                         $presetClass = $logFilters->preset === $preset
                             ? 'border-blue-600 bg-blue-600 text-white'
                             : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300 hover:text-blue-700';
                     @endphp
-                    <button type="submit" name="log_preset" value="{{ $preset }}" class="inline-flex min-h-10 items-center rounded-md border px-3 py-2 text-sm font-medium transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $presetClass }}" aria-pressed="{{ $logFilters->preset === $preset ? 'true' : 'false' }}">
+                    <button type="submit" name="log_preset" value="{{ $preset }}" class="inline-flex min-h-8 items-center rounded-md border px-2.5 py-1 text-xs font-medium transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $presetClass }}" aria-pressed="{{ $logFilters->preset === $preset ? 'true' : 'false' }}">
                         {{ __('admin.analytics.filters.'.$preset) }}
                     </button>
                 @endforeach
             </div>
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700" for="log-date-from">{{ __('admin.analytics.filters.date_from') }}</label>
+            <div class="flex flex-wrap items-end gap-2">
+                <div class="min-w-[8.5rem] flex-1 sm:flex-none">
+                    <label class="mb-1 block text-xs font-medium text-gray-600" for="log-date-from">{{ __('admin.analytics.filters.date_from') }}</label>
                     <input id="log-date-from" type="date" name="log_date_from" value="{{ $logFilterData['log_date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700" for="log-date-to">{{ __('admin.analytics.filters.date_to') }}</label>
+                <div class="min-w-[8.5rem] flex-1 sm:flex-none">
+                    <label class="mb-1 block text-xs font-medium text-gray-600" for="log-date-to">{{ __('admin.analytics.filters.date_to') }}</label>
                     <input id="log-date-to" type="date" name="log_date_to" value="{{ $logFilterData['log_date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700" for="log-traffic-type">{{ __('admin.analytics.filters.traffic_type') }}</label>
+                <div class="min-w-[10rem] flex-1 sm:flex-none">
+                    <label class="mb-1 block text-xs font-medium text-gray-600" for="log-traffic-type">{{ __('admin.analytics.filters.traffic_type') }}</label>
                     <select id="log-traffic-type" name="log_traffic_type" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         @foreach ($trafficOptions as $option)
                             <option value="{{ $option }}" @selected($logFilters->trafficType === $option)>{{ __('admin.analytics.filters.'.$option) }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-gray-700" for="log-source">{{ __('admin.analytics.filters.log_source') }}</label>
+                <div class="min-w-[10rem] flex-1 sm:flex-none">
+                    <label class="mb-1 block text-xs font-medium text-gray-600" for="log-source">{{ __('admin.analytics.filters.log_source') }}</label>
                     <select id="log-source" name="log_source" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         @foreach ($logSourceOptions as $option)
                             @php
@@ -108,7 +102,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <div>
                     <label class="mb-1 block text-sm font-medium text-gray-700" for="log-task-id">{{ __('admin.analytics.filters.task') }}</label>
                     <select id="log-task-id" name="task_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -138,12 +132,6 @@
                 </div>
             </div>
 
-            <div class="flex justify-end">
-                <button type="submit" name="log_preset" value="custom" class="inline-flex min-h-10 items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition duration-[120ms] motion-reduce:transition-none hover:bg-blue-700 active:scale-[.98] motion-reduce:active:scale-100">
-                    <i data-lucide="calendar-search" class="mr-1.5 h-4 w-4"></i>
-                    {{ __('admin.analytics.logs_apply_custom') }}
-                </button>
-            </div>
         </form>
 
         @if ((int) ($logSummary['excluded_source_rows'] ?? 0) > 0)
@@ -152,7 +140,6 @@
                 <p>{{ __('admin.analytics.logs_excluded_sources', ['count' => number_format((int) $logSummary['excluded_source_rows'])]) }}</p>
             </div>
         @endif
-        <p class="mt-3 text-xs leading-5 text-gray-500">{{ __('admin.analytics.logs_proxy_note') }}</p>
     </div>
 
     @if (empty($logSummary['has_data']))
@@ -167,30 +154,26 @@
     @else
         <div class="space-y-6 p-5 sm:p-6">
             <div>
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('admin.analytics.logs_title') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('admin.analytics.logs_desc') }}</p>
-                </div>
-                <h4 class="mb-4 text-base font-semibold text-gray-900">{{ __('admin.analytics.logs_overview') }}</h4>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <h4 class="mb-4 text-sm font-semibold text-gray-900">{{ __('admin.analytics.logs_overview') }}</h4>
+                <div class="grid grid-cols-2 gap-3 xl:grid-cols-4">
                     @foreach ([
                         ['key' => 'pv', 'icon' => 'mouse-pointer-click', 'tone' => 'text-blue-600'],
                         ['key' => 'unique_ip', 'icon' => 'network', 'tone' => 'text-emerald-600'],
                         ['key' => 'ai_bot_pv', 'icon' => 'bot', 'tone' => 'text-purple-600'],
                         ['key' => 'errors', 'icon' => 'triangle-alert', 'tone' => 'text-red-600'],
                     ] as $card)
-                        <div class="rounded-lg bg-gray-50 p-5">
-                            <div class="flex items-center gap-4">
-                                <i data-lucide="{{ $card['icon'] }}" class="h-6 w-6 {{ $card['tone'] }}"></i>
+                        <div class="rounded-lg bg-gray-50 p-4">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="{{ $card['icon'] }}" class="h-5 w-5 shrink-0 {{ $card['tone'] }}"></i>
                                 <div class="min-w-0 flex-1">
-                                    <div class="whitespace-nowrap text-sm font-medium text-gray-500">{{ __('admin.analytics.logs_kpi.'.$card['key']) }}</div>
-                                    <div class="mt-1 text-right text-2xl font-bold tabular-nums text-gray-900">{{ number_format((int) ($logSummary['kpis'][$card['key']] ?? 0)) }}</div>
+                                    <div class="whitespace-nowrap text-xs font-medium text-gray-500">{{ __('admin.analytics.logs_kpi.'.$card['key']) }}</div>
+                                    <div class="mt-1 text-xl font-bold tabular-nums text-gray-900">{{ number_format((int) ($logSummary['kpis'][$card['key']] ?? 0)) }}</div>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-                <p class="mt-3 text-xs leading-5 text-gray-500">{{ __('admin.analytics.logs_recorded_error_note') }}</p>
+                <p class="mt-3 text-xs leading-5 text-gray-400">{{ __('admin.analytics.logs_recorded_error_note') }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -314,9 +297,9 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.logs_table.'.$table['first']) }}</th>
-                                        <th class="whitespace-nowrap px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.logs_table.views') }}</th>
-                                        <th class="whitespace-nowrap px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('admin.analytics.logs_table.unique_ip') }}</th>
+                                        <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">{{ __('admin.analytics.logs_table.'.$table['first']) }}</th>
+                                        <th class="whitespace-nowrap px-5 py-3 text-right text-xs font-semibold text-gray-500">{{ __('admin.analytics.logs_table.views') }}</th>
+                                        <th class="whitespace-nowrap px-5 py-3 text-right text-xs font-semibold text-gray-500">{{ __('admin.analytics.logs_table.unique_ip') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100 bg-white">

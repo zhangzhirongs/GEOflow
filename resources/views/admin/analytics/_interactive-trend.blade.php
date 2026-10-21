@@ -27,8 +27,8 @@
 <div data-analytics-trend data-default-index="{{ max(0, $trendCount - 1) }}" data-preview-label="{{ __('admin.analytics.trend.preview') }}" data-pinned-label="{{ __('admin.analytics.trend.pinned') }}">
     <script type="application/json" data-analytics-trend-data>@json($trendRows->all())</script>
     <script type="application/json" data-analytics-trend-metrics>@json($trendMetrics->all())</script>
-    <div class="overflow-x-auto">
-        <svg viewBox="0 0 {{ $chartWidth }} {{ $chartHeight }}" class="h-60 min-w-[42rem] w-full touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" role="group" tabindex="0" aria-label="{{ $chartLabel ?? __('admin.analytics.trend.aria') }}" aria-keyshortcuts="ArrowLeft ArrowRight Enter Escape" data-analytics-trend-chart>
+    <div>
+        <svg viewBox="0 0 {{ $chartWidth }} {{ $chartHeight }}" preserveAspectRatio="none" class="block h-56 w-full touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" role="group" tabindex="0" aria-label="{{ $chartLabel ?? __('admin.analytics.trend.aria') }}" aria-keyshortcuts="ArrowLeft ArrowRight Enter Escape" data-analytics-trend-chart>
             <line x1="{{ $plotLeft }}" y1="{{ $plotBottom }}" x2="{{ $plotRight }}" y2="{{ $plotBottom }}" stroke="#d1d5db" />
             <line x1="{{ $defaultPoint['x'] }}" y1="{{ $plotTop }}" x2="{{ $defaultPoint['x'] }}" y2="{{ $plotBottom }}" stroke="#94a3b8" stroke-dasharray="4 4" data-analytics-trend-guide />
             @foreach ($trendMetrics as $metric)

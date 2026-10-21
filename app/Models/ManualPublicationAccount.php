@@ -20,33 +20,40 @@ class ManualPublicationAccount extends Model
 
     public const PLATFORM_XIAOHONGSHU = 'xiaohongshu';
 
-    public const PLATFORM_WEIBO = 'weibo';
+    public const PLATFORM_BAIJIAHAO = 'baijiahao';
 
-    public const PLATFORM_WECHAT = 'wechat';
+    public const PLATFORM_TOUTIAO = 'toutiao';
+
+    public const PLATFORM_WEIBO = 'weibo';
 
     public const PLATFORM_DOUYIN = 'douyin';
 
     public const PLATFORM_BILIBILI = 'bilibili';
 
+    public const PLATFORM_WECHAT_MP = 'wechat_mp';
+
+    public const PLATFORM_CSDN = 'csdn';
+
+    public const PLATFORM_LOCAL_DEMO = 'local_demo';
+
+    /** @deprecated Retained for legacy records; excluded from PLATFORMS. */
+    public const PLATFORM_WECHAT = 'wechat';
     public const PLATFORM_REDDIT = 'reddit';
-
     public const PLATFORM_X = 'x';
-
     public const PLATFORM_LINKEDIN = 'linkedin';
-
     public const PLATFORM_CUSTOM = 'custom';
 
     public const PLATFORMS = [
         self::PLATFORM_ZHIHU,
         self::PLATFORM_XIAOHONGSHU,
-        self::PLATFORM_WEIBO,
-        self::PLATFORM_WECHAT,
-        self::PLATFORM_DOUYIN,
+        self::PLATFORM_BAIJIAHAO,
+        self::PLATFORM_TOUTIAO,
         self::PLATFORM_BILIBILI,
-        self::PLATFORM_REDDIT,
-        self::PLATFORM_X,
-        self::PLATFORM_LINKEDIN,
-        self::PLATFORM_CUSTOM,
+        self::PLATFORM_WEIBO,
+        self::PLATFORM_DOUYIN,
+        self::PLATFORM_WECHAT_MP,
+        self::PLATFORM_CSDN,
+        self::PLATFORM_LOCAL_DEMO,
     ];
 
     protected $attributes = [

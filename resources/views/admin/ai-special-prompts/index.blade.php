@@ -5,7 +5,6 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="qdk-page-title">{{ __('admin.ai_special.heading') }}</h1>
-                <p class="qdk-page-sub">{{ __('admin.ai_special.subtitle') }}</p>
             </div>
         </div>
 
@@ -20,7 +19,6 @@
                         </div>
                         <div>
                             <h3 class="qdk-card-title">{{ __('admin.ai_special.keyword_title') }}</h3>
-                            <p class="qdk-card-sub">{{ __('admin.ai_special.keyword_subtitle') }}</p>
                         </div>
                     </div>
                 </div>
@@ -33,8 +31,6 @@
                             <textarea name="keyword_content" id="keyword_content" rows="8" required
                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
                                       placeholder="{{ __('admin.ai_special.keyword_placeholder') }}">{{ $keywordPromptContent }}</textarea>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('admin.ai_special.keyword_help') }}</p>
-                            <p class="mt-1 text-xs text-gray-500">{!! __('admin.ai_special.variable_help') !!}</p>
                         </div>
 
                         <div class="flex justify-end">
@@ -57,7 +53,6 @@
                         </div>
                         <div>
                             <h3 class="qdk-card-title">{{ __('admin.ai_special.description_title') }}</h3>
-                            <p class="qdk-card-sub">{{ __('admin.ai_special.description_subtitle') }}</p>
                         </div>
                     </div>
                 </div>
@@ -70,8 +65,6 @@
                             <textarea name="description_content" id="description_content" rows="8" required
                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm"
                                       placeholder="{{ __('admin.ai_special.description_placeholder') }}">{{ $descriptionPromptContent }}</textarea>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('admin.ai_special.description_help') }}</p>
-                            <p class="mt-1 text-xs text-gray-500">{!! __('admin.ai_special.variable_help') !!}</p>
                         </div>
 
                         <div class="flex justify-end">
@@ -85,24 +78,6 @@
             </div>
         </div>
 
-        <div class="mt-8 rounded-lg border border-[#d6e2ff] bg-[color:var(--qdk-primary-weak)] p-6">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i data-lucide="info" class="h-5 w-5 text-[color:var(--qdk-primary)]"></i>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-[color:var(--qdk-primary)]">{{ __('admin.ai_special.help_title') }}</h3>
-                    <div class="mt-2 text-sm text-[#3f5fb0]">
-                        <ul class="list-disc list-inside space-y-1">
-                            <li>{{ __('admin.ai_special.help_keyword') }}</li>
-                            <li>{{ __('admin.ai_special.help_description') }}</li>
-                            <li>{{ __('admin.ai_special.help_variables') }}</li>
-                            <li>{{ __('admin.ai_special.help_auto_apply') }}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 

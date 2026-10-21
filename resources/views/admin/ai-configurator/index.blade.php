@@ -4,12 +4,7 @@
     $workbench = $workbench ?? [];
     $skills = $workbench['skills'] ?? [];
     $capabilityGroups = $workbench['capability_groups'] ?? [];
-    $quickStats = $workbench['stats'] ?? [];
     $shortcuts = $workbench['shortcuts'] ?? [];
-    $taskSeed = $workbench['task']['seed'] ?? [];
-    $articleSeed = $workbench['article']['seed'] ?? [];
-    $taskSeedUrl = route('admin.tasks.create', array_merge(['workbench' => 1], array_filter($taskSeed, static fn ($value) => $value !== null && $value !== '' && $value !== [])));
-    $articleSeedUrl = route('admin.articles.create', array_merge(['workbench' => 1], array_filter($articleSeed, static fn ($value) => $value !== null && $value !== '' && $value !== [])));
     $toneClasses = [
         'blue' => 'bg-blue-50 text-blue-700 ring-blue-100',
         'emerald' => 'bg-emerald-50 text-emerald-700 ring-emerald-100',
@@ -24,9 +19,7 @@
     <div class="px-4 sm:px-0">
         <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">{{ __('admin.ai_configurator.workbench_eyebrow') }}</p>
                 <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ __('admin.ai_configurator.heading') }}</h1>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.subtitle') }}</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 @foreach ($shortcuts as $shortcut)
@@ -38,33 +31,11 @@
             </div>
         </div>
 
-        <section class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-8">
-            @foreach ([
-                ['label' => __('admin.ai_configurator.stats.models'), 'value' => (int) ($quickStats['task_models'] ?? 0), 'icon' => 'cpu'],
-                ['label' => __('admin.ai_configurator.stats.prompts'), 'value' => (int) ($quickStats['content_prompts'] ?? 0), 'icon' => 'message-square-text'],
-                ['label' => __('admin.ai_configurator.stats.tasks'), 'value' => (int) ($quickStats['tasks'] ?? 0), 'icon' => 'list-checks'],
-                ['label' => __('admin.ai_configurator.stats.titles'), 'value' => (int) ($quickStats['title_libraries'] ?? 0), 'icon' => 'library-big'],
-                ['label' => __('admin.ai_configurator.stats.keywords'), 'value' => (int) ($quickStats['keyword_libraries'] ?? 0), 'icon' => 'tags'],
-                ['label' => __('admin.ai_configurator.stats.knowledge'), 'value' => (int) ($quickStats['knowledge_bases'] ?? 0), 'icon' => 'database'],
-                ['label' => __('admin.ai_configurator.stats.images'), 'value' => (int) ($quickStats['image_libraries'] ?? 0), 'icon' => 'images'],
-                ['label' => __('admin.ai_configurator.stats.channels'), 'value' => (int) ($quickStats['distribution_channels'] ?? 0), 'icon' => 'radio-tower'],
-            ] as $stat)
-                <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <div class="flex items-center justify-between gap-3">
-                        <span class="truncate text-sm font-medium text-gray-500">{{ $stat['label'] }}</span>
-                        <i data-lucide="{{ $stat['icon'] }}" class="h-4 w-4 shrink-0 text-gray-400"></i>
-                    </div>
-                    <div class="mt-3 text-2xl font-bold text-gray-900">{{ $stat['value'] }}</div>
-                </div>
-            @endforeach
-        </section>
-
         <section class="mb-8 overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
             <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px]">
                 <div class="p-6">
                     <div class="mb-5">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('admin.ai_configurator.intent_title') }}</h2>
-                        <p class="mt-2 text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.intent_desc') }}</p>
                     </div>
 
                     <form id="ai-workbench-intent-form" class="space-y-4">
@@ -79,7 +50,7 @@
                             placeholder="{{ __('admin.ai_configurator.intent_placeholder') }}"
                         ></textarea>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div id="ai-workbench-status" class="min-h-5 text-sm text-gray-500">{{ __('admin.ai_configurator.intent_hint') }}</div>
+                            <div id="ai-workbench-status" class="min-h-5 text-sm text-gray-500"></div>
                             <button type="submit" class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                                 <i data-lucide="wand-sparkles" class="mr-2 h-4 w-4"></i>
                                 {{ __('admin.ai_configurator.intent_button') }}
@@ -90,7 +61,6 @@
 
                 <aside class="border-t border-blue-100 bg-blue-50/50 p-6 lg:border-l lg:border-t-0">
                     <h2 class="text-base font-semibold text-gray-900">{{ __('admin.ai_configurator.skills_title') }}</h2>
-                    <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.skills_desc') }}</p>
                     <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                         @foreach ($skills as $skill)
                             @php($toneClass = $toneClasses[$skill['tone']] ?? $toneClasses['slate'])
@@ -100,7 +70,6 @@
                                 </span>
                                 <span class="min-w-0">
                                     <span class="block truncate text-sm font-semibold text-gray-900">{{ $skill['title'] }}</span>
-                                    <span class="mt-0.5 block truncate text-xs text-gray-500">{{ $skill['desc'] }}</span>
                                 </span>
                                 <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
                             </a>
@@ -110,82 +79,11 @@
             </div>
         </section>
 
-        <section class="mb-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
-                        <i data-lucide="workflow" class="h-5 w-5"></i>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.ai_configurator.task_seed_title') }}</h2>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.task_seed_desc') }}</p>
-                        <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.name') }}</dt>
-                                <dd class="mt-1 truncate font-semibold text-gray-900">{{ $taskSeed['task_name'] ?? '' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.status') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ $taskSeed['status'] ?? '' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.interval') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ $taskSeed['publish_interval'] ?? 60 }} {{ __('admin.common.minutes') }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.scope') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ $taskSeed['publish_scope'] ?? '' }}</dd>
-                            </div>
-                        </dl>
-                        <a href="{{ $taskSeedUrl }}" class="mt-5 inline-flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">
-                            <i data-lucide="plus" class="mr-2 h-4 w-4"></i>
-                            {{ __('admin.ai_configurator.task_seed_button') }}
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                <div class="flex items-start gap-4">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
-                        <i data-lucide="file-pen-line" class="h-5 w-5"></i>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <h2 class="text-lg font-semibold text-gray-900">{{ __('admin.ai_configurator.article_seed_title') }}</h2>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.ai_configurator.article_seed_desc') }}</p>
-                        <dl class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.title') }}</dt>
-                                <dd class="mt-1 truncate font-semibold text-gray-900">{{ $articleSeed['title'] ?? '' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.review') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ $articleSeed['review_status'] ?? '' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.status') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ $articleSeed['status'] ?? '' }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-gray-500">{{ __('admin.ai_configurator.seed_fields.ai_mark') }}</dt>
-                                <dd class="mt-1 font-semibold text-gray-900">{{ ($articleSeed['is_ai_generated'] ?? '0') === '1' ? __('admin.common.yes') : __('admin.common.no') }}</dd>
-                            </div>
-                        </dl>
-                        <a href="{{ $articleSeedUrl }}" class="mt-5 inline-flex h-10 items-center rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white hover:bg-emerald-700">
-                            <i data-lucide="file-plus-2" class="mr-2 h-4 w-4"></i>
-                            {{ __('admin.ai_configurator.article_seed_button') }}
-                        </a>
-                    </div>
-                </div>
-            </article>
-        </section>
-
         <section class="grid grid-cols-1 gap-5 lg:grid-cols-2">
             @foreach ($capabilityGroups as $group)
                 <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                     <div class="mb-4">
                         <h2 class="text-lg font-semibold text-gray-900">{{ $group['title'] }}</h2>
-                        <p class="mt-1 text-sm leading-6 text-gray-600">{{ $group['desc'] }}</p>
                     </div>
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         @foreach ($group['items'] as $item)
@@ -195,7 +93,6 @@
                                 </span>
                                 <span class="min-w-0">
                                     <span class="block truncate text-sm font-semibold text-gray-900">{{ $item['label'] }}</span>
-                                    <span class="mt-1 block text-xs leading-5 text-gray-500">{{ $item['desc'] }}</span>
                                 </span>
                                 <i data-lucide="arrow-right" class="h-4 w-4 text-gray-400"></i>
                             </a>

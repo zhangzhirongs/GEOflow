@@ -1,5 +1,6 @@
 @php
     $adminBrandName = \App\Support\AdminWeb::siteName();
+    $adminBrandInitial = mb_strtoupper(mb_substr(trim((string) $adminBrandName), 0, 1) ?: 'G');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -33,28 +34,34 @@
 </head>
 <body class="admin-body-root">
 <div id="admin-shell" class="admin-shell">
-    @include('admin.partials.header', [
+    @include('admin.partials.sidebar', [
+        'activeMenu' => $activeMenu ?? '',
         'adminBrandName' => $adminBrandName,
-        'adminSiteName' => $adminSiteName ?? $adminBrandName,
-        'pageTitle' => $pageTitle ?? '',
+        'adminBrandInitial' => $adminBrandInitial,
     ])
-    <div class="admin-layout-body">
-        @include('admin.partials.sidebar', [
-            'activeMenu' => $activeMenu ?? '',
+    <div id="admin-sidebar-overlay" class="admin-sidebar-overlay" onclick="toggleSidebarDrawer(false)"></div>
+    <div class="admin-shell-body">
+        @include('admin.partials.header', [
+            'adminBrandName' => $adminBrandName,
+            'adminSiteName' => $adminSiteName ?? $adminBrandName,
+            'pageTitle' => $pageTitle ?? '',
         ])
-        <div id="admin-sidebar-overlay" class="admin-sidebar-overlay" onclick="toggleSidebarDrawer(false)"></div>
         <main class="admin-main">
-            <div class="admin-main-inner max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="admin-content">
                 @if (session('message'))
-                    <div class="admin-flash-alert mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                        <span class="block sm:inline">{{ session('message') }}</span>
+                    <div class="admin-flash-alert is-success mb-4" role="status">
+                        <i data-lucide="circle-check" class="nav-icon shrink-0"></i>
+                        <span>{{ session('message') }}</span>
                     </div>
                 @endif
                 @if ($errors->any())
-                    <div class="admin-flash-alert mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                        @foreach ($errors->all() as $err)
-                            <div>{{ $err }}</div>
-                        @endforeach
+                    <div class="admin-flash-alert is-error mb-4" role="alert">
+                        <i data-lucide="circle-alert" class="nav-icon shrink-0"></i>
+                        <div>
+                            @foreach ($errors->all() as $err)
+                                <div>{{ $err }}</div>
+                            @endforeach
+                        </div>
                     </div>
                 @endif
                 @yield('content')

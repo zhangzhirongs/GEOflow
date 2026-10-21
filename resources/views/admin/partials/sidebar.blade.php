@@ -5,6 +5,10 @@
         && $currentAdmin->canManageProtectedWorkflows();
     $isUpdateCenterEnabled = (bool) config('geoflow.update_center_enabled', true);
 
+    $adminBrandName = $adminBrandName ?? \App\Support\AdminWeb::siteName();
+    $adminBrandInitial = $adminBrandInitial ?? mb_strtoupper(mb_substr(trim((string) $adminBrandName), 0, 1) ?: 'G');
+    $appVersion = (string) config('geoflow.app_version', '2.0');
+
     // 侧边栏分组配置：label / icon(lucide) / route / match(路由名前缀，最长前缀命中为激活项)
     $navSections = [
         [
@@ -92,21 +96,32 @@
     }
 @endphp
 <aside class="admin-sidebar" aria-label="{{ __('admin.nav.dashboard') }}">
-    @foreach ($navSections as $sIdx => $section)
-        <div class="nav-group">
-            @if (!empty($section['title']))
-                <div class="nav-group-title">{{ $section['title'] }}</div>
-            @endif
-            @foreach ($section['items'] as $iIdx => $item)
-                @php $isActive = $sIdx === $activeSection && $iIdx === $activeIndex; @endphp
-                <a href="{{ route($item['route']) }}"
-                   class="nav-item @if($isActive) is-active @endif"
-                   title="{{ $item['label'] }}"
-                   @if($isActive) aria-current="page" @endif>
-                    <i data-lucide="{{ $item['icon'] }}" class="nav-icon"></i>
-                    <span class="nav-label">{{ $item['label'] }}</span>
-                </a>
-            @endforeach
-        </div>
-    @endforeach
+    <a href="{{ route('admin.dashboard') }}" class="admin-sidebar__brand">
+        <span class="admin-sidebar__mark">{{ $adminBrandInitial }}</span>
+        <span class="admin-sidebar__wordmark">{{ $adminBrandName }}</span>
+    </a>
+
+    <nav class="admin-sidebar__nav">
+        @foreach ($navSections as $sIdx => $section)
+            <div class="nav-group">
+                @if (!empty($section['title']))
+                    <div class="nav-group-title">{{ $section['title'] }}</div>
+                @endif
+                @foreach ($section['items'] as $iIdx => $item)
+                    @php $isActive = $sIdx === $activeSection && $iIdx === $activeIndex; @endphp
+                    <a href="{{ route($item['route']) }}"
+                       class="nav-item @if($isActive) is-active @endif"
+                       title="{{ $item['label'] }}"
+                       @if($isActive) aria-current="page" @endif>
+                        <i data-lucide="{{ $item['icon'] }}" class="nav-icon"></i>
+                        <span class="nav-label">{{ $item['label'] }}</span>
+                    </a>
+                @endforeach
+            </div>
+        @endforeach
+    </nav>
+
+    <div class="admin-sidebar__foot">
+        {{ __('admin.footer.version', ['version' => $appVersion]) }}
+    </div>
 </aside>

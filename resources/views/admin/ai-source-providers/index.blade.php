@@ -2,11 +2,10 @@
 
 @section('content')
     <div class="px-4 sm:px-0">
-        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex items-center gap-4">
                 <div>
                     <h1 class="qdk-page-title">{{ __('admin.ai_source_providers.page_title') }}</h1>
-                    <p class="qdk-page-sub">{{ __('admin.ai_source_providers.page_subtitle') }}</p>
                 </div>
             </div>
             <button type="button" onclick="showCreateProviderModal()" class="qdk-btn qdk-btn-primary">
@@ -15,41 +14,9 @@
             </button>
         </div>
 
-        <div class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-4">
-            <div class="qdk-stat">
-                <div class="qdk-stat-icon"><i data-lucide="server" class="h-5 w-5"></i></div>
-                <div>
-                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.total') }}</div>
-                    <div class="qdk-stat-value">{{ (int) ($stats['provider_count'] ?? 0) }}</div>
-                </div>
-            </div>
-            <div class="qdk-stat">
-                <div class="qdk-stat-icon"><i data-lucide="check-circle" class="h-5 w-5"></i></div>
-                <div>
-                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.active') }}</div>
-                    <div class="qdk-stat-value">{{ (int) ($stats['active_provider_count'] ?? 0) }}</div>
-                </div>
-            </div>
-            <div class="qdk-stat">
-                <div class="qdk-stat-icon"><i data-lucide="activity" class="h-5 w-5"></i></div>
-                <div>
-                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.today_usage') }}</div>
-                    <div class="qdk-stat-value">{{ number_format((int) ($stats['provider_today_usage'] ?? 0)) }}</div>
-                </div>
-            </div>
-            <div class="qdk-stat">
-                <div class="qdk-stat-icon"><i data-lucide="alert-triangle" class="h-5 w-5"></i></div>
-                <div>
-                    <div class="qdk-stat-label">{{ __('admin.ai_source_providers.stats.failed_runs') }}</div>
-                    <div class="qdk-stat-value">{{ number_format((int) ($stats['failed_runs'] ?? 0)) }}</div>
-                </div>
-            </div>
-        </div>
-
         <div class="qdk-card mb-6">
             <div class="qdk-card-head">
                 <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.quick_config_title') }}</h3>
-                <p class="qdk-card-sub">{{ __('admin.ai_source_providers.quick_config_desc') }}</p>
             </div>
             <div class="grid grid-cols-1 divide-y divide-gray-100 xl:grid-cols-2 xl:divide-x xl:divide-y-0">
                 <form method="POST" action="{{ route('admin.ai-source-providers.model-bindings.upsert-api') }}" class="space-y-5 p-6">
@@ -62,7 +29,6 @@
                                 <i data-lucide="braces" class="h-5 w-5 text-[color:var(--qdk-primary)]"></i>
                                 <h4 class="text-base font-semibold text-gray-900">{{ __('admin.ai_source_providers.deepseek_config_title') }}</h4>
                             </div>
-                            <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.deepseek_config_desc') }}</p>
                         </div>
                         <span class="qdk-badge qdk-badge-gray shrink-0">JSON</span>
                     </div>
@@ -121,7 +87,6 @@
                                 <i data-lucide="search-check" class="h-5 w-5 text-[color:var(--qdk-primary)]"></i>
                                 <h4 class="text-base font-semibold text-gray-900">{{ __('admin.ai_source_providers.doubao_ark_config_title') }}</h4>
                             </div>
-                            <p class="mt-1 text-sm text-gray-600">{{ __('admin.ai_source_providers.doubao_ark_config_desc') }}</p>
                         </div>
                         <span class="qdk-badge qdk-badge-gray shrink-0">Responses</span>
                     </div>
@@ -176,7 +141,6 @@
             <div class="qdk-card lg:col-span-2">
                 <div class="qdk-card-head">
                     <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.search_list_title') }}</h3>
-                    <p class="qdk-card-sub">{{ __('admin.ai_source_providers.search_list_desc') }}</p>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -254,7 +218,6 @@
             <div class="qdk-card">
                 <div class="qdk-card-head">
                     <h3 class="qdk-card-title">{{ __('admin.ai_source_providers.model_bindings_title') }}</h3>
-                    <p class="qdk-card-sub">{{ __('admin.ai_source_providers.model_bindings_desc') }}</p>
                 </div>
                 <form method="POST" action="{{ route('admin.ai-source-providers.model-bindings') }}" class="space-y-5 px-6 py-5">
                     @csrf

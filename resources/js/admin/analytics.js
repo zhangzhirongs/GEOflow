@@ -219,6 +219,7 @@ const initializeAnalyticsFilterForm = (form) => {
     const dateFromInput = form.querySelector('input[name="date_from"]');
     const dateToInput = form.querySelector('input[name="date_to"]');
     const presetButtons = form.querySelectorAll('[data-analytics-preset-button]');
+    const customDateFields = form.querySelector('[data-analytics-custom-date-fields]');
     const activeClasses = ['border-blue-600', 'bg-blue-50', 'text-blue-700'];
     const inactiveClasses = ['border-gray-200', 'text-gray-600', 'hover:border-blue-200', 'hover:bg-blue-50'];
 
@@ -229,6 +230,15 @@ const initializeAnalyticsFilterForm = (form) => {
             button.classList.add(...(isActive ? activeClasses : inactiveClasses));
             button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
+        customDateFields?.classList.toggle('hidden', selectedPreset !== 'custom');
+    };
+
+    const submitForm = () => {
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.submit();
+        }
     };
 
     presetButtons.forEach((button) => {
@@ -240,20 +250,27 @@ const initializeAnalyticsFilterForm = (form) => {
             dateFromInput.value = button.dataset.dateFrom || dateFromInput.value;
             dateToInput.value = button.dataset.dateTo || dateToInput.value;
             setPresetButtonState(selectedPreset);
-            if (selectedPreset === 'custom') dateFromInput.focus();
+            if (selectedPreset === 'custom') {
+                dateFromInput.focus();
+            } else {
+                submitForm();
+            }
         });
     });
 
-    form.querySelectorAll('[data-analytics-custom-date]').forEach((input) => {
+    form.querySelectorAll('[data-analytics-custom-date], input[type="date"]').forEach((input) => {
         input.addEventListener('change', () => {
             if (presetInput) presetInput.value = 'custom';
             setPresetButtonState('custom');
+            submitForm();
         });
     });
+
+    form.querySelectorAll('select').forEach((input) => input.addEventListener('change', submitForm));
 };
 
 if (typeof document !== 'undefined') {
     document.querySelectorAll('[data-analytics-log-chart]').forEach(initializeLogChart);
     document.querySelectorAll('[data-analytics-trend]').forEach(initializeTrendChart);
-    document.querySelectorAll('[data-analytics-filter-form]').forEach(initializeAnalyticsFilterForm);
+    document.querySelectorAll('[data-analytics-filter-form], [data-analytics-auto-submit]').forEach(initializeAnalyticsFilterForm);
 }

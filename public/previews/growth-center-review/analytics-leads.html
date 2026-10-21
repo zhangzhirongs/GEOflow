@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="lpwThwOE7GT2S4TpPhXFjz7jOwO58x9abo2FuLEN">
+        <title>线索转化 — GEOFlow</title>
+    <script src="assets/js/tailwindcss.play-cdn.js"></script>
+    <script src="assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="assets/css/admin-ui.css?v=1792546436">
+<style>
+    /* 仅保留与 Blade 路由/语言相关的少量动态样式，其余样式见 admin-ui.css */
+    .admin-locale-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center;
+        border: 1px solid var(--gf-gray-200);
+        border-radius: var(--gf-radius-control);
+        color: var(--gf-gray-700);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        height: 40px;
+        padding: 0 28px 0 10px;
+        transition: border-color 120ms ease-out, background-color 120ms ease-out;
+    }
+    .admin-locale-select:hover {
+        border-color: var(--gf-gray-300);
+    }
+    .admin-locale-select:focus {
+        border-color: var(--gf-blue-600);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+
+    /* 顶栏浮层（通知 / 用户菜单） */
+    .admin-popover {
+        background: #fff;
+        border: 1px solid var(--gf-gray-200);
+        box-shadow: var(--gf-shadow-menu);
+        display: none;
+        overflow: hidden;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        z-index: 60;
+    }
+    .admin-popover.is-open {
+        display: block;
+    }
+    .admin-popover--notice {
+        border-radius: var(--gf-radius-focus);
+        width: min(360px, calc(100vw - 32px));
+    }
+    .admin-popover--user {
+        border-radius: var(--gf-radius-nav);
+        width: 224px;
+    }
+    .admin-popover__head {
+        align-items: center;
+        border-bottom: 1px solid var(--gf-gray-100);
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        padding: 14px 16px;
+    }
+    .admin-popover__title {
+        color: var(--gf-gray-900);
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .admin-popover__body {
+        padding: 16px;
+    }
+    .admin-popover__copy {
+        color: var(--gf-gray-600);
+        font-size: 13px;
+        line-height: 22px;
+        margin: 8px 0 0;
+    }
+    .admin-popover__meta {
+        background: var(--gf-gray-50);
+        border-radius: var(--gf-radius-nav);
+        color: var(--gf-gray-500);
+        font-size: 12px;
+        line-height: 20px;
+        margin-top: 14px;
+        padding: 10px 12px;
+    }
+    .admin-popover__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+    }
+    .admin-menu-meta {
+        border-bottom: 1px solid var(--gf-gray-100);
+        padding: 12px 16px;
+    }
+    .admin-menu-meta__name {
+        color: var(--gf-gray-900);
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .admin-menu-meta__role {
+        color: var(--gf-gray-400);
+        font-size: 12px;
+        margin-top: 2px;
+    }
+    .admin-menu-link {
+        align-items: center;
+        color: var(--gf-gray-700);
+        display: flex;
+        font-size: 14px;
+        gap: 8px;
+        min-height: 40px;
+        padding: 8px 16px;
+        transition: background-color 120ms ease-out;
+    }
+    .admin-menu-link:hover {
+        background: var(--gf-gray-100);
+    }
+    .admin-menu-link--danger {
+        color: var(--gf-red-600);
+    }
+    .admin-menu-link--danger:hover {
+        background: var(--gf-red-50);
+    }
+    .admin-menu-link .nav-icon {
+        height: 16px;
+        width: 16px;
+    }
+    .admin-menu-divider {
+        border-top: 1px solid var(--gf-gray-100);
+    }
+</style>
+    
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('geoflow.sidebar.collapsed') === '1') {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
+            } catch (e) {}
+        })();
+    </script>
+        <style>#admin-welcome-modal{display:none!important}</style>
+</head>
+<body class="admin-body-root">
+<div id="admin-shell" class="admin-shell">
+    <aside class="admin-sidebar" aria-label="首页">
+    <a href="#" class="admin-sidebar__brand">
+        <span class="admin-sidebar__mark">G</span>
+        <span class="admin-sidebar__wordmark">GEOFlow</span>
+    </a>
+
+    <nav class="admin-sidebar__nav">
+                    <div class="nav-group">
+                                                                        <a href="#"
+                       class="nav-item "
+                       title="首页"
+                       >
+                        <i data-lucide="home" class="nav-icon"></i>
+                        <span class="nav-label">首页</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="AI工作台"
+                       >
+                        <i data-lucide="layout-grid" class="nav-icon"></i>
+                        <span class="nav-label">AI工作台</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item  is-active "
+                       title="增长中心"
+                        aria-current="page" >
+                        <i data-lucide="trending-up" class="nav-icon"></i>
+                        <span class="nav-label">增长中心</span>
+                    </a>
+                            </div>
+                    <div class="nav-group">
+                                    <div class="nav-group-title">内容生产</div>
+                                                                        <a href="#"
+                       class="nav-item "
+                       title="任务管理"
+                       >
+                        <i data-lucide="list-checks" class="nav-icon"></i>
+                        <span class="nav-label">任务管理</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="内容管理"
+                       >
+                        <i data-lucide="file-text" class="nav-icon"></i>
+                        <span class="nav-label">内容管理</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="手动发布"
+                       >
+                        <i data-lucide="send" class="nav-icon"></i>
+                        <span class="nav-label">手动发布</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="执行器节点"
+                       >
+                        <i data-lucide="monitor" class="nav-icon"></i>
+                        <span class="nav-label">执行器节点</span>
+                    </a>
+                            </div>
+                    <div class="nav-group">
+                                    <div class="nav-group-title">素材知识</div>
+                                                                        <a href="#"
+                       class="nav-item "
+                       title="内容资产"
+                       >
+                        <i data-lucide="database" class="nav-icon"></i>
+                        <span class="nav-label">内容资产</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="知识库"
+                       >
+                        <i data-lucide="brain" class="nav-icon"></i>
+                        <span class="nav-label">知识库</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="标题库"
+                       >
+                        <i data-lucide="library-big" class="nav-icon"></i>
+                        <span class="nav-label">标题库</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="关键词库"
+                       >
+                        <i data-lucide="tags" class="nav-icon"></i>
+                        <span class="nav-label">关键词库</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="图片库"
+                       >
+                        <i data-lucide="images" class="nav-icon"></i>
+                        <span class="nav-label">图片库</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="作者"
+                       >
+                        <i data-lucide="user-pen" class="nav-icon"></i>
+                        <span class="nav-label">作者</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="分类"
+                       >
+                        <i data-lucide="folders" class="nav-icon"></i>
+                        <span class="nav-label">分类</span>
+                    </a>
+                            </div>
+                    <div class="nav-group">
+                                    <div class="nav-group-title">AI 配置</div>
+                                                                        <a href="#"
+                       class="nav-item "
+                       title="模型配置"
+                       >
+                        <i data-lucide="cpu" class="nav-icon"></i>
+                        <span class="nav-label">模型配置</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="提示词技能"
+                       >
+                        <i data-lucide="message-square-text" class="nav-icon"></i>
+                        <span class="nav-label">提示词技能</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="其他提示词"
+                       >
+                        <i data-lucide="braces" class="nav-icon"></i>
+                        <span class="nav-label">其他提示词</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="搜索信源"
+                       >
+                        <i data-lucide="search-check" class="nav-icon"></i>
+                        <span class="nav-label">搜索信源</span>
+                    </a>
+                            </div>
+                    <div class="nav-group">
+                                    <div class="nav-group-title">站点系统</div>
+                                                                        <a href="#"
+                       class="nav-item "
+                       title="网站设置"
+                       >
+                        <i data-lucide="settings-2" class="nav-icon"></i>
+                        <span class="nav-label">网站设置</span>
+                    </a>
+                                                        <a href="#"
+                       class="nav-item "
+                       title="敏感词管理"
+                       >
+                        <i data-lucide="shield-check" class="nav-icon"></i>
+                        <span class="nav-label">敏感词管理</span>
+                    </a>
+                            </div>
+            </nav>
+
+    <div class="admin-sidebar__foot">
+        版本 2.3.0
+    </div>
+</aside>
+    <div id="admin-sidebar-overlay" class="admin-sidebar-overlay" onclick="toggleSidebarDrawer(false)"></div>
+    <div class="admin-shell-body">
+        <header class="admin-navbar">
+    
+    <button type="button" class="admin-navbar__menu" onclick="toggleSidebar()" aria-label="首页">
+        <i data-lucide="panel-left" class="nav-icon"></i>
+    </button>
+
+    
+    <div class="admin-navbar__context">
+        <i data-lucide="layout-dashboard" class="nav-icon"></i>
+        <span class="admin-navbar__title">线索转化</span>
+    </div>
+
+    <div class="admin-navbar__actions">
+        <a href="#" class="qdk-btn qdk-btn-sm qdk-btn-ghost" title="AI工作台">
+            <i data-lucide="sparkles" class="nav-icon"></i>
+            <span class="hidden sm:inline">AI工作台</span>
+        </a>
+
+        <div class="relative">
+            <button type="button"
+                    class="admin-icon-btn"
+                    onclick="toggleAdminNotifications()"
+                    aria-expanded="false"
+                    aria-label="通知消息"
+                    title="通知消息">
+                <i data-lucide="bell" class="nav-icon"></i>
+                            </button>
+
+            <div id="admin-notification-menu" class="admin-popover admin-popover--notice">
+                <div class="admin-popover__head">
+                    <div class="admin-popover__title">通知消息</div>
+                                    </div>
+                <div class="admin-popover__body">
+                                            <div class="admin-popover__title">更新检查已关闭</div>
+                        <p class="admin-popover__copy">当前未启用 GitHub 版本检查。如需提醒，请开启 GEOFLOW_UPDATE_CHECK_ENABLED。</p>
+                    
+                    <div class="admin-popover__meta space-y-0.5">
+                        <div>当前版本：v2.3.0</div>
+                                                <div>每天最多自动检查一次 GitHub。</div>
+                                            </div>
+
+                    <div class="admin-popover__actions">
+                                                <a href="https://github.com/zhangzhirongs/GEOflow/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="qdk-btn qdk-btn-sm qdk-btn-ghost">
+                            查看更新日志
+                        </a>
+                        <a href="https://github.com/zhangzhirongs/GEOflow" target="_blank" rel="noopener noreferrer" class="qdk-btn qdk-btn-sm qdk-btn-ghost">
+                            打开 GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden md:block">
+            <select
+                class="admin-locale-select"
+                aria-label="语言"
+                onchange="if (this.value) window.location.href = this.value"
+            >
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/zh_CN" selected>
+                        简体中文
+                    </option>
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/en" >
+                        English
+                    </option>
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/ja" >
+                        日本語
+                    </option>
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/es" >
+                        Español
+                    </option>
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/ru" >
+                        Русский
+                    </option>
+                                    <option value="http://192.168.169.74:18080/geo_admin/locale/pt_BR" >
+                        Português (BR)
+                    </option>
+                            </select>
+        </div>
+
+        <div class="relative">
+            <button type="button" class="admin-user-btn" onclick="toggleUserMenu()" aria-expanded="false">
+                <span class="admin-avatar">
+                    <i data-lucide="user" class="nav-icon"></i>
+                </span>
+                <span class="hidden text-sm font-medium text-gray-700 sm:inline">demo-admin</span>
+                <i data-lucide="chevron-down" class="nav-icon"></i>
+            </button>
+
+            <div id="user-menu" class="admin-popover admin-popover--user">
+                <div class="admin-menu-meta">
+                    <div class="admin-menu-meta__name">欢迎，demo-admin</div>
+                    <div class="admin-menu-meta__role">管理员</div>
+                </div>
+                <a href="#" class="admin-menu-link">
+                    <i data-lucide="home" class="nav-icon"></i>
+                    返回首页
+                </a>
+                <a href="#" class="admin-menu-link">
+                    <i data-lucide="wand-sparkles" class="nav-icon"></i>
+                    AI工作台
+                </a>
+                <div class="admin-menu-divider"></div>
+                <form method="POST" action="http://192.168.169.74:18080/geo_admin/logout">
+                    <input type="hidden" name="_token" value="lpwThwOE7GT2S4TpPhXFjz7jOwO58x9abo2FuLEN" autocomplete="off">                    <button type="submit" class="admin-menu-link admin-menu-link--danger w-full text-left">
+                        <i data-lucide="log-out" class="nav-icon"></i>
+                        退出登录
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    function setAdminPopover(el, open) {
+        if (!el) { return; }
+        el.classList.toggle('is-open', !!open);
+    }
+
+    function toggleUserMenu() {
+        var menu = document.getElementById('user-menu');
+        var notice = document.getElementById('admin-notification-menu');
+        if (!menu) { return; }
+        var willOpen = !menu.classList.contains('is-open');
+        setAdminPopover(notice, false);
+        setAdminPopover(menu, willOpen);
+    }
+
+    function toggleAdminNotifications() {
+        var menu = document.getElementById('admin-notification-menu');
+        var user = document.getElementById('user-menu');
+        if (!menu) { return; }
+        var willOpen = !menu.classList.contains('is-open');
+        setAdminPopover(user, false);
+        setAdminPopover(menu, willOpen);
+    }
+
+    function toggleSidebar() {
+        var root = document.documentElement;
+        // 移动端：切换抽屉；桌面端：切换迷你折叠
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            root.classList.toggle('sidebar-drawer-open');
+            return;
+        }
+        var collapsed = root.classList.toggle('sidebar-collapsed');
+        try { localStorage.setItem('geoflow.sidebar.collapsed', collapsed ? '1' : '0'); } catch (e) {}
+    }
+
+    function toggleSidebarDrawer(open) {
+        document.documentElement.classList.toggle('sidebar-drawer-open', !!open);
+    }
+
+    document.addEventListener('click', function (event) {
+        var userMenu = document.getElementById('user-menu');
+        var notificationMenu = document.getElementById('admin-notification-menu');
+        if (userMenu && !event.target.closest('[onclick="toggleUserMenu()"]') && !userMenu.contains(event.target)) {
+            setAdminPopover(userMenu, false);
+        }
+        if (notificationMenu && !event.target.closest('[onclick="toggleAdminNotifications()"]') && !notificationMenu.contains(event.target)) {
+            setAdminPopover(notificationMenu, false);
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') { return; }
+        setAdminPopover(document.getElementById('user-menu'), false);
+        setAdminPopover(document.getElementById('admin-notification-menu'), false);
+        document.documentElement.classList.remove('sidebar-drawer-open');
+    });
+</script>
+        <main class="admin-main">
+            <div class="admin-content">
+                                                    <div class="px-4 sm:px-0">
+        <header class="mb-5">
+    <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-950">线索转化</h1>
+        </div>
+        <button type="button" onclick="location.reload()" class="inline-flex min-h-10 w-fit items-center rounded-md border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 transition duration-[120ms] motion-reduce:transition-none hover:bg-gray-50 active:scale-[.98] motion-reduce:active:scale-100">
+            <i data-lucide="refresh-cw" class="mr-2 h-4 w-4"></i>
+            刷新
+        </button>
+    </div>
+    <nav class="mt-6 overflow-x-auto border-b border-gray-200" aria-label="增长中心专题导航">
+    <div class="flex min-w-max gap-6">
+                                <a href="#"  class="relative inline-flex min-h-10 items-center gap-2 border-b-2 px-0.5 pb-2 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800">
+                <span class="h-2 w-2 rounded-full bg-blue-600"></span>
+                总览
+            </a>
+                                <a href="#"  class="relative inline-flex min-h-10 items-center gap-2 border-b-2 px-0.5 pb-2 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                内容运营
+            </a>
+                                <a href="#"  class="relative inline-flex min-h-10 items-center gap-2 border-b-2 px-0.5 pb-2 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800">
+                <span class="h-2 w-2 rounded-full bg-cyan-500"></span>
+                流量归因
+            </a>
+                                <a href="#"  class="relative inline-flex min-h-10 items-center gap-2 border-b-2 px-0.5 pb-2 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800">
+                <span class="h-2 w-2 rounded-full bg-violet-500"></span>
+                AI 可见性
+            </a>
+                                <a href="#"  aria-current="page"  class="relative inline-flex min-h-10 items-center gap-2 border-b-2 px-0.5 pb-2 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none border-blue-600 text-gray-950">
+                <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                线索转化
+            </a>
+            </div>
+</nav>
+</header>
+
+        <section class="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            <form method="GET" action="http://192.168.169.74:18080/geo_admin/analytics/leads" class="space-y-4">
+                <div class="flex flex-wrap gap-2">
+                                            <button type="submit" name="lead_preset" value="7d" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 border-gray-300 bg-white text-gray-700 hover:border-amber-300 hover:text-amber-700" aria-pressed="false">近 7 天</button>
+                                            <button type="submit" name="lead_preset" value="30d" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 border-amber-600 bg-amber-600 text-white" aria-pressed="true">近 30 天</button>
+                                            <button type="submit" name="lead_preset" value="90d" class="inline-flex min-h-10 items-center rounded-md border px-3 text-sm font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 border-gray-300 bg-white text-gray-700 hover:border-amber-300 hover:text-amber-700" aria-pressed="false">近 90 天</button>
+                                    </div>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div><label for="lead-date-from" class="mb-1 block text-sm font-medium text-gray-700">开始日期</label><input id="lead-date-from" type="date" name="lead_date_from" value="2026-09-22" max="2026-10-21" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"></div>
+                    <div><label for="lead-date-to" class="mb-1 block text-sm font-medium text-gray-700">结束日期</label><input id="lead-date-to" type="date" name="lead_date_to" value="2026-10-21" max="2026-10-21" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"></div>
+                    <div><label for="lead-form-id" class="mb-1 block text-sm font-medium text-gray-700">转化表单</label><select id="lead-form-id" name="lead_form_id" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"><option value="">全部</option></select></div>
+                    <div><label for="lead-status" class="mb-1 block text-sm font-medium text-gray-700">状态</label><select id="lead-status" name="lead_status" class="block min-h-10 w-full rounded-md border-gray-300 text-sm focus:border-amber-500 focus:ring-amber-500"><option value="all">全部</option><option value="new" >新线索</option><option value="contacted" >已联系</option><option value="qualified" >有效线索</option><option value="invalid" >无效</option><option value="converted" >已转化</option></select></div>
+                </div>
+                <div class="flex justify-end"><button type="submit" name="lead_preset" value="custom" class="inline-flex min-h-10 items-center rounded-md bg-amber-600 px-4 text-sm font-semibold text-white hover:bg-amber-700"><i data-lucide="filter" class="mr-2 h-4 w-4"></i>应用筛选</button></div>
+            </form>
+        </section>
+
+        <section class="grid grid-cols-2 gap-4 lg:grid-cols-5">
+                            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">提交量</p><i data-lucide="send" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">0</p></article>
+                            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">新线索</p><i data-lucide="sparkles" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">0</p></article>
+                            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">待跟进</p><i data-lucide="phone-call" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">0</p></article>
+                            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">已转化</p><i data-lucide="badge-check" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">0</p></article>
+                            <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm"><div class="flex items-start justify-between gap-3"><p class="text-sm text-gray-500">转化率</p><i data-lucide="percent" class="h-5 w-5 text-amber-600"></i></div><p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">0.0%</p></article>
+                    </section>
+
+        <section class="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+            <h2 class="text-lg font-semibold text-gray-950">提交与转化趋势</h2>
+            <div class="mt-4"><div data-analytics-trend data-default-index="29" data-preview-label="预览" data-pinned-label="已固定">
+    <script type="application/json" data-analytics-trend-data>[{"date":"2026-09-22","submissions":0,"converted":0},{"date":"2026-09-23","submissions":0,"converted":0},{"date":"2026-09-24","submissions":0,"converted":0},{"date":"2026-09-25","submissions":0,"converted":0},{"date":"2026-09-26","submissions":0,"converted":0},{"date":"2026-09-27","submissions":0,"converted":0},{"date":"2026-09-28","submissions":0,"converted":0},{"date":"2026-09-29","submissions":0,"converted":0},{"date":"2026-09-30","submissions":0,"converted":0},{"date":"2026-10-01","submissions":0,"converted":0},{"date":"2026-10-02","submissions":0,"converted":0},{"date":"2026-10-03","submissions":0,"converted":0},{"date":"2026-10-04","submissions":0,"converted":0},{"date":"2026-10-05","submissions":0,"converted":0},{"date":"2026-10-06","submissions":0,"converted":0},{"date":"2026-10-07","submissions":0,"converted":0},{"date":"2026-10-08","submissions":0,"converted":0},{"date":"2026-10-09","submissions":0,"converted":0},{"date":"2026-10-10","submissions":0,"converted":0},{"date":"2026-10-11","submissions":0,"converted":0},{"date":"2026-10-12","submissions":0,"converted":0},{"date":"2026-10-13","submissions":0,"converted":0},{"date":"2026-10-14","submissions":0,"converted":0},{"date":"2026-10-15","submissions":0,"converted":0},{"date":"2026-10-16","submissions":0,"converted":0},{"date":"2026-10-17","submissions":0,"converted":0},{"date":"2026-10-18","submissions":0,"converted":0},{"date":"2026-10-19","submissions":0,"converted":0},{"date":"2026-10-20","submissions":0,"converted":0},{"date":"2026-10-21","submissions":0,"converted":0}]</script>
+    <script type="application/json" data-analytics-trend-metrics>[{"key":"submissions","label":"\u63d0\u4ea4\u91cf","color":"#d97706"},{"key":"converted","label":"\u5df2\u8f6c\u5316","color":"#059669"}]</script>
+    <div>
+        <svg viewBox="0 0 720 226" preserveAspectRatio="none" class="block h-56 w-full touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" role="group" tabindex="0" aria-label="提交与转化趋势" aria-keyshortcuts="ArrowLeft ArrowRight Enter Escape" data-analytics-trend-chart>
+            <line x1="48" y1="194" x2="704" y2="194" stroke="#d1d5db" />
+            <line x1="704" y1="18" x2="704" y2="194" stroke="#94a3b8" stroke-dasharray="4 4" data-analytics-trend-guide />
+                                            <polyline points="48.00,194.00 70.62,194.00 93.24,194.00 115.86,194.00 138.48,194.00 161.10,194.00 183.72,194.00 206.34,194.00 228.97,194.00 251.59,194.00 274.21,194.00 296.83,194.00 319.45,194.00 342.07,194.00 364.69,194.00 387.31,194.00 409.93,194.00 432.55,194.00 455.17,194.00 477.79,194.00 500.41,194.00 523.03,194.00 545.66,194.00 568.28,194.00 590.90,194.00 613.52,194.00 636.14,194.00 658.76,194.00 681.38,194.00 704.00,194.00" fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" data-analytics-series="submissions" />
+                <circle cx="704" cy="194" r="5" fill="white" stroke="#d97706" stroke-width="3" data-analytics-trend-marker="submissions" />
+                                            <polyline points="48.00,194.00 70.62,194.00 93.24,194.00 115.86,194.00 138.48,194.00 161.10,194.00 183.72,194.00 206.34,194.00 228.97,194.00 251.59,194.00 274.21,194.00 296.83,194.00 319.45,194.00 342.07,194.00 364.69,194.00 387.31,194.00 409.93,194.00 432.55,194.00 455.17,194.00 477.79,194.00 500.41,194.00 523.03,194.00 545.66,194.00 568.28,194.00 590.90,194.00 613.52,194.00 636.14,194.00 658.76,194.00 681.38,194.00 704.00,194.00" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" data-analytics-series="converted" />
+                <circle cx="704" cy="194" r="5" fill="white" stroke="#059669" stroke-width="3" data-analytics-trend-marker="converted" />
+                                        <circle cx="48" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="48" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="70.620689655172" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="70.620689655172" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="93.241379310345" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="93.241379310345" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="115.86206896552" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="115.86206896552" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="138.48275862069" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="138.48275862069" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="161.10344827586" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="161.10344827586" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="183.72413793103" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="183.72413793103" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="206.34482758621" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="206.34482758621" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="228.96551724138" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="228.96551724138" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="251.58620689655" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="251.58620689655" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="274.20689655172" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="274.20689655172" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="296.8275862069" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="296.8275862069" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="319.44827586207" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="319.44827586207" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="342.06896551724" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="342.06896551724" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="364.68965517241" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="364.68965517241" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="387.31034482759" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="387.31034482759" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="409.93103448276" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="409.93103448276" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="432.55172413793" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="432.55172413793" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="455.1724137931" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="455.1724137931" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="477.79310344828" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="477.79310344828" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="500.41379310345" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="500.41379310345" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="523.03448275862" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="523.03448275862" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="545.65517241379" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="545.65517241379" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="568.27586206897" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="568.27586206897" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="590.89655172414" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="590.89655172414" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="613.51724137931" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="613.51724137931" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="636.13793103448" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="636.13793103448" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="658.75862068966" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="658.75862068966" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="681.37931034483" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="681.37931034483" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                            <circle cx="704" cy="194" r="10" fill="transparent" data-analytics-trend-point data-x="704" data-y='{"submissions":194,"converted":194}' aria-hidden="true" />
+                    </svg>
+    </div>
+    <div data-analytics-axis="compact" class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                    <span data-axis-label="start" class="whitespace-nowrap ">
+                09-22
+            </span>
+                    <span data-axis-label="middle" class="whitespace-nowrap  text-center ">
+                10-06
+            </span>
+                    <span data-axis-label="end" class="whitespace-nowrap  text-right ">
+                10-21
+            </span>
+            </div>
+    <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4" aria-live="polite">
+        <div class="flex items-center justify-between gap-3">
+            <time class="font-mono text-sm font-semibold tabular-nums text-gray-900" data-analytics-trend-date>2026-10-21</time>
+            <span class="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-gray-500 ring-1 ring-gray-200" data-analytics-trend-state>预览</span>
+        </div>
+        <dl class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div>
+                    <dt class="flex items-center gap-1.5 text-xs text-gray-500"><span class="h-2 w-2 rounded-full" style="background-color: #d97706"></span>提交量</dt>
+                    <dd class="mt-1 text-right font-mono text-lg font-semibold tabular-nums text-gray-900" data-analytics-trend-value="submissions">0</dd>
+                </div>
+                            <div>
+                    <dt class="flex items-center gap-1.5 text-xs text-gray-500"><span class="h-2 w-2 rounded-full" style="background-color: #059669"></span>已转化</dt>
+                    <dd class="mt-1 text-right font-mono text-lg font-semibold tabular-nums text-gray-900" data-analytics-trend-value="converted">0</dd>
+                </div>
+                    </dl>
+    </div>
+</div>
+</div>
+        </section>
+
+        <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+                <h2 class="text-lg font-semibold text-gray-950">来源排行</h2>
+                <div class="mt-4 space-y-3"><p class="rounded-lg bg-gray-50 p-4 text-sm text-gray-500">暂无数据</p></div>
+            </section>
+            <section class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <div class="flex items-center justify-between p-5"><h2 class="text-lg font-semibold text-gray-950">最近线索</h2><a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700">查看全部</a></div>
+                <div class="divide-y divide-gray-100"><p class="p-8 text-center text-sm text-gray-500">暂无数据</p></div>
+            </section>
+        </div>
+    </div>
+            </div>
+            <footer class="admin-footer">
+    <div class="admin-footer__inner">
+        <span>© 2026 GEOFlow</span>
+        <span class="admin-footer__sep">·</span>
+        <span>版本 2.3.0</span>
+        <span class="admin-footer__sep">·</span>
+        <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span>作者：jiaozhizhang</span>
+            <a href="https://x.com/yaojingang" target="_blank" rel="noopener noreferrer">作者主页</a>
+            <a href="https://github.com/zhangzhirongs/GEOflow" target="_blank" rel="noopener noreferrer">项目GitHub地址</a>
+            <a href="https://github.com/zhangzhirongs/GEOflow/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener noreferrer">更新日志</a>
+            <a href="https://github.com/zhangzhirongs/GEOflow/wiki" target="_blank" rel="noopener noreferrer">帮助文档</a>
+            <button type="button" data-open-admin-welcome>项目说明</button>
+        </span>
+    </div>
+</footer>
+<script>
+    window.ADMIN_BASE_PATH = "\/geo_admin";
+    window.GEOFLOW_REVERB_CONFIG = {"enabled":false,"key":"geoflow-reverb-key","host":"localhost","port":18081,"scheme":"http","path":"/reverb","authEndpoint":"/broadcasting/auth"};
+    window.adminUrl = function (path) {
+        const base = window.ADMIN_BASE_PATH || '';
+        if (!path) return base + '/';
+        return base + '/' + String(path).replace(/^\/+/, '');
+    };
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+        </main>
+    </div>
+</div>
+<style>
+        #admin-welcome-modal .admin-welcome-document {
+            --admin-welcome-title-size: 24px;
+            --admin-welcome-section-size: 16px;
+            --admin-welcome-body-size: 14px;
+            --admin-welcome-body-leading: 1.52;
+            --admin-welcome-ink: #141413;
+            --admin-welcome-body: #3d3d3a;
+            --admin-welcome-muted: #5e5d59;
+            --admin-welcome-brand: #1B365D;
+            --admin-welcome-border: #e8e5da;
+            max-width: 860px;
+            background: #ffffff;
+            color: var(--admin-welcome-body);
+            font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        }
+
+        #admin-welcome-modal .admin-welcome-reader {
+            max-width: 640px;
+        }
+
+        #admin-welcome-title {
+            font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+            font-size: var(--admin-welcome-title-size);
+            font-weight: 500;
+            line-height: 1.22;
+            letter-spacing: 0;
+            color: var(--admin-welcome-ink);
+        }
+
+        #admin-welcome-subtitle {
+            margin-top: 12px;
+            border-left: 3px solid #1B365D;
+            padding-left: 14px;
+            color: var(--admin-welcome-muted);
+            font-size: var(--admin-welcome-body-size);
+            font-weight: 400;
+            line-height: var(--admin-welcome-body-leading);
+            letter-spacing: 0;
+        }
+
+        #admin-welcome-content {
+            margin-top: 24px;
+            color: var(--admin-welcome-body);
+            font-size: var(--admin-welcome-body-size);
+            font-weight: 400;
+            line-height: var(--admin-welcome-body-leading);
+            letter-spacing: 0;
+        }
+
+        #admin-welcome-content .admin-welcome-paragraph {
+            margin: 0;
+        }
+
+        #admin-welcome-content .admin-welcome-section-title {
+            margin: 18px 0 8px;
+            border-left: 3px solid #1B365D;
+            padding-left: 10px;
+            font-family: ui-serif, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", Georgia, serif;
+            font-size: var(--admin-welcome-section-size);
+            font-weight: 500;
+            line-height: 1.28;
+            color: var(--admin-welcome-ink);
+            letter-spacing: 0;
+        }
+
+        #admin-welcome-content .admin-welcome-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+        }
+
+        #admin-welcome-content .admin-welcome-list-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        #admin-welcome-content .admin-welcome-bullet {
+            width: 4px;
+            height: 4px;
+            margin-top: 8px;
+            flex-shrink: 0;
+            border-radius: 9999px;
+            background: var(--admin-welcome-brand);
+        }
+
+        #admin-welcome-modal .admin-welcome-meta-text {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+    </style>
+
+    <div id="admin-welcome-modal" class="hidden fixed inset-0 z-[70]">
+        <div class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"></div>
+        <div class="relative flex min-h-full items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div data-kami-document class="admin-welcome-document w-full overflow-hidden rounded-2xl border border-[#e8e5da] bg-white shadow-[0_24px_80px_rgba(20,20,19,0.14)] ring-1 ring-[#e8e5da]">
+                <div class="border-b border-[#e8e5da] bg-white px-5 py-3.5 sm:px-7">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <div id="admin-welcome-badge" class="admin-welcome-meta-text inline-flex rounded-full bg-[#EEF2F7] px-2.5 py-1 font-semibold text-[#1B365D]"></div>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-auto">
+                            <button type="button" data-welcome-switch class="admin-welcome-meta-text rounded-full border border-[#d1cfc5] bg-white px-3 py-1.5 font-medium text-[#3d3d3a] hover:border-[#1B365D] hover:text-[#1B365D]"></button>
+                            <button type="button" data-welcome-close class="admin-welcome-meta-text rounded-full border border-[#d1cfc5] bg-white px-3 py-1.5 font-medium text-[#3d3d3a] hover:bg-[#f7f6f1]"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="max-h-[80vh] overflow-y-auto bg-white px-5 py-7 sm:px-7 sm:py-8">
+                    <article class="admin-welcome-reader mx-auto">
+                        <h2 id="admin-welcome-title"></h2>
+                        <p id="admin-welcome-subtitle"></p>
+                        <div id="admin-welcome-content" class="admin-welcome-document-body space-y-4"></div>
+                    </article>
+
+                    <div class="admin-welcome-reader mx-auto mt-7 border-t border-[#e8e5da] pt-4">
+                        <p id="admin-welcome-links-label" class="admin-welcome-meta-text text-[#5e5d59]"></p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <a id="admin-welcome-link-x" class="admin-welcome-meta-text inline-flex items-center rounded-full bg-[#EEF2F7] px-3 py-1.5 font-medium text-[#1B365D] ring-1 ring-[#d1cfc5] hover:bg-[#E4ECF5]" target="_blank" rel="noopener noreferrer"></a>
+                            <a id="admin-welcome-link-github" class="admin-welcome-meta-text inline-flex items-center rounded-full bg-[#EEF2F7] px-3 py-1.5 font-medium text-[#1B365D] ring-1 ring-[#d1cfc5] hover:bg-[#E4ECF5]" target="_blank" rel="noopener noreferrer"></a>
+                            <a id="admin-welcome-link-changelog" class="admin-welcome-meta-text inline-flex items-center rounded-full bg-[#EEF2F7] px-3 py-1.5 font-medium text-[#1B365D] ring-1 ring-[#d1cfc5] hover:bg-[#E4ECF5]" target="_blank" rel="noopener noreferrer"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/json" id="admin-welcome-payload">{"copy":{"zh-CN":{"meta":{"badge":"\u9879\u76ee\u8bf4\u660e","switch_label":"English","close":"\u5173\u95ed","links_label":"\u9700\u8981\u66f4\u591a\u7ec6\u8282\u65f6\uff0c\u53ef\u4ee5\u67e5\u770b\u9879\u76ee\u4ed3\u5e93\u3001\u66f4\u65b0\u65e5\u5fd7\u548c\u4f5c\u8005\u4e3b\u9875\u3002","author_link":"\u4f5c\u8005 X \u4e3b\u9875","github_link":"\u9879\u76ee GitHub","changelog_link":"\u66f4\u65b0\u65e5\u5fd7"},"letter":{"title":"\u5199\u7ed9 GEOFlow \u4f7f\u7528\u8005\u7684\u4e00\u5c01\u4fe1","subtitle":"GEOFlow \u662f\u4e00\u5957\u9762\u5411 AI \u641c\u7d22\u4e0e\u591a\u7ad9\u70b9\u5206\u53d1\u7684\u5185\u5bb9\u5de5\u7a0b\u540e\u53f0\u3002\u5b83\u4e0d\u627f\u8bfa\u6392\u540d\uff0c\u800c\u662f\u7528\u771f\u5b9e\u8d44\u6599\u3001\u7ed3\u6784\u5316\u5185\u5bb9\u548c\u6301\u7eed\u9a8c\u8bc1\uff0c\u63d0\u9ad8\u88ab\u7406\u89e3\u3001\u5f15\u7528\u548c\u63a8\u8350\u7684\u6982\u7387\u3002","blocks":[{"type":"paragraph","content":"\u4f60\u597d\uff0c\u6b22\u8fce\u4f7f\u7528 GEOFlow\u3002\u8fd9\u4e2a\u7cfb\u7edf\u7684\u51fa\u53d1\u70b9\u4e0d\u662f\u628a\u5185\u5bb9\u751f\u4ea7\u53d8\u6210\u4e00\u6b21\u6027\u7684\u6279\u91cf\u751f\u6210\uff0c\u800c\u662f\u628a\u8d44\u6599\u3001\u4e8b\u5b9e\u3001\u63d0\u793a\u8bcd\u3001\u5ba1\u6838\u3001\u53d1\u5e03\u3001\u5206\u53d1\u548c\u6570\u636e\u590d\u76d8\u8fde\u63a5\u6210\u4e00\u4e2a\u53ef\u6301\u7eed\u7684 GEO \u5de5\u4f5c\u6d41\u3002"},{"type":"paragraph","content":"GEO \u7684\u6838\u5fc3\u4e0d\u662f\u201c\u9a97\u8fc7\u7b97\u6cd5\u201d\uff0c\u800c\u662f\u8ba9\u771f\u5b9e\u3001\u53ef\u9760\u3001\u7ed3\u6784\u5316\u7684\u5185\u5bb9\u66f4\u5bb9\u6613\u88ab\u7b54\u6848\u5f15\u64ce\u8bc6\u522b\u3002\u7cfb\u7edf\u53ef\u4ee5\u5e2e\u4f60\u63d0\u6548\uff0c\u4f46\u5185\u5bb9\u8d28\u91cf\u3001\u4e1a\u52a1\u4e8b\u5b9e\u548c\u4eba\u5de5\u5224\u65ad\u4ecd\u7136\u662f\u57fa\u7840\u3002"},{"type":"heading","content":"GEOFlow \u662f\u4ec0\u4e48"},{"type":"list","items":["\u628a AI \u6a21\u578b\u3001\u63d0\u793a\u8bcd\u3001\u77e5\u8bc6\u5e93\u3001\u7d20\u6750\u5e93\u3001\u4efb\u52a1\u548c\u6587\u7ae0\u7ba1\u7406\u96c6\u4e2d\u5230\u4e00\u4e2a\u540e\u53f0","\u628a\u672c\u7ad9\u3001\u76ee\u6807 Agent \u7ad9\u70b9\u3001WordPress \u548c\u901a\u7528 API \u5206\u53d1\u6e20\u9053\u63a5\u5165\u540c\u4e00\u6761\u53d1\u5e03\u94fe\u8def","\u7528\u89c2\u6d4b\u5f52\u56e0\u67e5\u770b\u5185\u5bb9\u751f\u4ea7\u3001\u4efb\u52a1\u72b6\u6001\u3001\u5206\u53d1\u7ed3\u679c\u3001\u8bbf\u95ee\u65e5\u5fd7\u548c AI \u722c\u866b\u8d8b\u52bf","\u7528\u5ba1\u6838\u3001\u5f15\u7528\u548c\u590d\u76d8\u673a\u5236\uff0c\u51cf\u5c11\u53ea\u8ffd\u6c42\u751f\u6210\u6570\u91cf\u5e26\u6765\u7684\u5185\u5bb9\u98ce\u9669"]},{"type":"heading","content":"GEO \u7684\u51e0\u4e2a\u57fa\u672c\u5e38\u8bc6"},{"type":"list","items":["GEO \u4f18\u5316\u7684\u662f\u7b54\u6848\u5f15\u64ce\u91c7\u7eb3\u4e8b\u5b9e\u3001\u89c2\u70b9\u548c\u9875\u9762\u7684\u6982\u7387\uff0c\u4e0d\u662f\u4fdd\u8bc1\u67d0\u4e2a\u5e73\u53f0\u56fa\u5b9a\u6392\u540d","AI \u66f4\u5bb9\u6613\u5f15\u7528\u6e05\u6670\u3001\u51c6\u786e\u3001\u6709\u6765\u6e90\u3001\u53ef\u9a8c\u8bc1\u3001\u6301\u7eed\u66f4\u65b0\u4e14\u7ed3\u6784\u5316\u826f\u597d\u7684\u5185\u5bb9","\u4e0d\u8981\u7528\u865a\u5047\u4e8b\u5b9e\u6216\u5806\u780c\u5173\u952e\u8bcd\u8d4c\u6982\u7387\uff0c\u957f\u671f\u6709\u6548\u7684 GEO \u4f9d\u8d56\u4e8b\u5b9e\u3001\u8bc1\u636e\u3001\u8bed\u4e49\u7ed3\u6784\u548c\u54c1\u724c\u4e00\u81f4\u6027","\u9ad8\u98ce\u9669\u5185\u5bb9\u9700\u8981\u4eba\u5de5\u5ba1\u6838\uff0c\u91cd\u8981\u751f\u6210\u7ed3\u679c\u6700\u597d\u80fd\u5f15\u7528\u5177\u4f53\u77e5\u8bc6\u5e93\u8bc1\u636e"]},{"type":"heading","content":"\u63a8\u8350\u7684\u4f7f\u7528\u65b9\u6cd5"},{"type":"list","items":["\u5148\u914d\u7f6e Chat \u6a21\u578b\u3001Embedding \u6a21\u578b\u548c\u63d0\u793a\u8bcd\uff0c\u518d\u6c89\u6dc0\u77e5\u8bc6\u5e93\u3001\u6807\u9898\u5e93\u3001\u5173\u952e\u8bcd\u5e93\u3001\u56fe\u7247\u548c\u4f5c\u8005","\u5148\u7528\u5c0f\u4efb\u52a1\u751f\u6210\u5c11\u91cf\u6587\u7ae0\uff0c\u68c0\u67e5\u6807\u9898\u3001\u4e8b\u5b9e\u3001Markdown \u6392\u7248\u3001\u56fe\u7247\u3001SEO \u5b57\u6bb5\u548c Schema","\u901a\u8fc7\u5ba1\u6838\u540e\u518d\u53d1\u5e03\u5230\u672c\u7ad9\uff0c\u6216\u540c\u6b65\u5230\u76ee\u6807 Agent\u3001WordPress\u3001\u901a\u7528 API \u7b49\u6e20\u9053","\u5b9a\u671f\u67e5\u770b\u89c2\u6d4b\u5f52\u56e0\uff0c\u7528\u4efb\u52a1\u72b6\u6001\u3001\u5206\u53d1\u65e5\u5fd7\u3001\u8bbf\u95ee\u65e5\u5fd7\u548c AI \u722c\u866b\u6570\u636e\u53cd\u5411\u4fee\u6b63\u77e5\u8bc6\u8d44\u4ea7\u548c\u5185\u5bb9"]},{"type":"heading","content":"\u8fd9\u5957\u7cfb\u7edf\u7684\u8fb9\u754c"},{"type":"list","items":["\u5b83\u80fd\u81ea\u52a8\u5316\u5185\u5bb9\u5de5\u7a0b\uff0c\u4f46\u4e0d\u80fd\u66ff\u4ee3\u4e1a\u52a1\u4e8b\u5b9e\u3001\u4e13\u5bb6\u5224\u65ad\u548c\u6700\u7ec8\u5ba1\u6838","\u5b83\u80fd\u63d0\u5347\u7ba1\u7406\u6548\u7387\u548c\u88ab\u5f15\u7528\u6982\u7387\uff0c\u4f46\u4e0d\u80fd\u4fdd\u8bc1\u4efb\u4f55 AI \u6216\u641c\u7d22\u5e73\u53f0\u4e00\u5b9a\u5c55\u793a","\u77e5\u8bc6\u5e93\u8d8a\u7cfb\u7edf\u3001\u8d8a\u51c6\u786e\u3001\u8d8a\u6709\u8bc1\u636e\uff0c\u540e\u7eed\u5185\u5bb9\u7684\u8d28\u91cf\u4e0a\u9650\u8d8a\u9ad8","\u6279\u91cf\u53d1\u5e03\u524d\u8bf7\u5148\u5c0f\u6837\u672c\u6d4b\u8bd5\uff0c\u786e\u8ba4\u4e8b\u5b9e\u3001\u56fe\u7247\u3001\u6392\u7248\u3001\u94fe\u63a5\u548c\u8fdc\u7aef\u9875\u9762\u90fd\u7b26\u5408\u9884\u671f"]},{"type":"paragraph","content":"\u8fd9\u5c01\u4fe1\u53ea\u4f1a\u5728\u5f53\u524d\u8bf4\u660e\u7248\u672c\u4e0b\u81ea\u52a8\u5f39\u51fa\u4e00\u6b21\u3002\u4ee5\u540e\u5982\u679c\u9700\u8981\u56de\u770b\uff0c\u53ef\u4ee5\u4ece\u540e\u53f0\u5e95\u90e8\u7684\u201c\u9879\u76ee\u8bf4\u660e\u201d\u518d\u6b21\u6253\u5f00\u3002"}]}},"en":{"meta":{"badge":"Project Intro","switch_label":"\u4e2d\u6587","close":"Close","links_label":"Use these links when you need repository details, release notes, or the author profile.","author_link":"Author X Profile","github_link":"Project GitHub","changelog_link":"Changelog"},"letter":{"title":"A Letter to GEOFlow Users","subtitle":"GEOFlow is a content engineering admin for AI search and multi-site distribution. It does not promise rankings; it improves the probability of being understood, cited, and recommended through facts, structure, and continuous validation.","blocks":[{"type":"paragraph","content":"Welcome to GEOFlow. The goal is not one-off bulk generation. The goal is to connect materials, facts, prompts, review, publishing, distribution, and analytics into a repeatable GEO workflow."},{"type":"paragraph","content":"GEO is not about tricking algorithms. It is about making truthful, reliable, well-structured content easier for answer engines to recognize. The system can improve efficiency, but content quality, business facts, and human judgment remain the foundation."},{"type":"heading","content":"What GEOFlow is"},{"type":"list","items":["A single admin for AI models, prompts, knowledge bases, materials, tasks, and articles","A publishing chain that connects the local site, target Agent sites, WordPress, and generic API channels","An analytics surface for production, task status, distribution results, access logs, and AI crawler trends","A quality workflow that uses review, evidence, and feedback instead of only optimizing for volume"]},{"type":"heading","content":"GEO basics"},{"type":"list","items":["GEO optimizes the probability that answer engines adopt your facts, viewpoints, and pages; it cannot guarantee fixed rankings","AI systems are more likely to cite clear, accurate, sourced, verifiable, fresh, and well-structured content","Do not gamble with fabricated facts or keyword stuffing. Durable GEO depends on evidence, semantic structure, and brand consistency","High-risk content needs human review, and important generated content should cite specific knowledge-base evidence"]},{"type":"heading","content":"Recommended workflow"},{"type":"list","items":["Configure chat models, embedding models, and prompts before building knowledge, title, keyword, image, and author libraries","Generate a few articles first, then review titles, facts, Markdown layout, images, SEO fields, and Schema","After review, publish to the local site or sync to target Agent, WordPress, and generic API channels","Use Analytics regularly to refine materials and content through task status, distribution logs, access logs, and AI crawler data"]},{"type":"heading","content":"System boundaries"},{"type":"list","items":["It can automate content engineering, but it cannot replace business facts, expert judgment, or final review","It can improve operational efficiency and citation probability, but it cannot guarantee visibility on any AI or search platform","The more systematic, accurate, and evidence-backed your knowledge base is, the higher the ceiling for downstream content","Before bulk publishing, test a small sample and verify facts, images, layout, links, and remote pages"]},{"type":"paragraph","content":"This letter auto-opens only once for the current intro version. You can always reopen it later from Project intro in the admin footer."}]}}},"state":{"mode":"intro","shouldAutoOpen":false,"dismissUrl":"\/geo_admin\/welcome\/dismiss","csrfToken":"lpwThwOE7GT2S4TpPhXFjz7jOwO58x9abo2FuLEN","links":{"x":"https:\/\/x.com\/yaojingang","github":"https:\/\/github.com\/zhangzhirongs\/GEOflow","changelog":{"zh-CN":"https:\/\/github.com\/zhangzhirongs\/GEOflow\/blob\/main\/docs\/CHANGELOG.md","en":"https:\/\/github.com\/zhangzhirongs\/GEOflow\/blob\/main\/docs\/CHANGELOG_en.md"}}}}</script>
+    
+    <script>
+        (function () {
+            const modal = document.getElementById('admin-welcome-modal');
+            const payloadNode = document.getElementById('admin-welcome-payload');
+            if (!modal || !payloadNode) {
+                return;
+            }
+
+            const payload = JSON.parse(payloadNode.textContent || '{}');
+            const copy = payload.copy || {};
+            const state = payload.state || {};
+            const localeCycle = ['zh-CN', 'en'];
+            let locale = 'zh-CN';
+            let dismissedPersisted = !state.shouldAutoOpen;
+
+            const badgeNode = document.getElementById('admin-welcome-badge');
+            const titleNode = document.getElementById('admin-welcome-title');
+            const subtitleNode = document.getElementById('admin-welcome-subtitle');
+            const contentNode = document.getElementById('admin-welcome-content');
+            const linksLabelNode = document.getElementById('admin-welcome-links-label');
+            const linkXNode = document.getElementById('admin-welcome-link-x');
+            const linkGithubNode = document.getElementById('admin-welcome-link-github');
+            const linkChangelogNode = document.getElementById('admin-welcome-link-changelog');
+            const switchButton = modal.querySelector('[data-welcome-switch]');
+            const closeButtons = modal.querySelectorAll('[data-welcome-close]');
+
+            function blockHtml(block) {
+                if (!block || !block.type) {
+                    return '';
+                }
+
+                if (block.type === 'heading') {
+                    return `<h3 class="admin-welcome-section-title">${block.content || ''}</h3>`;
+                }
+
+                if (block.type === 'list') {
+                    const items = Array.isArray(block.items) ? block.items : [];
+                    return `<ul class="admin-welcome-list">${items.map((item) => `<li class="admin-welcome-list-item"><span class="admin-welcome-bullet"></span><span>${item}</span></li>`).join('')}</ul>`;
+                }
+
+                return `<p class="admin-welcome-paragraph">${block.content || ''}</p>`;
+            }
+
+            function render(nextLocale) {
+                locale = localeCycle.includes(nextLocale) ? nextLocale : 'zh-CN';
+                const localeCopy = copy[locale] || copy['zh-CN'] || {};
+                const meta = localeCopy.meta || {};
+                const letter = localeCopy.letter || {};
+                const blocks = letter.blocks || [];
+
+                badgeNode.textContent = meta.badge || '';
+                titleNode.textContent = letter.title || '';
+                subtitleNode.textContent = letter.subtitle || '';
+                contentNode.innerHTML = blocks.map((block) => blockHtml(block)).join('');
+                linksLabelNode.textContent = meta.links_label || '';
+                linkXNode.textContent = meta.author_link || '';
+                linkXNode.href = state.links?.x || '#';
+                linkGithubNode.textContent = meta.github_link || '';
+                linkGithubNode.href = state.links?.github || '#';
+                linkChangelogNode.textContent = meta.changelog_link || '';
+                linkChangelogNode.href = state.links?.changelog?.[locale] || state.links?.changelog?.['zh-CN'] || '#';
+                switchButton.textContent = meta.switch_label || (locale === 'zh-CN' ? 'English' : '中文');
+                closeButtons.forEach((button) => {
+                    button.textContent = meta.close || 'Close';
+                });
+            }
+
+            function openModal() {
+                render('zh-CN');
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            async function persistDismissIfNeeded() {
+                if (dismissedPersisted || !state.dismissUrl || !state.csrfToken) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(state.dismissUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        body: new URLSearchParams({
+                            _token: state.csrfToken,
+                        }),
+                    });
+
+                    if (response.ok) {
+                        dismissedPersisted = true;
+                    }
+                } catch (error) {
+                    console.error('Failed to persist welcome dismissal', error);
+                }
+            }
+
+            async function closeModal() {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+                await persistDismissIfNeeded();
+            }
+
+            switchButton.addEventListener('click', function () {
+                render(locale === 'zh-CN' ? 'en' : 'zh-CN');
+            });
+
+            closeButtons.forEach((button) => {
+                button.addEventListener('click', closeModal);
+            });
+
+            modal.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.querySelectorAll('[data-open-admin-welcome]').forEach((trigger) => {
+                trigger.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    openModal();
+                });
+            });
+
+            if (state.shouldAutoOpen) {
+                openModal();
+            }
+        })();
+    </script>
+    
+<script>
+    (function () {
+        var openPanel = function (panel, btn, open) {
+            if (!panel) { return; }
+            panel.classList.toggle('is-open', open);
+            if (btn) { btn.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+        };
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-filter-more-toggle]');
+            if (!btn) { return; }
+            var panel = document.getElementById(btn.getAttribute('aria-controls'));
+            if (!panel) { return; }
+            openPanel(panel, btn, !panel.classList.contains('is-open'));
+        });
+        document.querySelectorAll('[data-filter-advanced]').forEach(function (panel) {
+            if (panel.classList.contains('is-open')) { return; }
+            var active = Array.prototype.some.call(panel.querySelectorAll('input, select'), function (el) {
+                if (el.type === 'hidden') { return false; }
+                if (el.type === 'checkbox' || el.type === 'radio') { return el.checked; }
+                return el.value !== null && String(el.value).trim() !== '';
+            });
+            if (active) {
+                var btn = document.querySelector('[data-filter-more-toggle][aria-controls="' + panel.id + '"]');
+                openPanel(panel, btn, true);
+            }
+        });
+    })();
+</script>
+</body>
+</html>

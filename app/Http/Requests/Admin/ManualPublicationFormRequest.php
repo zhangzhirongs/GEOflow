@@ -57,12 +57,7 @@ abstract class ManualPublicationFormRequest extends FormRequest
                 Rule::exists((new Admin)->getTable(), 'id')->where('status', 'active'),
             ],
             'platform' => ['required', Rule::in(ManualPublicationAccount::PLATFORMS)],
-            'custom_platform' => [
-                'nullable',
-                Rule::requiredIf(fn (): bool => $this->input('platform') === ManualPublicationAccount::PLATFORM_CUSTOM),
-                'string',
-                'max:120',
-            ],
+            'custom_platform' => ['nullable', 'string', 'max:120'],
             'target_url' => [
                 'nullable',
                 Rule::requiredIf(fn (): bool => $this->input('type') === ManualPublication::TYPE_COMMENT),

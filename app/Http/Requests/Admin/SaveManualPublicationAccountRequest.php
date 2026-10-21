@@ -39,12 +39,7 @@ class SaveManualPublicationAccountRequest extends FormRequest
                     'georank_remote',
                 ]),
             ],
-            'custom_platform' => [
-                'nullable',
-                Rule::requiredIf(fn (): bool => $this->input('platform') === ManualPublicationAccount::PLATFORM_CUSTOM),
-                'string',
-                'max:120',
-            ],
+            'custom_platform' => ['nullable', 'string', 'max:120'],
             'account_name' => ['required', 'string', 'max:160'],
             'profile_url' => ['nullable', 'url:http,https', 'max:1000'],
             'notes' => ['nullable', 'string', 'max:5000'],

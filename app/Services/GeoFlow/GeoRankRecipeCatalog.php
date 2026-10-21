@@ -13,8 +13,40 @@ class GeoRankRecipeCatalog
             'xiaohongshu' => $this->xiaohongshu(),
             'zhihu' => $this->zhihu(),
             'bilibili' => $this->bilibili(),
-            default => $this->xiaohongshu(),
+            'baijiahao', 'toutiao', 'weibo', 'douyin', 'wechat_mp', 'csdn', 'local_demo' => $this->generic($platform),
+            default => $this->generic($platform),
         };
+    }
+
+    /** @return array<string,mixed> */
+    private function generic(string $platform): array
+    {
+        $urls = [
+            'baijiahao' => 'https://baijiahao.baidu.com',
+            'toutiao' => 'https://mp.toutiao.com',
+            'weibo' => 'https://weibo.com',
+            'douyin' => 'https://creator.douyin.com',
+            'wechat_mp' => 'https://mp.weixin.qq.com',
+            'csdn' => 'https://editor.csdn.net/md/',
+            'local_demo' => '/demo',
+        ];
+        $url = $urls[$platform] ?? '/';
+
+        return [
+            'platform' => $platform,
+            'version' => 1,
+            'displayName' => $platform,
+            'login' => ['url' => $url, 'successSelectors' => [], 'successCookieNames' => [], 'timeoutMs' => 300000, 'keepOpenMs' => 3000],
+            'check' => ['url' => $url, 'loggedInSelectors' => [], 'loggedOutSelectors' => [], 'loggedInCookieNames' => [], 'timeoutMs' => 30000],
+            'publish' => [
+                'url' => $url,
+                'timeoutMs' => 900000,
+                'draftOnlyDefault' => true,
+                'mode' => 'handoff',
+                'handoffHint' => 'Open the platform editor, paste the prepared content, review it, and publish manually.',
+                'steps' => [['action' => 'goto', 'url' => $url, 'waitUntil' => 'domcontentloaded'], ['action' => 'wait', 'ms' => 1500]],
+            ],
+        ];
     }
 
     /**

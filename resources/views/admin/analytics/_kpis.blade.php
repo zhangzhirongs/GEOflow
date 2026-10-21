@@ -7,7 +7,6 @@
         ['key' => 'ai_calls', 'icon' => 'cpu', 'tone' => 'text-indigo-600'],
         ['key' => 'distribution_failed', 'icon' => 'radio-tower', 'tone' => 'text-rose-600'],
         ['key' => 'distribution_pending', 'icon' => 'clock', 'tone' => 'text-orange-600'],
-        ['key' => 'total_views', 'icon' => 'eye', 'tone' => 'text-slate-700'],
     ];
 @endphp
 

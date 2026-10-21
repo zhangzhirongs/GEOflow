@@ -33,8 +33,9 @@ return [
     ],
     'risk' => ['clean' => '内容正常', 'warning' => '存在提醒', 'blocked' => '高风险'],
     'platform' => [
-        'zhihu' => '知乎', 'xiaohongshu' => '小红书', 'weibo' => '微博', 'wechat' => '微信公众号',
-        'douyin' => '抖音', 'bilibili' => 'Bilibili', 'reddit' => 'Reddit', 'x' => 'X', 'linkedin' => 'LinkedIn', 'custom' => '自定义平台',
+        'zhihu' => '知乎', 'xiaohongshu' => '小红书', 'baijiahao' => '百家号', 'toutiao' => '今日头条',
+        'bilibili' => 'Bilibili', 'weibo' => '微博', 'douyin' => '抖音', 'wechat_mp' => '微信公众号',
+        'csdn' => 'CSDN', 'local_demo' => '本地演示',
     ],
     'filter' => [
         'all' => '全部', 'status' => '状态', 'type' => '类型', 'platform' => '平台', 'assignee' => '执行人',

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 — GEOFlow</title>
+    <script src="assets/js/tailwindcss.play-cdn.js"></script>
+    <script src="assets/js/lucide.min.js"></script>
+    <style>
+        /* 登录页：gray-50 画布 + 白色卡片，禁用渐变与毛玻璃，与管理端 design-lock 保持一致 */
+        body {
+            background: var(--gf-gray-50, #f9fafb);
+            color: var(--gf-gray-900, #111827);
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            min-height: 100vh;
+        }
+        .login-form {
+            background: #fff;
+            border: 1px solid var(--gf-gray-200, #e5e7eb);
+            border-radius: 16px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .login-badge {
+            background: var(--gf-blue-600, #2563eb);
+            border-radius: 16px;
+        }
+        .initial-admin-hint {
+            background: #fff;
+            border: 1px solid var(--gf-blue-100, #dbeafe);
+        }
+        .login-brand {
+            align-items: center;
+            color: var(--gf-gray-900, #111827);
+            display: flex;
+            font-size: 17px;
+            font-weight: 600;
+            gap: 10px;
+            letter-spacing: -0.02em;
+        }
+        .login-brand__mark {
+            align-items: center;
+            background: var(--gf-blue-600, #2563eb);
+            border-radius: 6px;
+            color: #fff;
+            display: flex;
+            flex: 0 0 28px;
+            font-size: 14px;
+            font-weight: 700;
+            height: 28px;
+            justify-content: center;
+            width: 28px;
+        }
+    </style>
+    <style>#admin-welcome-modal{display:none!important}</style>
+</head>
+<body class="overflow-hidden">
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-4">
+    <div class="rounded-2xl p-8 login-form">
+        <div class="mb-6 flex items-center justify-between">
+            <div class="login-brand">
+                <span class="login-brand__mark">G</span>
+                <span class="truncate">GEOFlow</span>
+            </div>
+            <select onchange="window.location.href=this.value" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-600 shadow-sm">
+                                    <option value="#" selected>
+                        简体中文
+                    </option>
+                                    <option value="#" >
+                        English
+                    </option>
+                                    <option value="#" >
+                        日本語
+                    </option>
+                                    <option value="#" >
+                        Español
+                    </option>
+                                    <option value="#" >
+                        Русский
+                    </option>
+                                    <option value="#" >
+                        Português (BR)
+                    </option>
+                            </select>
+        </div>
+        <div class="text-center mb-8">
+            <div class="login-badge mx-auto mb-4 flex h-14 w-14 items-center justify-center">
+                <i data-lucide="shield-check" class="h-7 w-7 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">管理员登录</h1>
+            <p class="mt-1 text-sm text-gray-500">GEOFlow 后台管理系统</p>
+        </div>
+                                <form method="POST" action="#" class="space-y-6">
+            <input type="hidden" name="_token" value="ZELq69n6Kk4nF2OWzlzzK9pX2n3daztsvFcyxFTI" autocomplete="off">            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                <input type="text" id="username" name="username" required value=""
+                       class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="请输入用户名" autocomplete="username">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                <input type="password" id="password" name="password" required
+                       class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="请输入密码" autocomplete="current-password">
+            </div>
+            <input type="hidden" name="remember" value="0">
+            <label class="flex items-center justify-between rounded-lg border border-gray-200 bg-white/70 px-3 py-3 text-sm text-gray-600">
+                <span class="flex items-center gap-2">
+                    <input type="checkbox" name="remember" value="1" checked class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span>保持登录 30 天</span>
+                </span>
+                <span class="text-xs text-gray-400">适合个人设备</span>
+            </label>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg">
+                登录
+            </button>
+        </form>
+    </div>
+    <div class="text-center mt-6">
+        <a href="http://192.168.169.74:18080" class="text-gray-600 hover:text-gray-900 text-sm">返回首页</a>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const initialHint = document.getElementById('initial-admin-hint');
+        if (initialHint) {
+            const storageKey = initialHint.getAttribute('data-storage-key') || 'geoflow.initial-admin-hint';
+            let shouldShow = true;
+
+            try {
+                shouldShow = window.localStorage.getItem(storageKey) !== 'seen';
+                if (shouldShow) {
+                    window.localStorage.setItem(storageKey, 'seen');
+                }
+            } catch (error) {
+                shouldShow = true;
+            }
+
+            if (shouldShow) {
+                initialHint.classList.remove('hidden');
+            }
+
+            initialHint.querySelector('[data-dismiss-initial-admin-hint]')?.addEventListener('click', function () {
+                initialHint.classList.add('hidden');
+                try {
+                    window.localStorage.setItem(storageKey, 'seen');
+                } catch (error) {}
+            });
+        }
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+</body>
+</html>

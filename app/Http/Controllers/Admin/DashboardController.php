@@ -22,10 +22,8 @@ use App\Models\Title;
 use App\Models\TitleLibrary;
 use App\Models\UrlImportJob;
 use App\Support\AdminWeb;
-use App\Support\Analytics\TrafficClassifier;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 /**
@@ -61,7 +59,6 @@ class DashboardController extends Controller
             'total_articles' => 0,
             'published_articles' => 0,
             'draft_articles' => 0,
-            'ai_generated_articles' => 0,
             'total_tasks' => 0,
             'active_tasks' => 0,
             'completed_tasks' => 0,
@@ -78,8 +75,6 @@ class DashboardController extends Controller
             'special_prompts' => 0,
             'pending_review' => 0,
             'approved_articles' => 0,
-            'total_views' => 0,
-            'total_likes' => 0,
         ];
 
         try {
@@ -96,14 +91,8 @@ class DashboardController extends Controller
             $defaults['total_articles'] = (int) Article::query()->whereNull('deleted_at')->count();
             $defaults['published_articles'] = (int) Article::query()->where('status', 'published')->whereNull('deleted_at')->count();
             $defaults['draft_articles'] = (int) Article::query()->where('status', 'draft')->whereNull('deleted_at')->count();
-            $defaults['ai_generated_articles'] = (int) Article::query()->where('is_ai_generated', 1)->whereNull('deleted_at')->count();
             $defaults['pending_review'] = (int) Article::query()->where('review_status', 'pending')->whereNull('deleted_at')->count();
             $defaults['approved_articles'] = (int) Article::query()->where('review_status', 'approved')->whereNull('deleted_at')->count();
-            $defaults['total_views'] = (int) (Article::query()->whereNull('deleted_at')->sum('view_count') ?? 0);
-            if (Schema::hasColumn('articles', 'like_count')) {
-                $defaults['total_likes'] = (int) (Article::query()->whereNull('deleted_at')->sum('like_count') ?? 0);
-            }
-
             $defaults['total_tasks'] = (int) Task::query()->count();
             $defaults['active_tasks'] = (int) Task::query()->where('status', 'active')->count();
             $defaults['total_keywords'] = (int) Keyword::query()->count();
@@ -122,11 +111,11 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array{today_articles: int, today_tasks: int, today_views: int, today_ai_bot_views: int}
+     * @return array{today_articles: int}
      */
     private function buildTodayStats(): array
     {
-        $out = ['today_articles' => 0, 'today_tasks' => 0, 'today_views' => 0, 'today_ai_bot_views' => 0];
+        $out = ['today_articles' => 0];
 
         try {
             $today = Carbon::today();
@@ -134,27 +123,6 @@ class DashboardController extends Controller
                 ->whereNull('deleted_at')
                 ->whereDate('created_at', $today)
                 ->count();
-            $out['today_tasks'] = (int) Task::query()
-                ->whereDate('created_at', $today)
-                ->count();
-            $todayViewQuery = DB::table('view_logs')->whereDate('created_at', $today);
-            if (Schema::hasColumn('view_logs', 'method')) {
-                $todayViewQuery->where('method', 'GET');
-            }
-            $out['today_views'] = (int) $todayViewQuery->count();
-            if (Schema::hasColumn('view_logs', 'user_agent')) {
-                $todayAiBotQuery = DB::table('view_logs')->whereDate('created_at', $today);
-                if (Schema::hasColumn('view_logs', 'method')) {
-                    $todayAiBotQuery->where('method', 'GET');
-                }
-                $out['today_ai_bot_views'] = (int) $todayAiBotQuery
-                    ->where(function ($query): void {
-                        foreach (TrafficClassifier::aiBotPatterns() as $pattern) {
-                            $query->orWhereRaw("LOWER(COALESCE(user_agent, '')) LIKE ?", ['%'.$pattern.'%']);
-                        }
-                    })
-                    ->count();
-            }
         } catch (\Throwable) {
             // Empty or partially migrated installations should still render the dashboard.
         }

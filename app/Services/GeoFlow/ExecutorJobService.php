@@ -28,7 +28,7 @@ class ExecutorJobService
             'name' => $name,
             'slug' => $slug,
             'node_key_hash' => hash('sha256', $nodeKey),
-            'platforms' => $input['platforms'] ?? ['xiaohongshu', 'zhihu', 'bilibili', 'weibo'],
+            'platforms' => $input['platforms'] ?? ManualPublicationAccount::PLATFORMS,
             'max_concurrency' => max(1, min(16, (int) ($input['max_concurrency'] ?? 1))),
             'enabled' => true,
             'online' => false,

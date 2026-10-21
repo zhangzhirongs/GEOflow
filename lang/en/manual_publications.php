@@ -40,8 +40,9 @@ return [
     ],
     'risk' => ['clean' => 'Clean', 'warning' => 'Warning', 'blocked' => 'Blocked'],
     'platform' => [
-        'zhihu' => 'Zhihu', 'xiaohongshu' => 'Xiaohongshu', 'weibo' => 'Weibo', 'wechat' => 'WeChat Official Account',
-        'douyin' => 'Douyin', 'bilibili' => 'Bilibili', 'reddit' => 'Reddit', 'x' => 'X', 'linkedin' => 'LinkedIn', 'custom' => 'Custom platform',
+        'zhihu' => 'Zhihu', 'xiaohongshu' => 'Xiaohongshu', 'baijiahao' => 'Baidu Baijiahao', 'toutiao' => 'Toutiao',
+        'bilibili' => 'Bilibili', 'weibo' => 'Weibo', 'douyin' => 'Douyin', 'wechat_mp' => 'WeChat Official Account',
+        'csdn' => 'CSDN', 'local_demo' => 'Local demo',
     ],
     'filter' => [
         'all' => 'All', 'status' => 'Status', 'type' => 'Type', 'platform' => 'Platform', 'assignee' => 'Assignee',

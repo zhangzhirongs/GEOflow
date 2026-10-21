@@ -17,7 +17,7 @@
         ])
 
         <section class="mb-5 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-            <form method="GET" action="{{ route('admin.analytics.ai-visibility') }}" class="space-y-3">
+            <form method="GET" action="{{ route('admin.analytics.ai-visibility') }}" class="space-y-3" data-analytics-auto-submit>
                 <div class="flex flex-wrap gap-1.5">
                     @foreach (['14d', '30d', '60d', '90d'] as $preset)
                         <button type="submit" name="ai_preset" value="{{ $preset }}" class="inline-flex min-h-8 items-center rounded-md border px-2.5 py-1 text-xs font-semibold transition duration-[120ms] motion-reduce:transition-none active:scale-[.98] motion-reduce:active:scale-100 {{ $filters->preset === $preset ? 'border-violet-600 bg-violet-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-violet-300 hover:text-violet-700' }}" aria-pressed="{{ $filters->preset === $preset ? 'true' : 'false' }}">
@@ -25,13 +25,13 @@
                         </button>
                     @endforeach
                 </div>
-                <div class="grid grid-cols-2 gap-2 md:grid-cols-4">
-                    <div>
-                        <label for="ai-date-from" class="sr-only">{{ __('admin.analytics.filters.date_from') }}</label>
+                <div class="flex flex-wrap items-end gap-2 {{ $filters->preset === 'custom' ? '' : 'hidden' }}" data-analytics-custom-date-fields>
+                    <div class="min-w-[8.5rem] flex-1 sm:flex-none">
+                        <label for="ai-date-from" class="mb-1 block text-xs font-medium text-gray-600">{{ __('admin.analytics.filters.date_from') }}</label>
                         <input id="ai-date-from" type="date" name="ai_date_from" value="{{ $filterData['ai_date_from'] }}" max="{{ now()->toDateString() }}" class="block min-h-9 w-full rounded-md border-gray-300 text-xs focus:border-violet-500 focus:ring-violet-500">
                     </div>
-                    <div>
-                        <label for="ai-date-to" class="sr-only">{{ __('admin.analytics.filters.date_to') }}</label>
+                    <div class="min-w-[8.5rem] flex-1 sm:flex-none">
+                        <label for="ai-date-to" class="mb-1 block text-xs font-medium text-gray-600">{{ __('admin.analytics.filters.date_to') }}</label>
                         <input id="ai-date-to" type="date" name="ai_date_to" value="{{ $filterData['ai_date_to'] }}" max="{{ now()->toDateString() }}" class="block min-h-9 w-full rounded-md border-gray-300 text-xs focus:border-violet-500 focus:ring-violet-500">
                     </div>
                     <div>
@@ -53,11 +53,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="flex justify-end">
-                    <button type="submit" name="ai_preset" value="custom" class="inline-flex min-h-10 items-center rounded-md bg-violet-600 px-4 text-sm font-semibold text-white transition duration-[120ms] motion-reduce:transition-none hover:bg-violet-700 active:scale-[.98] motion-reduce:active:scale-100">
-                        <i data-lucide="filter" class="mr-2 h-4 w-4"></i>{{ __('admin.analytics.filters.apply') }}
-                    </button>
-                </div>
             </form>
         </section>
 
@@ -74,10 +69,9 @@
             </section>
         @else
             <section>
-                <div class="mb-4">
-                    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-violet-600">{{ __('admin.growth_center.ai_visibility.eyebrow') }}</p>
-                    <h2 class="mt-1 text-xl font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.title') }}</h2>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('admin.growth_center.ai_visibility.desc', ['count' => $ai['daily_sample_target'] ?? 5]) }}</p>
+                <div class="mb-4 flex flex-col gap-1 lg:flex-row lg:items-baseline lg:justify-between">
+                    <h2 class="text-lg font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.title') }}</h2>
+                    <p class="text-xs text-gray-400">{{ __('admin.growth_center.ai_visibility.desc', ['count' => $ai['daily_sample_target'] ?? 5]) }}</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -89,7 +83,7 @@
                     ] as $card)
                         <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                             <p class="text-sm text-gray-500">{{ __('admin.growth_center.ai_visibility.kpi.'.$card['label']) }}</p>
-                            <p class="mt-3 text-right font-mono text-3xl font-semibold tabular-nums {{ $card['tone'] }}">{{ number_format((float) ($kpis[$card['key']] ?? 0), 1) }}%</p>
+                            <p class="mt-2 font-mono text-2xl font-semibold tabular-nums text-gray-950 sm:text-3xl">{{ number_format((float) ($kpis[$card['key']] ?? 0), 1) }}%</p>
                         </article>
                     @endforeach
                 </div>
@@ -132,8 +126,8 @@
 
                 <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                     <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.term_cloud_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('admin.growth_center.ai_visibility.term_cloud_desc') }}</p>
+                        <h3 class="text-base font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.term_cloud_title') }}</h3>
+                        <p class="mt-0.5 text-xs text-gray-400">{{ __('admin.growth_center.ai_visibility.term_cloud_desc') }}</p>
                         <div class="mt-5 flex min-h-36 flex-wrap content-center items-center justify-center gap-x-4 gap-y-3">
                             @forelse (($ai['terms'] ?? []) as $term)
                                 <span class="font-medium text-violet-700" style="font-size: {{ $term['size'] }}px">{{ $term['term'] }}</span>
@@ -143,8 +137,8 @@
                         </div>
                     </section>
                     <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.attention_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('admin.growth_center.ai_visibility.attention_desc') }}</p>
+                        <h3 class="text-base font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.attention_title') }}</h3>
+                        <p class="mt-0.5 text-xs text-gray-400">{{ __('admin.growth_center.ai_visibility.attention_desc') }}</p>
                         <div class="mt-4 space-y-3">
                             @forelse (($ai['attention_sources'] ?? []) as $source)
                                 <article class="rounded-lg border border-amber-100 bg-amber-50 p-4">
@@ -160,14 +154,14 @@
 
                 <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                     <section class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-                        <div class="p-5"><h3 class="text-lg font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.keyword_title') }}</h3><p class="mt-1 text-sm text-gray-500">{{ __('admin.growth_center.ai_visibility.keyword_desc') }}</p></div>
+                        <div class="p-5"><h3 class="text-base font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.keyword_title') }}</h3><p class="mt-0.5 text-xs text-gray-400">{{ __('admin.growth_center.ai_visibility.keyword_desc') }}</p></div>
                         <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left">{{ __('admin.growth_center.ai_visibility.table.keyword') }}</th><th class="px-5 py-3 text-right">{{ __('admin.growth_center.ai_visibility.table.samples') }}</th><th class="px-5 py-3 text-right">{{ __('admin.growth_center.ai_visibility.table.visibility') }}</th><th class="px-5 py-3 text-right">{{ __('admin.growth_center.ai_visibility.table.top3') }}</th></tr></thead><tbody class="divide-y divide-gray-100">
                             @forelse (($ai['keywords'] ?? []) as $row)<tr><td class="px-5 py-3 font-medium text-gray-900">{{ $row['keyword'] }}</td><td class="px-5 py-3 text-right font-mono tabular-nums">{{ $row['samples'] }}</td><td class="px-5 py-3 text-right font-mono tabular-nums">{{ number_format($row['brand_visibility'], 1) }}%</td><td class="px-5 py-3 text-right font-mono tabular-nums">{{ number_format($row['top3_rate'], 1) }}%</td></tr>@empty<tr><td colspan="4" class="px-5 py-8 text-center text-gray-500">{{ __('admin.growth_center.ai_visibility.no_keywords') }}</td></tr>@endforelse
                         </tbody></table></div>
                     </section>
                     <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-                        <h3 class="text-lg font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.source_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-500">{{ __('admin.growth_center.ai_visibility.source_desc') }}</p>
+                        <h3 class="text-base font-semibold text-gray-950">{{ __('admin.growth_center.ai_visibility.source_title') }}</h3>
+                        <p class="mt-0.5 text-xs text-gray-400">{{ __('admin.growth_center.ai_visibility.source_desc') }}</p>
                         <div class="mt-4 space-y-3">
                             @forelse (($ai['sources'] ?? []) as $source)
                                 <article class="rounded-lg border border-gray-100 p-4"><div class="flex items-center justify-between gap-3"><strong class="truncate text-sm text-gray-900">{{ $source['domain'] }}</strong><span class="font-mono text-sm tabular-nums text-gray-600">{{ __('admin.growth_center.ai_visibility.source_mentions', ['count' => $source['mentions']]) }}</span></div><div class="mt-2 flex gap-4 text-xs text-gray-500"><span>{{ __('admin.growth_center.ai_visibility.source_avg_rank', ['rank' => $source['avg_rank']]) }}</span><span>{{ __('admin.growth_center.ai_visibility.source_brand_coverage', ['rate' => number_format($source['brand_coverage'], 1)]) }}</span></div></article>

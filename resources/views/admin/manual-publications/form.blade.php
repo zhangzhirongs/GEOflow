@@ -121,10 +121,6 @@
                         </select>
                     </div>
                     <div>
-                        <label for="custom_platform" class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.custom_platform') }}</label>
-                        <input id="custom_platform" type="text" name="custom_platform" value="{{ old('custom_platform', $publication?->custom_platform) }}" maxlength="120" class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    </div>
-                    <div>
                         <label for="account_id" class="block text-sm font-medium text-gray-700">{{ __('admin.manual_publications.field.account') }}</label>
                         <select id="account_id" name="account_id" class="mt-1 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">{{ __('admin.manual_publications.option.no_account') }}</option>

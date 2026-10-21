@@ -199,7 +199,8 @@ final class ArticleContentPromptRenderer
     private function platformStyleInstruction(string $platform, bool $isEnglish): string
     {
         $platform = mb_strtolower(trim($platform), 'UTF-8');
-        if ($platform === '' || $platform === 'custom') {
+        $platform = $platform === 'wechat_mp' ? 'wechat' : $platform;
+        if ($platform === '') {
             return '';
         }
 
@@ -219,7 +220,7 @@ final class ArticleContentPromptRenderer
             'xiaohongshu' => 'Platform (Xiaohongshu/RED): casual, personal "sharing" tone; strong hook in the opening, a few emojis allowed in title/first line; short paragraphs and bullet points; end with 3-5 #hashtags; keep it concise.',
             'zhihu' => 'Platform (Zhihu): professional, rational, in-depth; structure as background → analysis → conclusion with subheadings; rigorous, data-aware but never fabricated; avoid marketing tone and excessive emojis.',
             'weibo' => 'Platform (Weibo): short and punchy, 140-300 characters; conversational, high information density; 1-2 #topic# tags; end with a line inviting reposts or comments.',
-            'wechat' => 'Platform (WeChat Official Account): reader-friendly long-form layout; subheadings, short paragraphs, standalone key sentences; formal yet warm; hook up front, wrap up with a follow prompt.',
+            'wechat_mp' => 'Platform (WeChat Official Account): reader-friendly long-form layout; subheadings, short paragraphs, standalone key sentences; formal yet warm; hook up front, wrap up with a follow prompt.',
             'douyin' => 'Platform (Douyin/TikTok): produce a short-video voiceover script; 3-second hook up front, split by spoken rhythm/shots, highly colloquial, end with a like/follow call-to-action.',
             'bilibili' => 'Platform (Bilibili): youthful, community-savvy tone; script or sectioned long-form, clear structure, light humor; end by inviting likes/coins/favorites and comments.',
             'reddit' => 'Platform (Reddit): sincere, non-promotional community voice; informative title, clear structure with bullet lists; no hard selling or hype.',

@@ -26,7 +26,7 @@ class GenericSocialPublishAdapter extends AbstractSocialPublishAdapter
         }
 
         $response = $this->sendJson($account, $endpoint, (string) ($account->publish_method ?: 'POST'), [
-            'platform' => (string) ($account->platform ?: 'custom'),
+            'platform' => (string) ($account->platform ?: 'unknown'),
             'mode' => 'generic_http_api',
             'login_identifier' => (string) ($account->publish_login_identifier ?? ''),
             'session_cookie_present' => $this->session($account) !== '',

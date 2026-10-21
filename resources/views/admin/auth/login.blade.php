@@ -7,44 +7,74 @@
     <script src="{{ asset('js/tailwindcss.play-cdn.js') }}"></script>
     <script src="{{ asset('js/lucide.min.js') }}"></script>
     <style>
+        /* 登录页：gray-50 画布 + 白色卡片，禁用渐变与毛玻璃，与管理端 design-lock 保持一致 */
         body {
-            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 32%),
-                radial-gradient(circle at bottom right, rgba(229, 231, 235, 0.72), rgba(229, 231, 235, 0) 30%),
-                linear-gradient(180deg, #f5f5f7 0%, #e5e7eb 100%);
+            background: var(--gf-gray-50, #f9fafb);
+            color: var(--gf-gray-900, #111827);
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
             min-height: 100vh;
         }
         .login-form {
-            background: rgba(255, 255, 255, 0.82);
-            backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid rgba(209, 213, 219, 0.9);
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+            background: #fff;
+            border: 1px solid var(--gf-gray-200, #e5e7eb);
+            border-radius: 16px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
         }
         .login-badge {
-            background: linear-gradient(180deg, #6b7280 0%, #374151 100%);
+            background: var(--gf-blue-600, #2563eb);
+            border-radius: 16px;
         }
         .initial-admin-hint {
-            background: linear-gradient(180deg, rgba(239, 246, 255, 0.96) 0%, rgba(255, 255, 255, 0.9) 100%);
+            background: #fff;
+            border: 1px solid var(--gf-blue-100, #dbeafe);
+        }
+        .login-brand {
+            align-items: center;
+            color: var(--gf-gray-900, #111827);
+            display: flex;
+            font-size: 17px;
+            font-weight: 600;
+            gap: 10px;
+            letter-spacing: -0.02em;
+        }
+        .login-brand__mark {
+            align-items: center;
+            background: var(--gf-blue-600, #2563eb);
+            border-radius: 6px;
+            color: #fff;
+            display: flex;
+            flex: 0 0 28px;
+            font-size: 14px;
+            font-weight: 700;
+            height: 28px;
+            justify-content: center;
+            width: 28px;
         }
     </style>
 </head>
 <body class="overflow-hidden">
-<div class="fixed right-4 top-4 z-50">
-    <select onchange="window.location.href=this.value" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-600 shadow-sm">
-        @foreach (\App\Support\AdminWeb::supportedLocales() as $localeCode => $localeLabel)
-            <option value="{{ route('admin.locale.switch', ['locale' => $localeCode]) }}" @selected(app()->getLocale() === $localeCode)>
-                {{ $localeLabel }}
-            </option>
-        @endforeach
-    </select>
-</div>
 <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-4">
     <div class="rounded-2xl p-8 login-form">
-        <div class="text-center mb-8">
-            <div class="login-badge w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+        <div class="mb-6 flex items-center justify-between">
+            <div class="login-brand">
+                <span class="login-brand__mark">{{ mb_strtoupper(mb_substr(trim((string) $adminSiteName), 0, 1) ?: 'G') }}</span>
+                <span class="truncate">{{ $adminSiteName }}</span>
             </div>
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ __('admin.login.title') }}</h1>
-            <p class="text-gray-600">{{ __('admin.login.subtitle', ['site_name' => $adminSiteName]) }}</p>
+            <select onchange="window.location.href=this.value" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-600 shadow-sm">
+                @foreach (\App\Support\AdminWeb::supportedLocales() as $localeCode => $localeLabel)
+                    <option value="{{ route('admin.locale.switch', ['locale' => $localeCode]) }}" @selected(app()->getLocale() === $localeCode)>
+                        {{ $localeLabel }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="text-center mb-8">
+            <div class="login-badge mx-auto mb-4 flex h-14 w-14 items-center justify-center">
+                <i data-lucide="shield-check" class="h-7 w-7 text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">{{ __('admin.login.title') }}</h1>
+            <p class="mt-1 text-sm text-gray-500">{{ __('admin.login.subtitle', ['site_name' => $adminSiteName]) }}</p>
         </div>
         @if (session('message'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">

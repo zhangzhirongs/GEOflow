@@ -5,7 +5,6 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="qdk-page-title">{{ __('admin.ai_prompts.heading') }}</h1>
-                <p class="qdk-page-sub">{{ __('admin.ai_prompts.subtitle') }}</p>
             </div>
             <button type="button" onclick="showCreatePromptModal()" class="qdk-btn qdk-btn-primary">
                 <i data-lucide="plus" class="w-4 h-4"></i>
@@ -13,14 +12,9 @@
             </button>
         </div>
 
-        <div class="mb-6 rounded-md border border-[#d6e2ff] bg-[color:var(--qdk-primary-weak)] p-4 text-sm text-[color:var(--qdk-primary)]">
-            {!! __('admin.ai_prompts.help_banner', ['url' => route('admin.ai-special-prompts')]) !!}
-        </div>
-
         <div class="qdk-card">
             <div class="qdk-card-head">
                 <h3 class="qdk-card-title">{{ __('admin.ai_prompts.list_title') }}</h3>
-                <p class="qdk-card-sub">{{ __('admin.ai_prompts.list_subtitle') }}</p>
             </div>
 
             <div class="overflow-x-auto">

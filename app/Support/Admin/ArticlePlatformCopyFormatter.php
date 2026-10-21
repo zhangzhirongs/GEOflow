@@ -32,11 +32,10 @@ final class ArticlePlatformCopyFormatter
         }
 
         return match ($platform) {
-            ManualPublicationAccount::PLATFORM_WECHAT => $this->wechatCopy($markdown),
+            ManualPublicationAccount::PLATFORM_WECHAT_MP => $this->wechatCopy($markdown),
             ManualPublicationAccount::PLATFORM_ZHIHU => $this->htmlCopy($markdown, 'zhihu-article', $platform),
             ManualPublicationAccount::PLATFORM_BILIBILI,
-            ManualPublicationAccount::PLATFORM_REDDIT,
-            ManualPublicationAccount::PLATFORM_CUSTOM => $this->markdownCopy($markdown, $platform),
+            ManualPublicationAccount::PLATFORM_CSDN => $this->markdownCopy($markdown, $platform),
             default => $this->plainCopy($markdown, $platform),
         };
     }
@@ -52,7 +51,7 @@ final class ArticlePlatformCopyFormatter
             'format' => 'html',
             'html' => $html,
             'text' => $html === '' ? '' : $this->weChatExporter->toPlainText($html),
-            'message' => $this->successMessage(ManualPublicationAccount::PLATFORM_WECHAT),
+            'message' => $this->successMessage(ManualPublicationAccount::PLATFORM_WECHAT_MP),
         ];
     }
 
