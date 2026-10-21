@@ -6,7 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AiModel;
 use App\Models\AiSourceProvider;
 use App\Models\AiVisibilityRun;
+use App\Models\KnowledgeBase;
 use App\Models\Prompt;
+use App\Services\GeoFlow\ArticleContentGenerationService;
+use App\Services\GeoFlow\ArticleContentPromptRenderer;
+use App\Services\GeoFlow\KnowledgeRetrievalService;
+use App\Services\GeoFlow\ArticleRiskScanner;
+use App\Services\GeoFlow\AiVisibility\DoubaoSearchCustomClient;
+use App\Support\AdminActivityLogger;
 use App\Models\Task;
 use App\Services\GeoFlow\WorkbenchStudioService;
 use App\Support\AdminWeb;
@@ -16,6 +23,8 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use RuntimeException;
+use Throwable;
 
 /**
  * bak/admin 各菜单入口的 Blade 占位页（统一布局 + 文案）；后续可拆成独立控制器。
@@ -154,6 +163,111 @@ class LegacyController extends Controller
         ]);
 
         return response()->json($workbench->resolve((string) $validated['input']));
+    }
+
+    public function generateAiConfiguratorArticle(
+        Request $request,
+        ArticleContentPromptRenderer $promptRenderer,
+        ArticleContentGenerationService $generationService,
+        KnowledgeRetrievalService $knowledgeRetrievalService,
+    ): \Symfony\Component\HttpFoundation\Response {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:500'],
+            'keyword' => ['nullable', 'string', 'max:200'],
+            'prompt' => ['nullable', 'string', 'max:4000'],
+            'knowledge_base_id' => ['nullable', 'integer', 'min:1', 'exists:knowledge_bases,id'],
+            'prompt_id' => ['nullable', 'integer', 'min:1', 'exists:prompts,id'],
+            'ai_model_id' => ['required', 'integer', 'min:1', 'exists:ai_models,id'],
+        ]);
+
+        $model = AiModel::query()
+            ->whereKey((int) $validated['ai_model_id'])
+            ->where('status', 'active')
+            ->where(function ($query): void {
+                $query->whereNull('model_type')->orWhere('model_type', '')->orWhere('model_type', 'chat');
+            })
+            ->firstOrFail();
+        $knowledge = ! empty($validated['knowledge_base_id']) ? KnowledgeBase::query()->findOrFail((int) $validated['knowledge_base_id']) : null;
+        $prompt = trim((string) ($validated['prompt'] ?? ''));
+        if ($prompt === '' && ! empty($validated['prompt_id'])) {
+            $prompt = (string) Prompt::query()->whereKey((int) $validated['prompt_id'])->where('type', 'content')->value('content');
+        }
+        $context = $knowledge ? $knowledgeRetrievalService->retrieveContext((int) $knowledge->id, trim($validated['title'].' '.($validated['keyword'] ?? '')), 5, 3200) : '';
+        $contentPrompt = $promptRenderer->renderForEditor(trim($validated['title']), trim((string) ($validated['keyword'] ?? '')), $prompt, $context);
+
+        try {
+            $stream = $generationService->stream($model, $contentPrompt);
+        } catch (RuntimeException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
+        } catch (Throwable $exception) {
+            report($exception);
+            return response()->json(['message' => __('admin.article_assistant.generate.failed')], 500);
+        }
+
+        $response = $stream->toResponse($request);
+        $response->headers->set('Cache-Control', 'no-cache, no-transform');
+        $response->headers->set('X-Accel-Buffering', 'no');
+        return $response;
+    }
+
+    public function checkAiConfiguratorArticle(Request $request, ArticleRiskScanner $riskScanner): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:500'],
+            'content' => ['required', 'string', 'max:200000'],
+            'excerpt' => ['nullable', 'string', 'max:10000'],
+            'keywords' => ['nullable', 'string', 'max:500'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        return response()->json($riskScanner->scan([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'excerpt' => (string) ($validated['excerpt'] ?? ''),
+            'keywords' => (string) ($validated['keywords'] ?? ''),
+            'meta_description' => (string) ($validated['meta_description'] ?? ''),
+        ]));
+    }
+
+    public function runAiConfiguratorSearch(Request $request, DoubaoSearchCustomClient $searchClient): JsonResponse
+    {
+        $validated = $request->validate([
+            'query' => ['required', 'string', 'max:500'],
+            'confirmed' => ['accepted'],
+        ]);
+        $provider = AiSourceProvider::query()
+            ->where('provider_key', AiSourceProvider::PROVIDER_DOUBAO_SEARCH_CUSTOM)
+            ->where('status', 'active')
+            ->latest('id')
+            ->first();
+        if (! $provider) {
+            return response()->json(['message' => __('admin.ai_configurator.tool_search_unavailable')], 422);
+        }
+
+        try {
+            $result = $searchClient->search($provider, trim($validated['query']), ['count' => 5]);
+        } catch (Throwable $exception) {
+            report($exception);
+            return response()->json(['message' => __('admin.ai_configurator.tool_search_failed')], 422);
+        }
+
+        $admin = $request->user('admin');
+        if ($admin) {
+            AdminActivityLogger::logFromRequest($request, $admin, 'ai:tool-search', [
+                'query' => $validated['query'],
+                'provider' => $provider->provider_key,
+                'source_count' => count($result->sources),
+            ]);
+        }
+
+        return response()->json([
+            'answer' => $result->answerText,
+            'sources' => collect($result->sources)->map(static fn ($source): array => [
+                'title' => $source->title,
+                'url' => $source->url,
+                'snippet' => $source->snippet ?: $source->summary,
+            ])->values()->all(),
+        ]);
     }
 
     /**

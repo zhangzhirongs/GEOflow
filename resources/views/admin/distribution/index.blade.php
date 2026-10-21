@@ -4,12 +4,17 @@
     @php($syncableChannels = $channels->filter(fn ($channel) => $channel->status === 'active' && $channel->channelType() === 'geoflow_agent')->values())
     @php($channelSyncSummaries = $channelSyncSummaries ?? [])
     @php($canDeleteChannels = auth('admin')->user() instanceof \App\Models\Admin && auth('admin')->user()->isSuperAdmin())
+    @php($channelsByType = $channels->groupBy(fn ($channel) => $channel->channelType()))
+    @php($channelTypes = [
+        'geoflow_agent' => ['icon' => 'radio-tower', 'tone' => 'blue'],
+        'wordpress_rest' => ['icon' => 'globe-2', 'tone' => 'indigo'],
+        'generic_http_api' => ['icon' => 'plug-zap', 'tone' => 'emerald'],
+    ])
 
     <div class="space-y-8 px-4 sm:px-0">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ __('admin.distribution.page_heading') }}</h1>
-                <p class="mt-1 text-sm text-gray-600">{{ __('admin.distribution.page_subtitle') }}</p>
             </div>
             <div class="flex flex-wrap items-center gap-3 lg:justify-end">
                 <button type="button" data-selected-sync-open class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -209,7 +214,6 @@
         <div data-external-distribution-channels class="rounded-lg bg-white shadow">
             <div class="border-b border-gray-200 px-6 py-4">
                 <h2 class="text-lg font-medium text-gray-900">{{ __('admin.distribution.channels_title') }}</h2>
-                <p class="mt-1 text-sm text-gray-500">{{ __('admin.distribution.channels_desc') }}</p>
             </div>
             @if ($channels->isEmpty())
                 <div class="px-6 py-10 text-center text-sm text-gray-500">
@@ -218,54 +222,54 @@
                     <div class="mt-1">{{ __('admin.distribution.empty_channels_desc') }}</div>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('admin.distribution.field.name') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('admin.distribution.field.domain') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('admin.distribution.field.status') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('admin.distribution.field.queue') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">{{ __('admin.common.actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @foreach ($channels as $channel)
-                                @php($channelStatusKey = 'admin.distribution.status.'.(string) $channel->status)
-                                @php($channelStatusLabel = trans()->has($channelStatusKey) ? __($channelStatusKey) : (string) $channel->status)
-                                @php($channelTypeKey = 'admin.distribution.channel_type.'.$channel->channelType())
-                                @php($channelTypeLabel = trans()->has($channelTypeKey) ? __($channelTypeKey) : $channel->channelType())
-                                <tr>
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="font-medium text-gray-900">{{ $channel->name }}</div>
-                                        <div class="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{{ $channelTypeLabel }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">{{ $channel->domain }}</td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $channel->status === 'active' ? 'bg-green-100 text-green-800' : ($channel->status === 'deleting' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700') }}">{{ $channelStatusLabel }}</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">
-                                        {{ __('admin.distribution.queue_summary', ['pending' => (int) $channel->pending_count, 'failed' => (int) $channel->failed_count]) }}
-                                    </td>
-                                    <td class="px-6 py-4 text-sm">
-                                        <div class="flex items-center gap-3">
-                                            <a href="{{ route('admin.distribution.show', ['channelId' => (int) $channel->id]) }}" class="text-blue-600 hover:text-blue-800">{{ __('admin.button.view') }}</a>
-                                            @if ($channel->status === 'deleting')
-                                                @if ($canDeleteChannels)
-                                                    <a href="{{ route('admin.distribution.delete', ['channelId' => (int) $channel->id]) }}" class="font-medium text-amber-700 hover:text-amber-900">{{ __('admin.distribution.delete.button.continue') }}</a>
-                                                @endif
-                                            @else
-                                                <a href="{{ route('admin.distribution.edit', ['channelId' => (int) $channel->id]) }}" class="text-gray-600 hover:text-gray-800">{{ __('admin.button.edit') }}</a>
-                                                @if ($canDeleteChannels)
-                                                    <a href="{{ route('admin.distribution.delete', ['channelId' => (int) $channel->id]) }}" class="text-red-600 hover:text-red-800">{{ __('admin.distribution.delete.button.open') }}</a>
-                                                @endif
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="divide-y divide-gray-200">
+                    @foreach ($channelTypes as $type => $presentation)
+                        @php($platformChannels = $channelsByType->get($type, collect()))
+                        @if ($platformChannels->isNotEmpty())
+                            <section class="px-5 py-5 sm:px-6">
+                                <div class="mb-3 flex items-center gap-3">
+                                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-{{ $presentation['tone'] }}-50 text-{{ $presentation['tone'] }}-700">
+                                        <i data-lucide="{{ $presentation['icon'] }}" class="h-4 w-4"></i>
+                                    </span>
+                                    <div class="min-w-0">
+                                        <h3 class="font-semibold text-gray-900">{{ __('admin.distribution.channel_type.'.$type) }}</h3>
+                                        <p class="text-xs text-gray-500">{{ $platformChannels->count() }} 个站点</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-3">
+                                    @foreach ($platformChannels as $channel)
+                                        @php($channelStatusKey = 'admin.distribution.status.'.(string) $channel->status)
+                                        @php($channelStatusLabel = trans()->has($channelStatusKey) ? __($channelStatusKey) : (string) $channel->status)
+                                        <article class="min-w-0 rounded-md border border-gray-200 bg-white p-4">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0">
+                                                    <h4 class="truncate text-sm font-semibold text-gray-900">{{ $channel->name }}</h4>
+                                                    <p class="mt-1 truncate text-sm text-gray-500">{{ $channel->domain }}</p>
+                                                </div>
+                                                <span class="inline-flex shrink-0 rounded-full px-2 py-1 text-xs font-medium {{ $channel->status === 'active' ? 'bg-green-100 text-green-800' : ($channel->status === 'deleting' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700') }}">{{ $channelStatusLabel }}</span>
+                                            </div>
+                                            <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-3">
+                                                <span class="text-xs text-gray-600">{{ __('admin.distribution.queue_summary', ['pending' => (int) $channel->pending_count, 'failed' => (int) $channel->failed_count]) }}</span>
+                                                <div class="flex items-center gap-3 text-sm">
+                                                    <a href="{{ route('admin.distribution.show', ['channelId' => (int) $channel->id]) }}" class="font-medium text-blue-600 hover:text-blue-800">{{ __('admin.button.view') }}</a>
+                                                    @if ($channel->status === 'deleting')
+                                                        @if ($canDeleteChannels)
+                                                            <a href="{{ route('admin.distribution.delete', ['channelId' => (int) $channel->id]) }}" class="font-medium text-amber-700 hover:text-amber-900">{{ __('admin.distribution.delete.button.continue') }}</a>
+                                                        @endif
+                                                    @else
+                                                        <a href="{{ route('admin.distribution.edit', ['channelId' => (int) $channel->id]) }}" class="text-gray-600 hover:text-gray-800">{{ __('admin.button.edit') }}</a>
+                                                        @if ($canDeleteChannels)
+                                                            <a href="{{ route('admin.distribution.delete', ['channelId' => (int) $channel->id]) }}" class="text-red-600 hover:text-red-800">{{ __('admin.distribution.delete.button.open') }}</a>
+                                                        @endif
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </article>
+                                    @endforeach
+                                </div>
+                            </section>
+                        @endif
+                    @endforeach
                 </div>
             @endif
         </div>

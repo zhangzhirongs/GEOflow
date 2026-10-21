@@ -119,6 +119,7 @@ body.admin-body-root {
     font-family: var(--gf-font);
     font-size: 14px;
     line-height: 1.5;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -329,7 +330,9 @@ html.sidebar-collapsed .nav-item {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
+    min-height: 0;
     min-width: 0;
+    overflow: hidden;
 }
 
 /* 2.4 顶栏：64px，无底边、无阴影 */
@@ -481,7 +484,7 @@ html.sidebar-collapsed .nav-item {
 }
 
 .admin-content {
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     margin: 0 auto;
     max-width: var(--gf-content-max);
     padding: 24px var(--gf-padding-desktop) 48px;

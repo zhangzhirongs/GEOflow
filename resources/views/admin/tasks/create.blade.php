@@ -42,11 +42,14 @@
                 </a>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">{{ $isEdit ? $t('task_edit.page_heading') : $t('task_create.page_heading') }}</h1>
-                    <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.page_subtitle') }}</p>
+                    @unless ($isEdit)
+                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.page_subtitle') }}</p>
+                    @endunless
                 </div>
             </div>
-        </div>
+        </div> 
 
+        @unless ($isEdit)
         <section class="mb-6 rounded-lg border border-blue-100 bg-white p-5 shadow-sm">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
@@ -75,6 +78,7 @@
                 @endforeach
             </div>
         </section>
+        @endunless
 
         <div data-task-form-shell class="w-full">
             @if (! $hasCategories)
@@ -99,7 +103,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.basic_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.basic_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.basic_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -134,7 +138,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.content_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.content_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.content_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -240,7 +244,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-6">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.image_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.image_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.image_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         @php($imageCountValue = (string) old('image_count', (string) ($taskForm['image_count'] ?? '1')))
@@ -275,7 +279,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-6">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.publish_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.publish_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.publish_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -300,7 +304,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.distribution_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.distribution_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.distribution_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <fieldset class="mb-5">
@@ -438,7 +442,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.seo_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.seo_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.seo_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -465,7 +469,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-8">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.category_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.category_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.category_desc') }}</p>@endunless
                     </div>
                     @php($categoryMode = (string) old('category_mode', (string) ($taskForm['category_mode'] ?? 'smart')))
                     <div class="px-6 py-4 space-y-4">
@@ -533,7 +537,7 @@
                 <div class="bg-white shadow rounded-lg xl:col-span-4">
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.advanced_title') }}</h3>
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.advanced_desc') }}</p>
+                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.advanced_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

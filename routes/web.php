@@ -356,6 +356,15 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
         Route::group([], function () {
             Route::get('ai-configurator', [LegacyController::class, 'aiConfigurator'])->name('ai.configurator');
             Route::post('ai-configurator/resolve', [LegacyController::class, 'resolveAiConfiguratorIntent'])->name('ai.configurator.resolve');
+            Route::post('ai-configurator/generate', [LegacyController::class, 'generateAiConfiguratorArticle'])
+                ->middleware('throttle:10,1')
+                ->name('ai.configurator.generate');
+            Route::post('ai-configurator/quality', [LegacyController::class, 'checkAiConfiguratorArticle'])
+                ->middleware('throttle:30,1')
+                ->name('ai.configurator.quality');
+            Route::post('ai-configurator/tools/search', [LegacyController::class, 'runAiConfiguratorSearch'])
+                ->middleware('throttle:20,1')
+                ->name('ai.configurator.tools.search');
             Route::prefix('ai-models')->name('ai-models.')->group(function () {
                 Route::get('/', [AiModelController::class, 'index'])->name('index');
                 Route::post('create', [AiModelController::class, 'store'])->name('store');

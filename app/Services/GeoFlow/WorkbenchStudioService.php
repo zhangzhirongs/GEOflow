@@ -3,11 +3,13 @@
 namespace App\Services\GeoFlow;
 
 use App\Models\AiModel;
+use App\Models\Article;
 use App\Models\Author;
 use App\Models\Category;
 use App\Models\DistributionChannel;
 use App\Models\ImageLibrary;
 use App\Models\KnowledgeBase;
+use App\Models\ManualPublicationAccount;
 use App\Models\Prompt;
 use App\Models\Task;
 use App\Models\TitleLibrary;
@@ -271,6 +273,38 @@ final class WorkbenchStudioService
         return [
             'categories' => $this->optionList(Category::query()->select(['id', 'name'])->orderBy('sort_order')->orderBy('name')->get()),
             'authors' => $this->optionList(Author::query()->select(['id', 'name'])->orderBy('name')->get()),
+            'knowledge_bases' => $this->optionList(KnowledgeBase::query()->select(['id', 'name'])->orderBy('name')->get()),
+            'content_prompts' => $this->optionList(Prompt::query()->select(['id', 'name'])->where('type', 'content')->orderBy('name')->get()),
+            'ai_models' => AiModel::query()
+                ->select(['id', 'name', 'model_id'])
+                ->where('status', 'active')
+                ->where(function ($query): void {
+                    $query->whereNull('model_type')->orWhere('model_type', '')->orWhere('model_type', 'chat');
+                })
+                ->orderBy('name')
+                ->get()
+                ->map(static fn (AiModel $model): array => [
+                    'id' => (int) $model->id,
+                    'name' => (string) $model->name,
+                    'model_id' => (string) ($model->model_id ?? ''),
+                ])
+                ->values()
+                ->all(),
+            'platforms' => collect(ManualPublicationAccount::PLATFORMS)
+                ->map(static fn (string $code): array => [
+                    'code' => $code,
+                    'name' => (string) __('manual_publications.platform.'.$code),
+                ])
+                ->values()
+                ->all(),
+            'drafts' => Schema::hasTable('articles')
+                ? Article::query()->where('status', 'draft')->latest('updated_at')->limit(30)->get(['id', 'title', 'content', 'keywords'])->map(static fn (Article $article): array => [
+                    'id' => (int) $article->id,
+                    'title' => (string) $article->title,
+                    'content' => (string) $article->content,
+                    'keywords' => (string) ($article->keywords ?? ''),
+                ])->values()->all()
+                : [],
         ];
     }
 
