@@ -203,7 +203,7 @@ Provider 需要解决的问题：
 
 用途：
 
-- 未来 CLI、Skill 或第三方系统可以触发补发、查询分发状态和读取日志。
+- 未来 CLI、技能或第三方系统可以触发补发、查询分发状态和读取日志。
 
 ## 6. 发布链路建议
 
@@ -256,16 +256,16 @@ flowchart LR
 | 平台 | 发布能力 | 个人接入便利度 | 一期建议 | 说明 |
 | --- | --- | --- | --- | --- |
 | WordPress | Posts / Media REST API | 高 | P0 | 用户控制站点即可，适合作为最稳定的外部分发目标。 |
-| Ghost | Admin API 发布 posts | 高 | P0 | 适合自建 Ghost 或 Ghost Pro，内容模型清晰。 |
+| Ghost | Admin API 发布文章 | 高 | P0 | 适合自建 Ghost 或 Ghost Pro，内容模型清晰。 |
 | 微信公众号 | 草稿箱、发布能力等接口 | 中低 | P0 条件支持 | 需要公众号 AppID/AppSecret 和对应接口权限，部分能力与账号类型/认证有关。 |
-| Telegram Channel | Bot API 发送消息 | 高 | P0 | 适合频道通知，不等同于 SEO 内容页。 |
+| Telegram 频道 | Bot API 发送消息 | 高 | P0 | 适合频道通知，不等同于 SEO 内容页。 |
 | Generic Webhook | 用户自定义 HTTP 回调 | 高 | P0 | 可连接 n8n、Zapier、Make、自建脚本，是最重要兜底方案。 |
 | Dev.to / Forem | 创建文章 API | 高 | P1 | 适合开发者和技术内容。 |
 | Mastodon | statuses API | 高 | P1 | 更适合摘要和链接分发。 |
 | Bluesky | AT Protocol 发帖 | 中 | P1 | 适合短文本和链接摘要，需处理字符限制。 |
 | X / Twitter | 发帖 API | 低 | P2 | API 权限、费用和限制变化较多，不适合默认承诺。 |
 | LinkedIn Pages | Posts API | 中低 | P2 | 需要 OAuth、组织页权限和应用审核，更适合企业用户。 |
-| Facebook Pages | Graph API Page feed | 中低 | P2 | 需要 Page 权限、应用审核和平台政策适配。 |
+| Facebook Pages | Graph API Page 信息流 | 中低 | P2 | 需要 Page 权限、应用审核和平台政策适配。 |
 | Instagram | Graph API 内容发布 | 低 | P2 | 面向 Business/Creator，偏图片视频，文章分发不自然。 |
 | 微博 | statuses/update 等能力 | 中低 | P2 | 开放能力存在，但权限、审核和稳定性需要单独验证。 |
 | 抖音 | 内容管理/视频发布能力 | 低 | P2 | 更适合视频内容和企业/开放平台应用，不适合一期文章分发。 |
@@ -291,7 +291,7 @@ flowchart LR
 - 所有第三方 API Key、Token、App Secret 使用 Laravel 加密存储。
 - 后台展示只显示掩码，不回显完整密钥。
 - 测试连接时不保存完整响应，只保存状态摘要。
-- 分发日志不记录 Authorization header、access token、refresh token。
+- 分发日志不记录 Authorization 请求头、访问令牌、刷新令牌。
 - 用户删除平台账号时，保留历史分发记录，但清空或失效凭据。
 
 建议做：
@@ -327,11 +327,11 @@ flowchart LR
 - 分发队列增加定时发布和失败重试策略。
 - 增加平台 payload 预览。
 
-### Phase 3：更多平台与 Skill / CLI
+### Phase 3：更多平台与技能 / CLI
 
 - Telegram、Mastodon、Bluesky、Dev.to Provider。
 - CLI 支持查询分发队列、重试、手动分发。
-- Skill 支持根据平台规则调整标题、摘要和正文。
+- 技能支持根据平台规则调整标题、摘要和正文。
 - 增加平台健康检查和每日更新提醒。
 
 ## 13. 需要确认的问题
@@ -344,17 +344,17 @@ flowchart LR
 
 ## 14. 官方资料参考
 
-- WordPress REST API Posts: https://developer.wordpress.org/rest-api/reference/posts/
-- WordPress REST API Media: https://developer.wordpress.org/rest-api/reference/media/
-- Ghost Admin API Posts: https://docs.ghost.org/admin-api/posts/
-- DEV / Forem API: https://developers.forem.com/api/v1
-- Mastodon Statuses API: https://docs.joinmastodon.org/methods/statuses/
+- WordPress REST API 文章：https://developer.wordpress.org/rest-api/reference/posts/
+- WordPress REST API 媒体：https://developer.wordpress.org/rest-api/reference/media/
+- Ghost 管理端文章接口：https://docs.ghost.org/admin-api/posts/
+- DEV / Forem API：https://developers.forem.com/api/v1
+- Mastodon 状态接口：https://docs.joinmastodon.org/methods/statuses/
 - Bluesky 创建帖子文档: https://docs.bsky.app/docs/tutorials/creating-a-post
-- Telegram Bot API sendMessage: https://core.telegram.org/bots/api#sendmessage
-- Discord Execute Webhook: https://discord.com/developers/docs/resources/webhook#execute-webhook
-- X API Manage Tweets: https://docs.x.com/x-api/posts/manage-tweets/introduction
-- LinkedIn Posts API: https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api
-- Facebook Graph API Page Feed: https://developers.facebook.com/docs/graph-api/reference/page/feed
+- Telegram 机器人 sendMessage 接口：https://core.telegram.org/bots/api#sendmessage
+- Discord 执行 Webhook：https://discord.com/developers/docs/resources/webhook#execute-webhook
+- X API 管理推文：https://docs.x.com/x-api/posts/manage-tweets/introduction
+- LinkedIn 文章接口：https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api
+- Facebook Graph API 页面 Feed：https://developers.facebook.com/docs/graph-api/reference/page/feed
 - 微信公众号新增草稿: https://developers.weixin.qq.com/doc/offiaccount/Draft_Box/Add_draft.html
 - 微信公众号发布能力: https://developers.weixin.qq.com/doc/offiaccount/Publish/Publish.html
 - 抖音开放平台内容管理: https://developer.open-douyin.com/docs/resource/zh-CN/dop/develop/openapi/video-management/upload-video/

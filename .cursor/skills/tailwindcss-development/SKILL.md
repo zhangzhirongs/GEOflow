@@ -1,44 +1,45 @@
 ---
 name: tailwindcss-development
-description: "Always invoke when the user's message includes 'tailwind' in any form. Also invoke for: building responsive grid layouts (multi-column card grids, product grids), flex/grid page structures (dashboards with sidebars, fixed topbars, mobile-toggle navs), styling UI components (cards, tables, navbars, pricing sections, forms, inputs, badges), adding dark mode variants, fixing spacing or typography, and Tailwind v3/v4 work. The core use case: writing or fixing Tailwind utility classes in HTML templates (Blade, JSX, Vue). Skip for backend PHP logic, database queries, API routes, JavaScript with no HTML/CSS component, CSS file audits, build tool configuration, and vanilla CSS."
+description: 只要用户消息以任何形式包含 'tailwind'，就始终调用。以下情况也调用：构建响应式网格布局（多列卡片网格、产品网格）、flex/grid 页面结构（带侧边栏的仪表板、固定顶栏、移动端切换导航）、为 UI 组件设置样式（卡片、表格、导航栏、定价区、表单、输入框、徽章）、添加深色模式变体、修复间距或排版，以及 Tailwind v3/v4 工作。核心用例：在 HTML 模板（Blade、JSX、Vue）中编写或修复 Tailwind 工具类。跳过后端 PHP 逻辑、数据库查询、API 路由、没有 HTML/CSS 组件的 JavaScript、CSS 文件审计、构建工具配置和原生 CSS。
 license: MIT
 metadata:
   author: laravel
+  display_name: Tailwind CSS 开发
 ---
 
-# Tailwind CSS Development
+# Tailwind CSS 开发
 
-## Documentation
+## 文档
 
-Use `search-docs` for detailed Tailwind CSS v4 patterns and documentation.
+使用 `search-docs` 获取详细的 Tailwind CSS v4 模式和文档。
 
-## Basic Usage
+## 基本用法
 
-- Use Tailwind CSS classes to style HTML. Check and follow existing Tailwind conventions in the project before introducing new patterns.
-- Offer to extract repeated patterns into components that match the project's conventions (e.g., Blade, JSX, Vue).
-- Consider class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child elements carefully to reduce repetition, and group elements logically.
+- 使用 Tailwind CSS 类来设置 HTML 样式。引入新模式前，检查并遵循项目中现有的 Tailwind 约定。
+- 主动提出将重复模式提取为符合项目约定的组件（例如 Blade、JSX、Vue）。
+- 考虑类的位置、顺序、优先级和默认值。移除冗余类，谨慎地向父元素或子元素添加类以减少重复，并按逻辑对元素分组。
 
-## Tailwind CSS v4 Specifics
+## Tailwind CSS v4 特定内容
 
-- Always use Tailwind CSS v4 and avoid deprecated utilities.
-- `corePlugins` is not supported in Tailwind v4.
+- 始终使用 Tailwind CSS v4，并避免使用已弃用的工具类。
+- Tailwind v4 不支持 `corePlugins`。
 
-### CSS-First Configuration
+### CSS 优先配置
 
-In Tailwind v4, configuration is CSS-first using the `@theme` directive — no separate `tailwind.config.js` file is needed:
+在 Tailwind v4 中，配置采用 CSS 优先方式，使用 `@theme` 指令——不需要单独的 `tailwind.config.js` 文件：
 
-<!-- CSS-First Config -->
+<!-- CSS 优先配置 -->
 ```css
 @theme {
   --color-brand: oklch(0.72 0.11 178);
 }
 ```
 
-### Import Syntax
+### 导入语法
 
-In Tailwind v4, import Tailwind with a regular CSS `@import` statement instead of the `@tailwind` directives used in v3:
+在 Tailwind v4 中，使用常规 CSS `@import` 语句导入 Tailwind，而不是使用 v3 中的 `@tailwind` 指令：
 
-<!-- v4 Import Syntax -->
+<!-- v4 导入语法 -->
 ```diff
 - @tailwind base;
 - @tailwind components;
@@ -46,11 +47,11 @@ In Tailwind v4, import Tailwind with a regular CSS `@import` statement instead o
 + @import "tailwindcss";
 ```
 
-### Replaced Utilities
+### 已替换的实用程序
 
-Tailwind v4 removed deprecated utilities. Use the replacements shown below. Opacity values remain numeric.
+Tailwind v4 移除了已弃用的工具类。请使用下方给出的替代方案。不透明度值仍为数字。
 
-| Deprecated | Replacement |
+| 已弃用 | 替代项 |
 |------------|-------------|
 | bg-opacity-* | bg-black/* |
 | text-opacity-* | text-black/* |
@@ -64,11 +65,11 @@ Tailwind v4 removed deprecated utilities. Use the replacements shown below. Opac
 | decoration-slice | box-decoration-slice |
 | decoration-clone | box-decoration-clone |
 
-## Spacing
+## 间距
 
-Use `gap` utilities instead of margins for spacing between siblings:
+对于同级元素之间的间距，使用 `gap` 工具类而不是外边距：
 
-<!-- Gap Utilities -->
+<!-- 间距工具类 -->
 ```html
 <div class="flex gap-8">
     <div>Item 1</div>
@@ -76,22 +77,22 @@ Use `gap` utilities instead of margins for spacing between siblings:
 </div>
 ```
 
-## Dark Mode
+## 深色模式
 
-If existing pages and components support dark mode, new pages and components must support it the same way, typically using the `dark:` variant:
+如果现有页面和组件支持深色模式，新页面和组件也必须以相同方式支持它，通常使用 `dark:` 变体：
 
-<!-- Dark Mode -->
+<!-- 深色模式 -->
 ```html
 <div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
     Content adapts to color scheme
 </div>
 ```
 
-## Common Patterns
+## 常见模式
 
-### Flexbox Layout
+### Flexbox 布局
 
-<!-- Flexbox Layout -->
+<!-- Flexbox 布局 -->
 ```html
 <div class="flex items-center justify-between gap-4">
     <div>Left content</div>
@@ -99,9 +100,9 @@ If existing pages and components support dark mode, new pages and components mus
 </div>
 ```
 
-### Grid Layout
+### 网格布局
 
-<!-- Grid Layout -->
+<!-- 网格布局 -->
 ```html
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div>Card 1</div>
@@ -110,10 +111,10 @@ If existing pages and components support dark mode, new pages and components mus
 </div>
 ```
 
-## Common Pitfalls
+## 常见陷阱
 
-- Using deprecated v3 utilities (bg-opacity-*, flex-shrink-*, etc.)
-- Using `@tailwind` directives instead of `@import "tailwindcss"`
-- Trying to use `tailwind.config.js` instead of CSS `@theme` directive
-- Using margins for spacing between siblings instead of gap utilities
-- Forgetting to add dark mode variants when the project uses dark mode
+- 使用已弃用的 v3 工具类（bg-opacity-*、flex-shrink-* 等）
+- 使用 `@tailwind` 指令而不是 `@import "tailwindcss"`
+- 尝试使用 `tailwind.config.js` 而不是 CSS `@theme` 指令
+- 使用外边距在同级元素之间设置间距，而不是使用 gap 工具类
+- 项目使用深色模式时忘记添加深色模式变体

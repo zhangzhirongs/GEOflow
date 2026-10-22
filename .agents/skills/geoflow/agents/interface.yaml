@@ -1,24 +1,24 @@
 interface:
-  display_name: "GEOFlow"
-  short_description: "Build and operate GEOFlow across backend, admin, public frontend, themes, and channel sites"
-  default_prompt: "Use $geoflow for GEOFlow-specific development and operations. Discover the real workspace or instance first, select development, operations, public_frontend, channel_frontend, or legacy_migration mode, preserve current contracts, verify the result, and separate preview from high-risk activation or publication."
+  display_name: GEOFlow 开发与运营
+  short_description: 开发与运营 GEOFlow 后端、管理后台、公共前端、主题及渠道站点
+  default_prompt: 使用 $geoflow 进行 GEOFlow 特定的开发和运维。先发现真实的工作区或实例，选择 development、operations、public_frontend、channel_frontend 或 legacy_migration 模式，保留当前契约，验证结果，并将预览与高风险激活或发布分开。
 compatibility:
-  canonical_format: "agent-skills"
+  canonical_format: agent-skills
   adapter_targets:
-    - "openai"
-    - "claude"
-    - "generic"
+  - openai
+  - claude
+  - generic
   activation:
-    mode: "manual"
+    mode: manual
     paths: []
   execution:
-    context: "inline"
-    shell: "bash"
+    context: inline
+    shell: bash
   trust:
-    source_tier: "local"
-    remote_inline_execution: "forbid"
-    remote_metadata_policy: "allow-metadata-only"
+    source_tier: local
+    remote_inline_execution: forbid
+    remote_metadata_policy: allow-metadata-only
   degradation:
-    openai: "metadata-adapter"
-    claude: "neutral-source-plus-adapter"
-    generic: "neutral-source"
+    openai: metadata-adapter
+    claude: neutral-source-plus-adapter
+    generic: neutral-source

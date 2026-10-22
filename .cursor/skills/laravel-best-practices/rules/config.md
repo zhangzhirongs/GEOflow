@@ -1,73 +1,73 @@
-# Configuration Best Practices
+# 配置最佳实践
 
-## `env()` Only in Config Files
+## `env()` 仅限配置文件
 
-Direct `env()` calls may return `null` when config is cached.
+当配置已缓存时，直接调用 `env()` 可能返回 `null`。
 
-Incorrect:
+错误：
 ```php
 $key = env('API_KEY');
 ```
 
-Correct:
+正确：
 ```php
 // config/services.php
 'key' => env('API_KEY'),
 
-// Application code
+// 应用代码
 $key = config('services.key');
 ```
 
-## Use Encrypted Env or External Secrets
+## 使用加密的环境变量或外部密钥
 
-Never store production secrets in plain `.env` files in version control.
+绝不要在版本控制中把生产密钥存储在明文 `.env` 文件中。
 
-Incorrect:
+错误：
 ```bash
 
-# .env committed to repo or shared in Slack
+# .env 被提交到仓库或在 Slack 中共享
 
 STRIPE_SECRET=sk_live_abc123
 AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI
 ```
 
-Correct:
+正确：
 ```bash
 php artisan env:encrypt --env=production --readable
 php artisan env:decrypt --env=production
 ```
 
-For cloud deployments, prefer the platform's native secret store (AWS Secrets Manager, Vault, etc.) and inject at runtime.
+对于云部署，优先使用平台的原生机密存储（AWS Secrets Manager、Vault 等），并在运行时注入。
 
-## Use `App::environment()` for Environment Checks
+## 使用 `App::environment()` 进行环境检查
 
-Incorrect:
+错误：
 ```php
 if (env('APP_ENV') === 'production') {
 ```
 
-Correct:
+正确：
 ```php
 if (app()->isProduction()) {
-// or
+// 或
 if (App::environment('production')) {
 ```
 
-## Use Constants and Language Files
+## 使用常量与语言文件
 
-Use class constants instead of hardcoded magic strings for model states, types, and statuses.
+针对模型状态、类型和状态值，使用类常量而不是硬编码的魔法字符串。
 
 ```php
-// Incorrect
+// 错误
 return $this->type === 'normal';
 
-// Correct
+// 正确
 return $this->type === self::TYPE_NORMAL;
 ```
 
-If the application already uses language files for localization, use `__()` for user-facing strings too. Do not introduce language files purely for English-only apps — simple string literals are fine there.
+如果应用已使用语言文件进行本地化，面向用户的字符串也请使用 `__()`。不要仅为纯英文应用引入语言文件——在这种场景下，简单字符串字面量即可。
 
 ```php
-// Only when lang files already exist in the project
+// 仅当项目中已存在 lang 文件时
 return back()->with('message', __('app.article_added'));
 ```

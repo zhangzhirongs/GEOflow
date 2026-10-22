@@ -1,379 +1,379 @@
-# GEOFlow Changelog
+# GEOFlow 变更日志
 
-This document tracks user-facing updates in the public repository. For future GitHub pushes, update this file together with the Chinese version in `CHANGELOG.md`.
+本文档跟踪公共仓库中面向用户的更新。对于未来的 GitHub 推送，请将此文件与 `CHANGELOG.md` 中的中文版本一起更新。
 
 ## 2026-08-09
 
 ### v2.3.0
 
-- Added the `geoflow-template-21-enterprise-signature` frontend theme:
-  - Includes home, category, article, About, archive, and pagination templates, with dedicated CSS, JavaScript, design tokens, module mappings, and preview notes.
-  - The homepage supports value proposition, capability, case study, content, and lead form modules. It shows a demo form when no valid form is selected and uses the live submission flow after selection.
-  - Preview coverage includes 1280 px desktop and 375 px and 320 px mobile layouts. The theme is published and becomes the default after a fresh installation completes.
-- Added the versioned `frontend-reference-v1` website content pack:
-  - Ships 50 Markdown documents with shared JSON metadata, organized into 35 Feature Guide articles and 15 Deployment & Operations articles.
-  - `geoflow:install` imports the pack and activates theme 21 on a pristine database. `--without-demo` remains available for a minimal first install.
-  - Sites with an installation marker or business data skip the import and retain their active theme, settings, authors, categories, and articles.
-- Added a standalone Admin UI V2 prototype:
-  - Includes 84 page states across eight groups covering the workspace, content, materials, distribution, analytics, site, AI configuration, and system management.
-  - Uses read-only demonstration data isolated from production APIs, with build scripts, a page manifest, a component gallery, and automated verification.
-- Added the Manual Publication workspace:
-  - Creates post tasks from approved articles and comment tasks for public target URLs, with identity, platform account, assignee, schedule, risk, and duplicate-warning fields.
-  - Supports ready, in-progress, completed, failed, skipped, and cancelled transitions, with stable identity and account snapshots, complete status history, completion URLs and notes, filtering, summaries, and CSV exports.
-  - The article picker provides server-side search and pagination while retaining the article linked to the current task. Exact-content, target-URL, and source-article duplicate checks cover the complete 90-day window.
-  - State transitions reauthorize the current assignee inside the database lock, preventing a former assignee from acting after a concurrent reassignment.
-  - Standard administrators can only work with assigned tasks. The workspace stores no external platform passwords, cookies, tokens, or OAuth credentials.
-- Updated AI model and outbound request runtimes:
-  - Official OpenAI chat models use the Responses API, third-party OpenAI-compatible services use the compatible driver, and new Gemini parameters and Atlas Cloud presets are included.
-  - Model connection tests count toward quota and usage audit records, upstream errors redact keys and tokens before display, and DNS resolution avoids repeated lookups when addresses are already available.
-- Expanded integration across articles, lead forms, distribution, site settings, and admin navigation, with additional coverage for themes, Manual Publication, AI runtimes, authorization, and outbound security.
+- 新增 `geoflow-template-21-enterprise-signature` 前端主题：
+  - 包含首页、分类、文章、About、归档和分页模板，并配有专用 CSS、JavaScript、设计令牌、模块映射和预览说明。
+  - 主页支持价值主张、能力、案例研究、内容和潜在客户表单模块。当未选择有效表单时，它会显示演示表单；选择后则使用实时提交流程。
+  - 预览覆盖包括 1280 px 桌面端以及 375 px 和 320 px 移动端布局。主题已发布，并在全新安装完成后成为默认主题。
+- 新增带版本控制的 `frontend-reference-v1` 网站内容包：
+  - 附带 50 份 Markdown 文档，共享 JSON 元数据，组织为 35 篇功能指南文章和 15 篇部署与运维文章。
+  - `geoflow:install` 会在全新数据库上导入包并激活主题 21。`--without-demo` 仍可用于最小化首次安装。
+  - 带有安装标记或业务数据的站点会跳过导入，并保留其活动主题、设置、作者、分类和文章。
+- 新增独立的 Admin UI V2 原型：
+  - 包含 84 个页面状态，分为八组，覆盖工作区、内容、素材、分发、分析、站点、AI 配置和系统管理。
+  - 使用与生产 API 隔离的只读演示数据，并包含构建脚本、页面清单、组件展示库和自动化验证。
+- 新增手动发布工作区：
+  - 根据已批准的文章创建发布任务，并为公共目标 URL 创建评论任务，包含身份、平台账号、负责人、日程、风险和重复警告字段。
+  - 支持就绪、进行中、已完成、失败、跳过和已取消状态转换，并具有稳定身份与账号快照、完整状态历史、完成 URL 和备注、筛选、汇总以及 CSV 导出。
+  - 文章选择器提供服务端搜索和分页，同时保留与当前任务关联的文章。精确内容、目标 URL 和源文章重复检查覆盖完整的 90 天窗口。
+  - 状态转换在数据库锁内重新授权当前受让人，防止前任受让人在并发重新分配后执行操作。
+  - 标准管理员只能处理分配的任务。工作区不存储任何外部平台密码、Cookie、令牌或 OAuth 凭据。
+- 更新了 AI 模型和出站请求运行时：
+  - 官方 OpenAI 聊天模型使用 Responses API，第三方 OpenAI 兼容服务使用兼容驱动程序，并包含新的 Gemini 参数和 Atlas Cloud 预设。
+  - 模型连接测试会计入配额和使用审计记录，上游错误在显示前会脱敏密钥和令牌，并且当地址已可用时 DNS 解析会避免重复查询。
+- 扩展了跨文章、潜在客户表单、分发、站点设置和管理导航的集成，并增加了对主题、Manual Publication、AI 运行时、授权和出站安全的覆盖。
 
 ## 2026-07-29
 
 ### v2.2.0
 
-- Added anonymous successful-login telemetry:
-  - Successful admin web and API logins emit `admin_login` events with the channel, current version, random installation ID, and an irreversible admin digest.
-  - Every successful event carries a unique UUID for deduplication, allowing the central collector to aggregate login counts and anonymous admin activity accurately.
-  - A fixed payload allowlist excludes usernames, email addresses, IP addresses, domains, page paths, failed-login details, content, and secrets.
-- Preserved login availability:
-  - Telemetry runs after the response, so collector timeouts or failures do not change web or API login outcomes.
-  - Failed logins, disabled telemetry, and missing collector endpoints send no central request.
-- Expanded automated coverage for anonymous payloads, web/API channels, silent failed logins, and telemetry network failures.
+- 新增匿名成功登录遥测：
+  - 管理员 Web 和 API 登录成功时会发出 `admin_login` 事件，其中包含渠道、当前版本、随机安装 ID 和不可逆的管理员摘要。
+  - 每个成功事件都带有用于去重的唯一 UUID，使中央收集器能够准确聚合登录次数和匿名管理员活动。
+  - 固定 payload 允许列表排除用户名、电子邮件地址、IP 地址、域名、页面路径、登录失败详情、内容和密钥。
+- 保留的登录可用性：
+  - 遥测在响应后运行，因此收集器超时或失败不会改变 Web 或 API 登录结果。
+  - 登录失败、遥测禁用以及收集器端点缺失时不发送任何中心请求。
+- 扩展了针对匿名载荷、Web/API 渠道、静默登录失败和遥测网络故障的自动化覆盖。
 
 ## 2026-07-28
 
 ### v2.1.2
 
-- Refreshed the frontend dependency security baseline:
-  - Updated compatible patch releases for Axios, Vite, esbuild, PostCSS, concurrently, shell-quote, Pusher JS, and related packages.
-  - Removed the legacy `engine.io-client` / `ws` dependency chain, restoring production and development npm audits to zero known vulnerabilities.
-- Corrected anonymous telemetry metric boundaries:
-  - Server-side install, update, and daily heartbeat events exclusively drive deployment totals, active deployments, and version distribution.
-  - Browser `admin_active` Pulse events now contribute only to admin DAU and no longer inflate deployment metrics.
-  - Cloudflare D1 deduplicates lifecycle versions, daily heartbeats, and daily admin digests so network retries do not multiply raw events.
-- Normalized the PHP formatting baseline so the full Pint check passes.
+- 刷新了前端依赖安全基线：
+  - 更新了 Axios、Vite、esbuild、PostCSS、concurrently、shell-quote、Pusher JS 及相关包的兼容补丁版本。
+  - 移除了遗留的 `engine.io-client` / `ws` 依赖链，使生产和开发 npm 审计恢复为零已知漏洞。
+- 修正了匿名遥测指标边界：
+  - 服务端安装、更新和每日心跳事件专门驱动部署总数、活跃部署和版本分布。
+  - 浏览器 `admin_active` Pulse 事件现在仅计入管理员 DAU，不再抬高部署指标。
+  - Cloudflare D1 会对生命周期版本、每日心跳和每日管理员摘要进行去重，因此网络重试不会使原始事件成倍增加。
+- 规范化了 PHP 格式基线，使完整的 Pint 检查通过。
 
 ### v2.1.1
 
-- Added lightweight anonymous deployment telemetry:
-  - First install sends `installed`, version changes send `updated`, and the scheduler sends at most one daily `heartbeat` for discovered-deployment, active-deployment, and version-distribution metrics.
-  - The browser `admin_active` Pulse remains in place and measures admin DAU by random instance ID plus an irreversible admin digest.
-  - Events use a Cloudflare Pages Functions HTTPS gateway backed by D1 by default; operators can replace the endpoint or disable telemetry completely.
-  - Server payloads contain only event type, random instance ID, and version. Network failures do not change install, update, or scheduler outcomes, and telemetry can be disabled with `GEOFLOW_TELEMETRY_ENABLED=false`.
+- 新增轻量级匿名部署遥测：
+  - 首次安装发送 `installed`，版本变更发送 `updated`，调度器针对 discovered-deployment、active-deployment 和 version-distribution 指标每天最多发送一次 `heartbeat`。
+  - 浏览器中的 `admin_active` Pulse 保持不变，通过随机实例 ID 加上不可逆的管理员摘要来衡量管理员 DAU。
+  - 事件默认使用由 D1 支持的 Cloudflare Pages Functions HTTPS 网关；运维人员可以替换端点或完全禁用遥测。
+  - 服务器载荷仅包含事件类型、随机实例 ID 和版本。网络故障不会改变安装、更新或调度器结果，遥测可通过 `GEOFLOW_TELEMETRY_ENABLED=false` 禁用。
 
-- Hardened frontend structured data:
-  - Every theme now emits JSON-LD through Laravel `Js::encode`, blocking executable-context payloads such as `</script>` while preserving valid Schema data.
-- Tightened managed image and API idempotency boundaries:
-  - Image uploads now use content-addressed names and managed-root validation. The new `images.managed_path_hash` identity and `managed_image_paths` registry track state and fencing data to prevent external-path, symlink, and concurrent-deletion escapes.
-  - API idempotency records now carry durable state, owner leases, and a fingerprint version. Legacy and expired `in_progress` records enter explicit manual-recovery paths.
-  - Physical image deletion stays disabled by default. Upgrades must drain old processes, confirm the migration, complete the `managed_path_hash` backfill, and pass readiness checks before enabling deletion.
-- Unified outbound request security and sensitive admin authorization:
-  - Distribution, URL import, theme reference fetching, AI, update metadata, and archive downloads now use the safe outbound gateway with URL normalization, complete DNS-candidate validation, IP pinning, redirect controls, response limits, and redacted errors, closing SSRF bypass paths.
-  - Sensitive Distribution, URL Import, theme, and replication management routes now require super-admin authorization.
-- Isolated generated theme code:
-  - Live theme editing routes and UI that wrote Blade or CSS are disabled. Theme replication preview uses a trusted deterministic page, never compiles generated Blade, and applies a sandbox CSP that blocks scripts and external resources.
-  - Theme replication publication is package-only and no longer writes generated files into live theme directories.
-- Added a read-only security audit:
-  - `php artisan geoflow:security-audit` emits a human-readable report, while `--json` emits a stable schema. Any finding or incomplete audit returns exit code `1`.
-  - Checks cover security migrations, the managed image registry, deletion gates, API idempotency state, legacy image path input, and private outbound exceptions without HTTP, DNS, or repair operations.
-- Updated the dependency security baseline:
-  - Upgraded Laravel, Guzzle, PSR-7, and Symfony security patches; the lock file has no known advisories in the dependency audit.
-  - The minimum PHP version is now consistently 8.3 to match the current `laravel/ai` requirement; Docker continues to default to PHP 8.4.
+- 加固后的前端结构化数据：
+  - 现在每个主题都通过 Laravel `Js::encode` 输出 JSON-LD，阻止诸如 `</script>` 的可执行上下文载荷，同时保留有效的 Schema 数据。
+- 收紧了托管镜像和 API 幂等性边界：
+  - 图片上传现在使用内容寻址名称和受管根目录验证。新的 `images.managed_path_hash` 身份与 `managed_image_paths` 注册表跟踪状态和防护数据，以防止外部路径、符号链接和并发删除逃逸。
+  - API 幂等记录现在带有持久状态、所有者租约和指纹版本。旧版和过期的 `in_progress` 记录会进入明确的手动恢复路径。
+  - 物理镜像删除默认保持禁用。升级必须排空旧进程、确认迁移、完成 `managed_path_hash` 回填，并在启用删除之前通过就绪检查。
+- 统一出站请求安全与敏感管理员授权：
+  - 分发、URL 导入、主题引用获取、AI、更新元数据和归档下载现在使用安全出站网关，具备 URL 规范化、完整的 DNS 候选验证、IP 固定、重定向控制、响应限制和脱敏错误，从而封堵 SSRF 绕过路径。
+  - 敏感的 Distribution、URL Import、主题和复制管理路由现在需要超级管理员授权。
+- 隔离生成的生成主题代码：
+  - 写入 Blade 或 CSS 的实时主题编辑路由和 UI 已被禁用。主题复制预览使用可信的确定性页面，绝不编译生成的 Blade，并应用沙箱 CSP 来阻止脚本和外部资源。
+  - 主题复制发布仅基于包，不再将生成文件写入实时主题目录。
+- 新增只读安全审计：
+  - `php artisan geoflow:security-audit` 输出人类可读的报告，而 `--json` 输出稳定的 schema。任何发现项或未完成的审计都会返回退出码 `1`。
+  - 检查覆盖安全迁移、托管镜像仓库、删除门禁、API 幂等状态、旧版镜像路径输入和私有出站例外，且不执行 HTTP、DNS 或修复操作。
+- 更新了依赖安全基线：
+  - 升级了 Laravel、Guzzle、PSR-7 和 Symfony 安全补丁；依赖审计中锁文件没有已知安全通告。
+  - 最低 PHP 版本现在统一为 8.3，以匹配当前 `laravel/ai` 要求；Docker 仍默认使用 PHP 8.4。
 
 ## 2026-06-26
 
 ### v2.1.0
 
-- Added the Enterprise Knowledge drafting workflow:
-  - The admin now includes an Enterprise Knowledge entry for creating projects, uploading or pasting multiple source files, reviewing parsed sources, generating AI drafts, and viewing revision history.
-  - Added project, source, and revision tables plus a queued generation job, so long drafting runs can execute in the background instead of blocking the admin page.
-  - Source parsing covers common formats including text, Markdown, HTML, CSV, JSON, XML, PDF, Word, and Excel, with each source kept traceable.
-  - AI cleanup and structured organization now prioritize source coverage. Long inputs are processed by module, and missing source facts are backfilled into the relevant sections to reduce over-simplification.
-  - Draft output keeps modules, audience, content format, manual-review notes, and source summaries for later review and publishing.
-- Improved knowledge-base and material management:
-  - Knowledge-base detail pages now include a Markdown editor for viewing and adjusting knowledge content directly in the admin.
-  - Knowledge-base detail pages can resubmit semantic chunking and safely return to the detail page after the action.
-  - The materials page now links into the Enterprise Knowledge builder, making standard knowledge bases, material libraries, and Enterprise Knowledge drafts easier to connect.
-- Expanded themes, templates, and frontend output:
-  - Added live theme-template editing from the admin, with test coverage for the editing flow. Live theme editing is disabled in v2.1.1; the current security flow uses isolated previews and package-only review archives.
-  - Site settings now support homepage module configuration and custom styling, and target-site packages can sync richer homepage structures.
-  - Added the APIHot recommendation frontend theme with home, category, archive, article pages, and bundled assets.
-  - Unified frontend SEO metadata output so themes share the same SEO head logic and avoid inconsistent titles, Open Graph data, and structured data.
-- Improved Distribution Management and target-site synchronization:
-  - Tasks now include distribution strategies for local, channel-only, and local-plus-channel publishing.
-  - Article lists show clearer distribution status, remote-copy links, sync state, and failure information.
-  - Distribution Management can sync target-site settings for selected active GEOFlow Agent channels.
-  - Target-site packages now follow the same SEO metadata contract as local frontend pages.
-- Improved deployment and runtime stability:
-  - Added install-state tracking and default-data seed guards so existing deployments are not polluted by repeated demo data after restarts, migrations, or upgrades.
-  - Default-admin initialization now supports email configuration, with additional production entrypoint, Redis session, Docker image, network, permissions, and reverse-proxy improvements.
-  - Admin paths and Reverb auth paths now support subdirectory deployments, reducing asset and WebSocket issues when `APP_URL` includes a path prefix.
-- Expanded test coverage:
-  - Added tests for Enterprise Knowledge, theme editing, site settings, distribution strategies, target-site sync, SEO metadata, install guards, and deployment configuration.
-  - Full release verification passed with `479 passed` and `3179 assertions`.
+- 新增企业知识起草工作流：
+  - 管理后台现在包含企业知识（Enterprise Knowledge）入口，可用于创建项目、上传或粘贴多个源文件、审阅已解析的源、生成 AI 草稿以及查看修订历史。
+  - 新增项目、来源和修订表，以及排队生成作业，使长时间的起草运行可以在后台执行，而不会阻塞管理页面。
+  - 源解析涵盖常见格式，包括文本、Markdown、HTML、CSV、JSON、XML、PDF、Word 和 Excel，且每个来源都保持可追溯。
+  - AI 清理和结构化整理现在优先保证来源覆盖。长输入按模块处理，缺失的来源事实会回填到相关章节，以减少过度简化。
+  - 草稿输出保留模块、受众、内容格式、人工审核备注和来源摘要，以供后续审核和发布。
+- 改进了知识库与素材管理：
+  - 知识库详情页现在包含 Markdown 编辑器，可直接在管理后台查看和调整知识内容。
+  - 知识库详情页可以重新提交语义分块，并在操作后安全返回详情页。
+  - 素材页面现在链接到企业知识构建器，使标准知识库、素材库和企业知识草稿更易于连接。
+- 扩展了主题、模板和前端输出：
+  - 新增从管理后台进行实时主题模板编辑，并为编辑流程提供测试覆盖。实时主题编辑在 v2.1.1 中已禁用；当前安全流程使用隔离预览和仅软件包的审查归档。
+  - 站点设置现在支持首页模块配置和自定义样式，目标站点包可以同步更丰富的首页结构。
+  - 新增 APIHot 推荐前端主题，包含首页、分类、归档、文章页面以及捆绑资源。
+  - 统一前端 SEO 元数据输出，使各主题共享相同的 SEO head 逻辑，并避免标题、Open Graph 数据和结构化数据不一致。
+- 改进了 Distribution Management 与目标站点同步：
+  - 任务现在包括本地发布、仅渠道发布以及本地加渠道发布的分发策略。
+  - 文章列表显示更清晰的分发状态、远程副本链接、同步状态和失败信息。
+  - 分发管理可以为选定的活跃 GEOFlow Agent 渠道同步目标站点设置。
+  - 目标站点包现在遵循与本地前端页面相同的 SEO 元数据契约。
+- 改进了部署与运行时稳定性：
+  - 新增安装状态跟踪和默认数据种子防护，以免现有部署在重启、迁移或升级后受到重复演示数据的污染。
+  - 默认管理员初始化现在支持电子邮件配置，并新增生产入口点、Redis 会话、Docker 镜像、网络、权限和反向代理方面的改进。
+  - 管理端路径和 Reverb 认证路径现在支持子目录部署，减少当 `APP_URL` 包含路径前缀时出现的资源和 WebSocket 问题。
+- 扩展了测试覆盖：
+  - 新增针对 Enterprise Knowledge、主题编辑、站点设置、分发策略、目标站点同步、SEO 元数据、安装防护和部署配置的测试。
+  - 使用 `479 passed` 和 `3179 assertions` 的完整发布验证已通过。
 
 ## 2026-06-02
 
 ### v2.0.4
 
-- Fixed stale admin versions after code updates in deployed environments: the admin version now defaults to local `version.json`, and environment examples no longer write `GEOFLOW_APP_VERSION`.
-- Reworked Docker first-install behavior: added `php artisan geoflow:install` and a system installation marker, so default install seeders only run on an empty database; existing deployments are marked as installed without re-seeding default categories, articles, site settings, ads, or prompts.
-- Updated the admin version to `2.0.4`, including `version.json` and default admin version display values.
+- 修复了已部署环境中代码更新后管理员版本陈旧的问题：管理员版本现在默认使用本地 `version.json`，环境示例不再写入 `GEOFLOW_APP_VERSION`。
+- 重构了 Docker 首次安装行为：添加了 `php artisan geoflow:install` 和系统安装标记，因此默认安装种子程序仅在空数据库上运行；现有部署会被标记为已安装，而不会重新填充默认分类、文章、站点设置、广告或提示词。
+- 将 admin 版本更新为 `2.0.4`，包括 `version.json` 和默认 admin 版本显示值。
 
 ### v2.0.3
 
-- Added the System Update Center:
-  - The admin notification area now links to a dedicated System Update Center with current version, latest GitHub version, repository links, changelog links, and last-check time.
-  - GitHub `version.json` metadata is used to detect and display newer versions in the admin.
-- Added update planning, preflight checks, and manual command previews:
-  - Admins can generate update plans from remote release archives and review added, modified, deleted, migration, dependency, and manual-step changes.
-  - Preflight checks cover repository trust, archive size, file paths, disk space, worktree state, backup state, and execution switches.
-  - The admin shows copyable manual command lists and does not execute host shell commands by default.
-- Added backup and rollback flow:
-  - Files scheduled for replacement are backed up before update, with manifest, source version, target version, file count, and backup path recorded.
-  - Supports single-file restore, full rollback, rollback preflight checks, and a keep-last-10 backup policy.
-  - Rollback execution is protected by environment switches and super-admin password checks by default.
-- Added queued update execution and recovery:
-  - Updates and rollbacks run through the background queue with stages, timeline entries, logs, verification commands, and failure reasons.
-  - Includes status polling, stale-run warnings, failed-run retry, and manual failure marking.
-  - File verification before apply reduces partial replacement and concurrent update risks.
-- Added deployment diagnostics and self-recovery guidance:
-  - System Update Center now checks APP_URL, APP_KEY, database connectivity, migrations table, and writable `storage/app` / `bootstrap/cache` paths.
-  - Shows runtime configuration, Laravel log summaries, and deployment-mode-specific command guidance.
-  - Added Ubuntu 24.04 LTS + Docker production troubleshooting docs for initialization commands, `.env.prod` checks, container logs, and 500 errors.
-- Updated the admin version to `2.0.3`, including `version.json` and default admin version display values.
+- 新增系统更新中心：
+  - 管理后台通知区域现在链接到专门的系统更新中心，其中包含当前版本、最新 GitHub 版本、仓库链接、变更日志链接和上次检查时间。
+  - GitHub `version.json` 元数据用于检测并在管理后台显示较新版本。
+- 新增更新规划、预检以及手动命令预览：
+  - 管理员可以从远程发布归档生成更新计划，并审查新增、修改、删除、迁移、依赖和手动步骤变更。
+  - 预检涵盖仓库信任、归档大小、文件路径、磁盘空间、工作树状态、备份状态和执行开关。
+  - 管理后台显示可复制的手动命令列表，默认不执行宿主机 shell 命令。
+- 新增备份和回滚流程：
+  - 计划替换的文件在更新前会备份，并记录清单、源版本、目标版本、文件数量和备份路径。
+  - 支持单文件恢复、完整回滚、回滚预检以及保留最近 10 份备份的策略。
+  - 默认情况下，回滚执行受环境开关和超级管理员密码校验保护。
+- 新增排队更新执行和恢复：
+  - 更新和回滚通过后台队列运行，包含阶段、时间线条目、日志、验证命令和失败原因。
+  - 包含状态轮询、过期运行警告、失败运行重试和手动标记失败。
+  - 应用前进行文件验证可降低部分替换和并发更新风险。
+- 新增部署诊断和自恢复指南：
+  - 系统更新中心现在会检查 APP_URL、APP_KEY、数据库连接、迁移表以及可写的 `storage/app` / `bootstrap/cache` 路径。
+  - 显示运行时配置、Laravel 日志摘要以及特定部署模式的命令指导。
+  - 添加了 Ubuntu 24.04 LTS + Docker 生产环境故障排除文档，涵盖初始化命令、`.env.prod` 检查、容器日志和 500 错误。
+- 将 admin 版本更新为 `2.0.3`，包括 `version.json` 和默认 admin 版本显示值。
 
 ## 2026-05-30
 
-### Distribution Management
+### 分发管理
 
-- Added Generic HTTP API distribution channels:
-  - Supports no auth, Bearer Token, Basic Auth, custom Header Key, and HMAC signatures.
-  - Supports per-action HTTP methods and paths for health checks, publish, update, delete, and site-settings sync.
-  - Supports `remote_id` / `remote_url` response mapping, success-status configuration, payload wrapping, and request timeout settings.
-  - Generic API channels reuse the existing distribution queue, retries, logs, remote article edit/delete actions, and site-settings sync flow.
-- Distribution channel detail pages now show Generic API onboarding, response-mapping summaries, and a sample payload for third-party receivers.
-- README and localized READMEs now describe the Generic HTTP API channel capability.
+- 添加了通用 HTTP API 分发渠道：
+  - 支持无认证、Bearer Token、Basic Auth、自定义 Header Key 和 HMAC 签名。
+  - 支持为健康检查、发布、更新、删除和站点设置同步按操作配置 HTTP 方法和路径。
+  - 支持 `remote_id` / `remote_url` 响应映射、成功状态配置、响应载荷包装和请求超时设置。
+  - 通用 API 渠道复用现有的分发队列、重试、日志、远程文章编辑/删除操作以及站点设置同步流程。
+- 分发渠道详情页现在显示 Generic API 接入引导、响应映射摘要，以及面向第三方接收方的示例负载。
+- README 和本地化 README 现在描述通用 HTTP API 渠道能力。
 
 ## 2026-05-28
 
 ### v2.0.2
 
-- Upgraded the admin dashboard into a GEOFlow automation workflow panel:
-  - Shows how APIs, material libraries, tasks, articles, distribution, Analytics, and site settings connect in the automated production flow.
-  - Keeps the three-step setup guide and companion Skill shortcuts while removing duplicated dashboard metric cards.
-- Improved Analytics data accuracy:
-  - Total views, viewed content, top content, and log analytics now prefer `view_logs` event data and filter out non-GET requests.
-  - Publishing trends use actual `published_at` timestamps, and distribution metrics respect task/category filters through related articles.
-  - AI crawler, search bot, other automation, and human traffic classification now share one rule set to reduce misclassification.
-- Improved local Docker development behavior:
-  - The development image disables CLI OPcache so mounted code updates are reflected without stale admin pages.
-- Updated the admin version to `2.0.2`, including `version.json`, environment examples, and default admin version display values.
+- 将 admin 仪表盘升级为 GEOFlow 自动化工作流面板：
+  - 展示 API、素材库、任务、文章、分发、Analytics 和站点设置如何在自动化生产流程中连接。
+  - 保留三步设置指南和配套技能快捷方式，同时移除重复的仪表盘指标卡片。
+- 提高了 Analytics 数据准确性：
+  - 总浏览量、已查看内容、热门内容和日志分析现在优先使用 `view_logs` 事件数据，并过滤掉非 GET 请求。
+  - 发布趋势使用实际的 `published_at` 时间戳，分发指标通过相关文章遵循任务/分类筛选。
+  - AI 爬虫、搜索机器人、其他自动化和人类流量分类现在共用一套规则，以减少误分类。
+- 改进了本地 Docker 开发行为：
+  - 开发镜像禁用 CLI OPcache，使挂载代码的更新生效，而不会出现陈旧的管理页面。
+- 将 admin 版本更新为 `2.0.2`，包括 `version.json`、环境示例和默认 admin 版本显示值。
 
 ## 2026-05-24
 
-### AI Models and Knowledge Bases
+### AI 模型与知识库
 
-- Added native Gemini model support:
-  - Gemini chat and embedding models can be configured without relying only on OpenAI-compatible routes.
-  - Model listings, connection tests, and task generation now recognize Gemini providers consistently.
-- Added knowledge-base chunking strategy configuration:
-  - Supports structured rule chunking, automatic strategy selection, and optional LLM semantic planning.
-  - The LLM only plans semantic boundaries; final chunks are rebuilt from the source text, with rule chunking as the stable fallback.
-  - Chunk metadata now includes title, section path, strategy, sequence, and source hash for preview, debugging, and rebuilds.
+- 新增原生 Gemini 模型支持：
+  - 可以配置 Gemini 聊天和嵌入模型，而不必仅依赖 OpenAI 兼容路由。
+  - 模型列表、连接测试和任务生成现在一致地识别 Gemini 提供商。
+- 新增知识库分块策略配置：
+  - 支持结构化规则分块、自动策略选择以及可选的 LLM 语义规划。
+  - LLM 仅规划语义边界；最终分块由源文本重建，规则分块作为稳定的回退方案。
+  - 分块元数据现在包含标题、章节路径、策略、序号和源哈希，用于预览、调试和重建。
 
-### Tasks and Distribution
+### 任务与分发
 
-- Improved task create/edit pages:
-  - Form width now aligns with the task-management list and reduces unused side whitespace.
-  - Content settings, material choices, and distribution-scope sections use the wider layout more effectively.
-- Fixed channel selection when the publication scope is local-only:
-  - Selecting “publish only to local site” disables and clears distribution channel checkboxes in the UI.
-  - The backend ignores stale `distribution_channel_ids` under `local_only`, preventing accidental remote distribution jobs.
+- 改进了任务创建/编辑页面：
+  - 表单宽度现在与任务管理列表对齐，并减少了未使用的侧边空白。
+  - 内容设置、素材选择和分发范围部分能更有效地使用更宽布局。
+- 当发布范围为仅本地时的固定渠道选择：
+  - 选择“仅发布到本地站点”会禁用并清除 UI 中的分发渠道复选框。
+  - 后端忽略 `local_only` 下过期的 `distribution_channel_ids`，防止意外的远程分发任务。
 
-### Documentation
+### 文档
 
-- Updated the repository README and localized READMEs with Gemini, semantic chunking, WordPress REST channels, and publication-scope behavior.
-- Updated the Chinese and English Wiki outline and added focused pages for Distribution Management, Analytics, and Knowledge Chunking / RAG.
+- 更新了仓库 README 和本地化 README，加入 Gemini、语义分块、WordPress REST 渠道和发布范围行为。
+- 更新了中英文 Wiki 大纲，并新增了 Distribution Management、Analytics 和 Knowledge Chunking / RAG 的专题页面。
 
 ## 2026-05-23
 
-### Distribution Management
+### 分发管理
 
-- Added WordPress REST API distribution channel support:
-  - Supports WordPress Application Password authentication, with encrypted storage and no plaintext reveal.
-  - Supports post publish, update, delete, media upload, category/tag sync, and basic site settings sync.
-  - Shows different configuration fields and onboarding guidance for GEOFlow Agent and WordPress REST channels.
-  - Reuses the unified distribution queue, remote metadata, health checks, remote edit/delete actions, and distribution logs for WordPress channels.
+- 添加了 WordPress REST API 分发渠道支持：
+  - 支持 WordPress 应用程序密码认证，加密存储且不显示明文。
+  - 支持文章发布、更新、删除、媒体上传、分类/标签同步以及基础站点设置同步。
+  - 显示 GEOFlow Agent 和 WordPress REST 渠道的不同配置字段和入门指导。
+  - 为 WordPress 渠道复用统一分发队列、远程元数据、健康检查、远程编辑/删除操作和分发日志。
 
-### Documentation
+### 文档
 
-- Systematically refreshed the repository homepage README and localized READMEs:
-  - Updated the hero description from future multi-channel distribution to the current GEO content engineering and multi-site distribution system.
-  - Added Analytics, Distribution Management, target-site packages, static page distribution, `llms.txt` / TXT maps, remote site-settings sync, and LLM-friendly output to the feature tables.
-  - Updated runtime and architecture sections with target-site Agents, distribution queues, remote static pages, and log analytics.
+- 系统性地刷新了仓库主页 README 和各本地化 README：
+  - 将 hero 描述从未来的多渠道分发更新为当前的 GEO 内容工程与多站点分发系统。
+  - 在功能表中添加了分析、分发管理、目标站点包、静态页面分发、`llms.txt` / TXT 映射、远程站点设置同步以及对 LLM 友好的输出。
+  - 更新了运行时和架构章节，加入目标站点智能体、分发队列、远程静态页面和日志分析。
 
 ## 2026-05-22
 
 ### v2.0.1
 
-- Added a working Distribution Management flow:
-  - The admin now includes distribution channel listing, creation, editing, detail pages, queue view, logs, connection tests, pause/enable actions, secret reset, and remote article management.
-  - Channel secrets are shown once after creation, and super admins can temporarily reveal them again by verifying the current login password.
-  - Tasks and articles can be bound to distribution channels. After local publishing, articles can automatically enter the distribution queue, with distribution status visible on task and article lists.
-  - The distribution queue supports remote-copy editing and deletion. Remote edits also update the local GEOFlow article, and remote deletion refreshes the target homepage and map files.
-- Added target-site packages and static-site delivery:
-  - Channel detail pages can download target-site packages preconfigured with the current channel secret, site settings, and deployment path.
-  - Packages include a PHP Agent, homepage, article detail pages, static assets, sitemap, TXT map, Apache `.htaccess`, and Nginx rewrite-rule examples.
-  - Static mode is enabled by default. Publishing or deleting articles regenerates the static homepage, detail pages, sitemap, and LM-friendly TXT map files.
-  - Article pages now include Markdown rendering, tables, code blocks, quotes, image rendering, Schema structured data, and external CSS asset references.
-- Added remote site-settings synchronization:
-  - Distribution channel edit pages can manage target-site title, subtitle, description, copyright, ICP/filing text, theme template, and categories.
-  - Added an Update Target Site action to resync homepage, article pages, map files, and remote configuration after uploading a fresh package or changing settings.
-  - Added static-mode and rewrite-mode guidance, plus copyable Apache/Nginx rules in the admin.
-- Added the Analytics page:
-  - The admin top navigation now includes Analytics, centralizing system overview, single-site operations, multi-site distribution, and self-service log data.
-  - Analytics supports date range, quick time ranges, distribution channel, task, category, article, traffic type, and log source filters. Quick time selection updates the form first; data refreshes after clicking Apply Filters.
-  - Content analytics includes publishing trends, task trends, content funnel, category distribution, and task/material/AI health panels.
-  - Log analytics includes visit trends, top articles, top channel sites, AI crawler recognition, status codes, source types, and sample access-log visualization.
-- Reworked the admin dashboard into a navigation hub:
-  - Removed dashboard statistics cards and moved statistics into Analytics.
-  - Kept the three-step setup guide and grouped common entries into Single-Site Operations, Multi-Site Distribution, and companion Skill resources.
-  - Added prompt configuration and user management entries under single-site operations, plus target packages, distribution queue/logs, and related skills under multi-site distribution.
-- Improved the first-deployment guide:
-  - `GEOFlow 2.0 First Deployment Guide` now uses a compact white Kami-style document layout with smaller title and body typography.
-  - Copy now covers dashboard navigation, Analytics, single-site operations, multi-site distribution, and backup checks before production.
-- Completed Portuguese admin localization:
-  - Incorporated and completed the `pt_BR` admin translations from PR #27, covering navigation, notifications, authors, frontend copy, materials, AI configuration, Analytics, Distribution Management, and all current admin language keys.
-  - Added Portuguese locale coverage tests to prevent new admin modules from falling back to English copy.
-- Incorporated low-risk Docker deployment PR improvements:
-  - Development and production compose files can now configure PHP, Composer, Nginx, pgvector, Redis, and Composer Packagist mirror images through environment variables.
-  - `.dockerignore` now excludes local Docker data, logs, caches, sessions, view caches, and upload directories so runtime data is not copied into built images.
-  - Added default-admin seeder coverage for creating the initial admin and preserving existing credentials.
-- Expanded test coverage:
-  - Added tests for Distribution Management, Analytics, access logs, admin activity sanitization, the welcome guide, migration structure, and retry policy.
-  - Full release verification passed with `188 passed` and `1231 assertions`.
+- 新增可用的 Distribution Management 流程：
+  - 管理后台现在包含分发渠道的列表、创建、编辑、详情页、队列视图、日志、连接测试、暂停/启用操作、密钥重置以及远程文章管理。
+  - Channel 密钥在创建后仅显示一次，超级管理员可通过验证当前登录密码临时再次查看。
+  - 任务和文章可以绑定到分发渠道。本地发布后，文章可以自动进入分发队列，分发状态可在任务列表和文章列表中查看。
+  - 分发队列支持远程副本的编辑和删除。远程编辑还会更新本地 GEOFlow 文章，远程删除会刷新目标主页和地图文件。
+- 新增目标站点包和静态站点交付：
+  - 渠道详情页可以下载已预配置当前渠道密钥、站点设置和部署路径的目标站点包。
+  - 包中包含 PHP 智能体、首页、文章详情页、静态资源、站点地图、TXT 映射、Apache `.htaccess` 和 Nginx 重写规则示例。
+  - 默认启用静态模式。发布或删除文章会重新生成静态首页、详情页、站点地图以及对 LM 友好的 TXT 地图文件。
+  - 文章页面现在包括 Markdown 渲染、表格、代码块、引用、图片渲染、Schema 结构化数据和外部 CSS 资源引用。
+- 新增远程站点设置同步：
+  - 分发渠道编辑页可以管理目标站点标题、副标题、描述、版权、ICP/备案文本、主题模板和分类。
+  - 新增“更新目标站点”操作，在上传新软件包或更改设置后重新同步首页、文章页面、地图文件和远程配置。
+  - 新增静态模式和重写模式指南，并在管理后台提供可复制的 Apache/Nginx 规则。
+- 新增分析页面：
+  - 管理后台顶部导航现在包含 Analytics，集中展示系统概览、单站点运维、多站点分发和自助日志数据。
+  - 分析支持日期范围、快捷时间范围、分发渠道、任务、分类、文章、流量类型和日志来源筛选。快捷时间选择会先更新表单；点击“应用筛选”后数据刷新。
+  - 内容分析包括发布趋势、任务趋势、内容漏斗、分类分布以及任务/素材/AI 健康面板。
+  - 日志分析包括访问趋势、热门文章、热门渠道站点、AI 爬虫识别、状态码、来源类型和示例访问日志可视化。
+- 将管理仪表板改造为导航中心：
+  - 移除了仪表板统计卡片，并将统计信息移至 Analytics。
+  - 保留了三步设置指南，并将常用入口归入单站点运营、多站点分发和配套技能资源。
+  - 在单站点运营下新增提示词配置和用户管理入口，并在多站点分发下新增目标包、分发队列/日志和相关技能。
+- 改进了首次部署指南：
+  - `GEOFlow 2.0 First Deployment Guide` 现在使用紧凑的白色 Kami 风格文档布局，标题和正文的字体更小。
+  - 文案现已涵盖仪表盘导航、Analytics、单站点运营、多站点分发和生产前备份检查。
+- 已完成葡萄牙语管理员本地化：
+  - 已纳入并完成来自 PR #27 的 `pt_BR` 后台翻译，覆盖导航、通知、作者、前端文案、素材、AI 配置、Analytics、Distribution Management 以及所有当前后台语言键。
+  - 添加了葡萄牙语区域设置覆盖测试，以防止新的管理模块回退到英语文案。
+- 已纳入低风险 Docker 部署 PR 改进：
+  - 开发和生产 Compose 文件现在可以通过环境变量配置 PHP、Composer、Nginx、pgvector、Redis 以及 Composer Packagist 镜像。
+  - `.dockerignore` 现在会排除本地 Docker 数据、日志、缓存、会话、视图缓存和上传目录，因此运行时数据不会被复制到构建镜像中。
+  - 新增默认管理员种子数据填充器覆盖，用于创建初始管理员并保留现有凭据。
+- 扩展了测试覆盖：
+  - 新增针对 Distribution Management、Analytics、访问日志、管理员活动清理、欢迎指南、迁移结构和重试策略的测试。
+  - 使用 `188 passed` 和 `1231 assertions` 的完整发布验证已通过。
 
 ## 2026-05-21
 
 ### v2.0
 
-- Updated the admin version to `2.0`, including `version.json`, environment examples, and default admin version display values.
-- Reworked the first-login admin welcome panel into a first-deployment guide:
-  - Reminds administrators to check passwords, admin path, site URL, language, and baseline security settings first
-  - Guides verification of PostgreSQL, Redis, queue workers, scheduler, and writable storage paths
-  - Clarifies the first-run flow: configure models and prompts, prepare materials, generate a small sample, review/publish, then scale to larger tasks
-- Added first-use guidance for Distribution Management 2.0:
-  - Explains target channels, Agent URL, secrets, static mode, and target-site packages
-  - Guides package download, connection tests, remote settings sync, and distribution log review
-  - Emphasizes backing up the database, `.env`, uploads, `storage`, and target-site packages before upgrades or migrations
+- 将 admin 版本更新为 `2.0`，包括 `version.json`、环境示例和默认 admin 版本显示值。
+- 将首次登录的管理员欢迎面板改造为首次部署指南：
+  - 提醒管理员首先检查密码、管理路径、站点 URL、语言和基线安全设置
+  - 指导验证 PostgreSQL、Redis、队列工作进程、调度器和可写存储路径
+  - 阐明首次运行流程：配置模型和提示词，准备素材，生成小样本，审核/发布，然后扩展到更大任务
+- 新增 Distribution Management 2.0 的首次使用指南：
+  - 说明目标渠道、智能体 URL、密钥、静态模式和目标站点包
+  - 指导包下载、连接测试、远程设置同步和分发日志审查
+  - 强调在升级或迁移之前备份数据库、`.env`、上传内容、`storage`和目标站点包
 
 ## 2026-05-10
 
 ### v1.2.x
 
-- Improved third-party AI title generation compatibility:
-  - The title generation flow no longer hardcodes the `openai` driver
-  - Runtime driver selection now uses the API base URL and model ID
-  - Prevents DeepSeek, Zhipu, MiniMax, Volcengine Ark, Alibaba DashScope, and other OpenAI-compatible providers from being routed to `/v1/responses` and returning 404 errors
-- Strengthened URL Smart Import security configuration:
-  - SSRF protection remains strict by default
-  - Added `URL_IMPORT_ALLOW_MIXED_DNS=false` as an example setting only for explicitly controlled transparent proxy, Docker, or VPN mixed-DNS environments
-  - Application code reads `config('geoflow.url_import_allow_mixed_dns')`, so it is compatible with Laravel config caching
-- Added coverage for model driver resolution and URL normalization.
-- Fixed default admin initialization for production Docker first-time deployment:
-  - The one-shot `init` service runs `geoflow:install` after migrations
-  - The default admin account is created only for an empty first install; existing deployments are marked as initialized
-  - Long-running services do not receive initialization environment variables, so restarts do not repeat install seeders
+- 改进了第三方 AI 标题生成兼容性：
+  - 标题生成流程不再硬编码 `openai` 驱动
+  - 运行时驱动选择现在使用 API 基础 URL 和模型 ID
+  - 防止 DeepSeek、Zhipu、MiniMax、Volcengine Ark、Alibaba DashScope 以及其他 OpenAI 兼容提供商被路由到 `/v1/responses` 并返回 404 错误
+- 增强了 URL 智能导入安全配置：
+  - 默认情况下，SSRF 防护仍然严格
+  - 新增 `URL_IMPORT_ALLOW_MIXED_DNS=false`，仅作为示例设置，用于明确受控的透明代理、Docker 或 VPN 混合 DNS 环境
+  - 应用代码读取 `config('geoflow.url_import_allow_mixed_dns')`，因此兼容 Laravel 配置缓存
+- 新增对模型驱动解析和 URL 规范化的覆盖。
+- 修复了生产 Docker 首次部署时默认管理员初始化的问题：
+  - 一次性 `init` 服务会在迁移后运行 `geoflow:install`
+  - 默认管理员账户仅在空的首次安装时创建；现有部署会被标记为已初始化
+  - 长期运行的服务不会接收初始化环境变量，因此重启不会重复执行安装数据填充器
 
 ## 2026-05-08
 
 ### v1.2.x
 
-- Added AI model connection testing:
-  - Admin AI model lists can now test API connectivity directly
-  - Basic checks cover both chat models and embedding models
-  - Failed tests return concrete errors to help diagnose API keys, endpoints, model IDs, and provider settings
-- Improved frontend and admin asset loading stability:
-  - Replaced external Tailwind Play CDN and Lucide CDN usage in frontend templates with locally hosted assets
-  - Reduces the risk of broken styles or scripts in regions where external CDNs are unstable
-- Added one-click deployment scripts and deployment documentation:
-  - Added `deploy-scripts/` for Docker deployment, server preflight checks, and post-deployment health checks
-  - Updated the Wiki with deployment guidance, server sizing recommendations, and deployment script usage notes
-- Fixed task deletion compatibility:
-  - Task deletion no longer depends on the legacy `article_queue` table
-  - Prevents `Undefined table: article_queue` errors on the current database schema
-- Improved optional material field handling in the task creation API:
-  - API task creation can now omit optional author, image library, knowledge base, and fixed category fields
-  - Omitted fields are written as explicit `null` values, keeping the API contract aligned with admin task creation
-  - Added API contract coverage for omitted optional material fields
-- Added a NetEase News-inspired frontend theme:
-  - Added the `netease-news-20260429` frontend theme
-  - Homepage, category, and article pages now support a cleaner two-column news-style reading layout
-  - Preserves GEOFlow article, category, author, SEO, and Schema data contracts
-- Added a TDWH English theme fork:
-  - Added the `tdwh-english-20260501` English theme sample
-  - Provides a clearer internationalized homepage, listing page, and article page structure for English content sites
+- 添加了 AI 模型连接测试：
+  - 管理端 AI 模型列表现在可以直接测试 API 连通性
+  - 基本检查涵盖聊天模型和嵌入模型
+  - 失败的测试会返回具体错误，以帮助诊断 API 密钥、端点、模型 ID 和提供商设置
+- 改进了前端与后台资源加载稳定性：
+  - 将前端模板中的外部 Tailwind Play CDN 和 Lucide CDN 使用替换为本地托管资源
+  - 降低在外部 CDN 不稳定地区出现样式或脚本损坏的风险
+- 新增一键部署脚本和部署文档：
+  - 新增 `deploy-scripts/`，用于 Docker 部署、服务器预检和部署后健康检查
+  - 更新了 Wiki，加入部署指南、服务器规格建议和部署脚本使用说明
+- 修复了任务删除的兼容性问题：
+  - 任务删除不再依赖旧版 `article_queue` 表
+  - 防止当前数据库架构上出现 `Undefined table: article_queue` 错误
+- 改进了任务创建 API 中可选素材字段的处理：
+  - API 任务创建现在可以省略可选的作者、图片库、知识库和固定分类字段
+  - 省略的字段会写为显式的 `null` 值，使 API 契约与管理任务创建保持一致
+  - 添加了针对被省略的可选素材字段的 API 契约覆盖
+- 新增一个受 NetEase News 启发的前端主题：
+  - 新增 `netease-news-20260429` 前端主题
+  - 首页、分类页和文章页现在支持更简洁的双栏新闻式阅读布局
+  - 保留 GEOFlow 文章、分类、作者、SEO 和 Schema 数据契约
+- 新增一个 TDWH 英文主题分支：
+  - 新增 `tdwh-english-20260501` 英文主题示例
+  - 为英文内容站点提供更清晰的国际化首页、列表页和文章页结构
 
 ## 2026-05-06
 
 ### v1.2.x
 
-- Fixed the author fallback logic during task-based article generation:
-  - If a task has no author configured, GEOFlow now uses an existing author automatically
-  - If the configured author no longer exists, GEOFlow falls back to an available author
-  - If no author exists in the system, GEOFlow creates a default `GEOFlow` author
-  - This prevents PostgreSQL `NOT NULL` failures caused by writing `null` into `articles.author_id`
-- Improved AI parsing compatibility for `URL Smart Import`:
-  - When one AI model fails, GEOFlow continues with the next available model
-  - Keyword and title stages can now parse plain-text AI lists, reducing failures caused by non-standard JSON responses
-  - Error messages keep the model name and concrete failure reason for easier API key, response format, and provider debugging
-- Upgraded the admin dashboard:
-  - Added overview panels for tasks, materials, AI models, URL imports, and popular content
-  - Repositioned the quick-start and trend sections to make the dashboard more useful for operations
-  - Fixed overly tight spacing between the weekly trend chart and the health panels below it
-- Stabilized the local runtime after the fixes:
-  - Cleared Laravel optimize cache and restarted the app / queue / scheduler containers
-  - Added tests for task author fallback across empty-author, missing-author, and no-author initialization scenarios
+- 修复了基于任务生成文章时的作者回退逻辑：
+  - 如果任务未配置作者，GEOFlow 现在会自动使用现有作者
+  - 如果配置的作者不再存在，GEOFlow 会回退到可用作者
+  - 如果系统中不存在作者，GEOFlow 会创建一个默认的 `GEOFlow` 作者
+  - 这可以防止因将 `null` 写入 `articles.author_id` 而导致的 PostgreSQL `NOT NULL` 失败
+- 改进了对 `URL Smart Import` 的 AI 解析兼容性：
+  - 当一个 AI 模型失败时，GEOFlow 会继续使用下一个可用模型
+  - 关键词和标题阶段现在可以解析纯文本 AI 列表，减少由非标准 JSON 响应导致的失败
+  - 错误消息保留模型名称和具体失败原因，以便更容易地调试 API 密钥、响应格式和提供商
+- 升级了 admin 仪表盘：
+  - 新增任务、素材、AI 模型、URL 导入和热门内容的概览面板
+  - 重新调整了快速开始和趋势部分的位置，使仪表板对运维更有用
+  - 修复了每周趋势图与其下方健康面板之间间距过紧的问题
+- 修复后稳定了本地运行时：
+  - 清除了 Laravel optimize 缓存，并重启了 app / queue / scheduler 容器
+  - 新增针对空作者、缺失作者和无作者初始化场景下任务作者回退的测试
 
 ## 2026-04-18
 
 ### v1.2
 
-- Added first-stage Chinese/English interface support:
-  - English is now available across the formal admin pages
-  - The login page now has its own language selector
-  - The frontend shell follows the admin language selection
-- Added `Smart Model Failover` for tasks:
-  - Tasks can now use `Fixed Model` or `Smart Failover`
-  - When the primary model fails, GEOFlow automatically tries the next available chat model by priority
-- Improved provider endpoint handling:
-  - Supports versioned chat and embedding endpoints for OpenAI, DeepSeek, MiniMax, Zhipu GLM, and Volcengine Ark
-  - Model settings now accept either a base URL or a full endpoint
-- Improved task execution behavior:
-  - `task-execute.php` now queues execution instead of blocking the page synchronously
-  - `published_count` is now updated correctly for tasks that publish directly
-- Added frontend theme preview and activation:
-  - dynamic `preview/<theme-id>` routes for safe preview-first inspection
-  - theme package support under `themes/<theme-id>`
-  - admin-side theme preview and activation in Site Settings
-  - sample theme `qiaomu-editorial-20260418` is now included in the public repository
-  - homepage, category, and archive card summaries now strip Markdown artifacts before rendering
-- Added an admin first-login welcome panel:
-  - shown automatically after the first admin login
-  - redesigned as a single welcome letter instead of a multi-card module layout
-  - defaults to Chinese with an in-panel English switch
-  - footer now includes a `Project Intro` entry that reopens the panel
-  - implementation notes are documented in `project/ADMIN_WELCOME_en.md`
-- Added the companion `geoflow-template` skill entry:
-  - maps reference URLs into GEOFlow-compatible theme packages
-  - outputs `tokens.json`, `mapping.json`, and preview-first theme plans
-- Upgraded default GEO prompt templates:
-  - Long-form templates now cover article generation, ranking articles, keywords, and descriptions
-  - Templates are aligned with GeoFlow's variable rules
-- Fixed multiple admin usability issues:
-  - PostgreSQL timezone drift
-  - Missing leading `/` in generated image paths
-  - PostgreSQL boolean write error when saving AI-generated titles
-  - Default provider examples now use a neutral DeepSeek sample instead of the old third-party domain
+- 新增第一阶段中英文界面支持：
+  - 英语现已在所有正式管理页面中可用
+  - 登录页面现在拥有自己的语言选择器
+  - 前端外壳跟随管理后台的语言选择
+- 新增 `Smart Model Failover`，用于任务：
+  - 任务现在可以使用 `Fixed Model` 或 `Smart Failover`
+  - 当主模型失败时，GEOFlow 会按优先级自动尝试下一个可用的聊天模型
+- 改进了服务提供方端点处理：
+  - 支持 OpenAI、DeepSeek、MiniMax、智谱 GLM 和火山引擎 Ark 的版本化聊天与嵌入端点
+  - 模型设置现在接受基础 URL 或完整端点
+- 改进了任务执行行为：
+  - `task-execute.php` 现在将执行加入队列，而不是同步阻塞页面
+  - `published_count` 现在已针对直接发布的任务正确更新
+- 新增前端主题预览和启用：
+  - 用于安全的预览优先检查的动态 `preview/<theme-id>` 路由
+  - `themes/<theme-id>` 下的主题包支持
+  - Site Settings 中管理后台侧的主题预览和激活
+  - 示例主题 `qiaomu-editorial-20260418` 现已包含在公共仓库中
+  - 主页、分类和归档卡片摘要现在会在渲染前剥离 Markdown 残留内容
+- 新增管理员首次登录欢迎面板：
+  - 首次管理员登录后自动显示
+  - 重新设计为单封欢迎信，而不是多卡片模块布局
+  - 默认为中文，面板内提供英文切换
+  - 页脚现在包含一个 `Project Intro` 条目，可重新打开面板
+  - 实现说明记录在 `project/ADMIN_WELCOME_en.md` 中
+- 新增配套的 `geoflow-template` 技能条目：
+  - 将参考 URL 映射为兼容 GEOFlow 的主题包
+  - 输出 `tokens.json`、`mapping.json` 和预览优先的主题方案
+- 升级了默认 GEO 提示词模板：
+  - 长文模板现在涵盖文章生成、排名文章、关键词和描述
+  - 模板已与 GeoFlow 的变量规则保持一致
+- 修复了多个管理员可用性问题：
+  - PostgreSQL 时区漂移
+  - 生成的图片路径中缺少前导 `/`
+  - 保存 AI 生成的标题时出现 PostgreSQL 布尔值写入错误
+  - 默认提供方示例现在使用中性的 DeepSeek 示例，而不是旧的第三方域名

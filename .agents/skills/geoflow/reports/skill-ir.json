@@ -2,15 +2,15 @@
   "schema_version": "2.0.0",
   "name": "geoflow",
   "title": "GEOFlow",
-  "job_to_be_done": "Develop or operate GEOFlow across Laravel backend/admin/API/CLI, the default site, themes, leads, and GeoFlow Agent channel sites. Use for code changes, running-system operations, frontend or template edits, channel capability sync, legacy PHP migration, or retired yao-geoflow-cli, yao-geoflow-design, and yao-geoflow-template IDs. Discover real routes first. Excludes unrelated work, database shortcuts, invented routes, auth bypass, secret exposure, raw copying, and unapproved live or destructive actions.",
+  "job_to_be_done": "跨 Laravel 后端/后台管理/API/CLI、默认站点、主题、线索和 GeoFlow Agent 渠道站点开发或运营 GEOFlow。用于代码变更、运行中系统操作、前端或模板编辑、渠道能力同步、旧版 PHP 迁移，或已停用的 yao-geoflow-cli、yao-geoflow-design 和 yao-geoflow-template ID。先发现真实路由。不包含无关工作、数据库捷径、虚构路由、绕过身份验证、泄露机密、直接复制以及未经批准的线上或破坏性操作。",
   "trigger_surface": {
-    "description": "Develop or operate GEOFlow across Laravel backend/admin/API/CLI, the default site, themes, leads, and GeoFlow Agent channel sites. Use for code changes, running-system operations, frontend or template edits, channel capability sync, legacy PHP migration, or retired yao-geoflow-cli, yao-geoflow-design, and yao-geoflow-template IDs. Discover real routes first. Excludes unrelated work, database shortcuts, invented routes, auth bypass, secret exposure, raw copying, and unapproved live or destructive actions.",
+    "description": "跨 Laravel 后端/后台管理/API/CLI、默认站点、主题、线索和 GeoFlow Agent 渠道站点开发或运营 GEOFlow。用于代码变更、运行中系统操作、前端或模板编辑、渠道能力同步、旧版 PHP 迁移，或已停用的 yao-geoflow-cli、yao-geoflow-design 和 yao-geoflow-template ID。先发现真实路由。不包含无关工作、数据库捷径、虚构路由、绕过身份验证、泄露机密、直接复制以及未经批准的线上或破坏性操作。",
     "should_trigger": [
       "给 GEOFlow 后台新增一个 AI 来源管理模块，包含迁移、模型、控制器、页面和测试。",
       "修改 GEOFlow API v1，让任务接口支持新的发布策略，并补齐权限和回归测试。",
       "修复 GEOFlow worker 重试后重复发布的问题，先找根因再改服务和测试。",
       "在当前 GEOFlow 增加一个可配置的后台页面，但要继续支持自定义后台路径。",
-      "用 geoflow CLI 创建任务、入队，检查 job，然后审核并发布文章。",
+      "使用 geoflow CLI 创建任务、入队，检查 job，然后审核并发布文章。",
       "Laravel 版 GEOFlow 没有本地 CLI，用 API v1 创建关键词库和标题条目。",
       "登录 GEOFlow 后台导出今天的线索，并把个人信息做脱敏汇总。",
       "进入 GEOFlow 系统更新中心生成计划和备份，先保留在 apply 前。",
@@ -41,28 +41,28 @@
   },
   "workflow": {
     "steps": [
-      "Discover the current GEOFlow workspace, routes, commands, contracts, or authenticated runtime surface.",
-      "Select development, operations, public_frontend, channel_frontend, or legacy_migration as the active mode.",
-      "Implement or operate through the supported surface while preserving authorization, data, theme, and channel contracts.",
-      "Run focused tests, preview or readback checks, and record every unverified runtime layer.",
-      "Finalize only the user-approved target and report evidence, rollback boundary, final state, and remaining risks."
+      "发现当前 GEOFlow 工作区、路由、命令、契约或已认证的运行时接口。",
+      "选择 development、operations、public_frontend、channel_frontend 或 legacy_migration 作为活动模式。",
+      "在保留授权、数据、主题和渠道契约的同时，通过受支持的接口面实现或操作。",
+      "运行聚焦测试、预览或回读检查，并记录每个未验证的运行时层。",
+      "仅最终确定用户批准的目标，并报告证据、回滚边界、最终状态和剩余风险。"
     ],
     "decision_points": [
-      "Choose source-work discovery or running-instance preflight from the target supplied by the user.",
-      "Split mixed requests into ordered mode phases when implementation crosses into authenticated operation.",
-      "Use an isolated theme preview or reviewed homepage payload before live activation or replacement.",
-      "Compare default-site, packaged, cached, and live channel capabilities before sync.",
-      "Stop for exact target approval before destructive, live, activation, publication, update-apply, or broad channel actions."
+      "从用户提供的目标中选择源工作发现或运行实例预检。",
+      "当实现涉及需要认证的操作时，将混合请求拆分为有序的模式阶段。",
+      "在实时激活或替换之前，使用隔离的主题预览或经过审查的首页负载。",
+      "在同步前比较默认站点、打包、缓存和实时频道的能力。",
+      "在执行破坏性、实时、激活、发布、应用更新或广泛渠道操作之前，停下来等待确切目标批准。"
     ],
     "failure_modes": [
-      "Use of a remembered route or command without current discovery evidence.",
-      "Treating an unavailable API or admin capability as supported.",
-      "Crossing from code or design work into runtime mutation without an operations phase.",
-      "Editing an active theme in place when preview staging is available.",
-      "Syncing a module that the target package does not support.",
-      "Adding fields or modules without migrations, validation, localization, permissions, or tests.",
-      "Exposing secrets, credentials, or personal lead data in output.",
-      "Claiming completion without tests, rendering, persisted readback, or capability evidence."
+      "在没有当前发现证据的情况下使用记忆中的路由或命令。",
+      "将不可用的 API 或管理员功能视为受支持。",
+      "从代码或设计工作直接跨越到运行时变更，而没有运维阶段。",
+      "当预览暂存可用时，就地编辑活动主题。",
+      "同步目标包不支持的模块。",
+      "在没有迁移、验证、本地化、权限或测试的情况下添加字段或模块。",
+      "在输出中暴露机密、凭据或个人潜在客户数据。",
+      "在没有测试、渲染、持久化回读或能力证据的情况下声称完成。"
     ]
   },
   "resources": {

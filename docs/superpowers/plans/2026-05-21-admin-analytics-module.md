@@ -1,71 +1,71 @@
-# Admin Analytics Module Implementation Plan
+# 管理端分析模块实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **面向智能体工作者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐项实现此计划任务。步骤使用复选框（`- [ ]`）语法进行跟踪。
 
-**Goal:** Add a new admin “数据分析” section after “首页” that centralizes content operations analytics and prepares a structured log analytics pipeline for website, channel-site, and AI crawler traffic.
+**目标：** 在“首页”之后新增管理后台“数据分析”部分，集中内容运营分析，并为网站、渠道站点和 AI 爬虫流量准备结构化日志分析流水线。
 
-**Architecture:** Keep the existing dashboard as the operational entry page and move deeper analytical views into a new `Admin\AnalyticsController`. Reuse existing dashboard query logic through focused services, then add a separate analytics log ingestion layer with normalized events and daily aggregates. The first runnable slice should show database-backed content analytics immediately, while log parsing lands behind clear empty states and import jobs.
+**架构：** 保留现有仪表盘作为运营入口页面，并将更深入的分析视图移入新的 `Admin\AnalyticsController`。通过聚焦的服务复用现有仪表盘查询逻辑，然后新增独立的分析日志摄取层，包含规范化事件和每日聚合。第一个可运行切片应立即展示由数据库支持的内容分析，而日志解析则在清晰的空状态和导入任务之后落地。
 
-**Tech Stack:** Laravel 12, Blade, Tailwind utility classes already used by the admin, PostgreSQL, Redis queue/scheduler, PHPUnit feature/unit tests, Laravel migrations and Eloquent models.
-
----
-
-## Scope
-
-### Included
-
-- Add top navigation item `数据分析` immediately after `首页`.
-- Add `/admin/analytics` page with date, site/channel, content, traffic-type, and log-source filters.
-- Reuse current dashboard metrics for content, task, material, AI, URL import, distribution, and popular article analytics.
-- Add content operation charts: publication trend, task status trend, content funnel, AI/API usage summary, distribution status, top content.
-- Add log analytics design and first implementation shell: log source registry, import records, crawler classifier, parsed event storage, aggregate tables, and empty states.
-- Support future Nginx/Apache daily access log parsing and target channel-site log sync.
-
-### Deferred Beyond First Runnable Slice
-
-- Full remote channel log upload from generated target-site package can be implemented after the local log import path is stable.
-- Geographic analysis should not be included until an IP geolocation database or provider is explicitly configured.
-- Real-time streaming charts are not part of the first version; daily and hourly aggregation is enough.
+**技术栈：** Laravel 12、Blade、管理后台已使用的 Tailwind 工具类、PostgreSQL、Redis 队列/调度器、PHPUnit 功能/单元测试、Laravel 迁移和 Eloquent 模型。
 
 ---
 
-## File Map
+## 范围
 
-### Routes and Navigation
+### 已包含
 
-- Modify `routes/web.php`
-  - Add `use App\Http\Controllers\Admin\AnalyticsController;`
-  - Add `Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics');`
-- Modify `resources/views/admin/partials/header.blade.php`
-  - Insert `analytics` menu after `dashboard`.
-  - Add analytics route names to `$subMap`.
-- Modify `lang/zh_CN/admin.php`
-  - Add `admin.nav.analytics`.
-  - Add `admin.analytics.*` copy.
-- Modify `lang/en/admin.php`
-  - Add English fallback copy for tests and language switching.
+- 在 `首页` 之后立即添加顶部导航项 `数据分析`。
+- 添加 `/admin/analytics` 页面，包含日期、站点/渠道、内容、流量类型和日志来源筛选器。
+- 复用当前仪表板指标用于内容、任务、素材、AI、URL 导入、分发和热门文章分析。
+- 添加内容运营图表：发布趋势、任务状态趋势、内容漏斗、AI/API 使用摘要、分发状态、热门内容。
+- 添加日志分析设计与首个实现外壳：日志来源注册表、导入记录、爬虫分类器、解析事件存储、聚合表和空状态。
+- 支持未来解析 Nginx/Apache 每日访问日志，并同步目标渠道站点日志。
 
-### Controllers and Services
+### 推迟到首个可运行切片之后
 
-- Create `app/Http/Controllers/Admin/AnalyticsController.php`
-  - Owns request filters and page rendering.
-  - Does not contain raw query logic.
-- Create `app/Services/Admin/AdminDashboardMetricsService.php`
-  - Extract reusable logic currently private in `DashboardController`.
-  - Provides existing dashboard stats and chart series.
-- Modify `app/Http/Controllers/Admin/DashboardController.php`
-  - Delegate metrics to `AdminDashboardMetricsService`.
-  - Keep dashboard behavior unchanged.
-- Create `app/Services/Admin/Analytics/AnalyticsFilter.php`
-  - Normalizes `date_from`, `date_to`, `channel_id`, `task_id`, `category_id`, `article_id`, `traffic_type`, and `log_source`.
-- Create `app/Services/Admin/Analytics/AnalyticsOverviewService.php`
-  - Builds content operation summaries and chart datasets.
-- Create `app/Services/Admin/Analytics/AnalyticsLogQueryService.php`
-  - Builds traffic summaries from parsed log aggregates.
+- 在本地日志导入路径稳定后，可以实现从生成的目标站点包进行完整的远程渠道日志上传。
+- 在显式配置 IP 地理位置数据库或提供商之前，不应包含地理分析。
+- 实时流式图表不属于第一版；按日和按小时聚合已足够。
 
-### Log Analytics Data Layer
+---
 
-- Create migration `database/migrations/2026_05_21_000000_create_analytics_tables.php`
+## 文件映射
+
+### 路由和导航
+
+- 修改 `routes/web.php`
+  - 添加 `use App\Http\Controllers\Admin\AnalyticsController;`
+  - 添加 `Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics');`
+- 修改 `resources/views/admin/partials/header.blade.php`
+  - 在 `dashboard` 之后插入 `analytics` 菜单。
+  - 将分析路由名称添加到 `$subMap`。
+- 修改 `lang/zh_CN/admin.php`
+  - 添加 `admin.nav.analytics`。
+  - 添加 `admin.analytics.*` 文案。
+- 修改 `lang/en/admin.php`
+  - 为测试和语言切换添加英语回退文案。
+
+### 控制器与服务
+
+- 创建 `app/Http/Controllers/Admin/AnalyticsController.php`
+  - 负责请求过滤器和页面渲染。
+  - 不包含原始查询逻辑。
+- 创建 `app/Services/Admin/AdminDashboardMetricsService.php`
+  - 提取当前在 `DashboardController` 中私有的可复用逻辑。
+  - 提供现有的仪表盘统计信息和图表系列。
+- 修改 `app/Http/Controllers/Admin/DashboardController.php`
+  - 将指标委托给 `AdminDashboardMetricsService`。
+  - 保持仪表盘行为不变。
+- 创建 `app/Services/Admin/Analytics/AnalyticsFilter.php`
+  - 规范化 `date_from`、`date_to`、`channel_id`、`task_id`、`category_id`、`article_id`、`traffic_type` 和 `log_source`。
+- 创建 `app/Services/Admin/Analytics/AnalyticsOverviewService.php`
+  - 构建内容操作摘要和图表数据集。
+- 创建 `app/Services/Admin/Analytics/AnalyticsLogQueryService.php`
+  - 根据解析后的日志聚合构建流量摘要。
+
+### 日志分析数据层
+
+- 创建迁移 `database/migrations/2026_05_21_000000_create_analytics_tables.php`
   - `analytics_log_sources`
   - `analytics_log_imports`
   - `analytics_log_events`
@@ -73,7 +73,7 @@
   - `analytics_path_daily_metrics`
   - `analytics_article_daily_metrics`
   - `analytics_bot_daily_metrics`
-- Create models:
+- 创建模型：
   - `app/Models/AnalyticsLogSource.php`
   - `app/Models/AnalyticsLogImport.php`
   - `app/Models/AnalyticsLogEvent.php`
@@ -82,24 +82,24 @@
   - `app/Models/AnalyticsArticleDailyMetric.php`
   - `app/Models/AnalyticsBotDailyMetric.php`
 
-### Log Parsing and Import
+### 日志解析与导入
 
-- Create `app/Services/Admin/Analytics/AccessLogParser.php`
-  - Parses Nginx/Apache common and combined log lines.
-- Create `app/Services/Admin/Analytics/CrawlerClassifier.php`
-  - Classifies user agents into `human`, `search_bot`, `ai_bot`, `other_bot`, and `unknown`.
-- Create `app/Services/Admin/Analytics/AnalyticsLogImporter.php`
-  - Imports lines, stores normalized events, and updates aggregate tables.
-- Create `app/Console/Commands/GeoFlowImportAnalyticsLogsCommand.php`
-  - Command: `php artisan geoflow:analytics-import-logs --source=local --date=2026-05-21`
-- Modify `routes/console.php` or scheduler registration if the project uses scheduled commands there.
+- 创建 `app/Services/Admin/Analytics/AccessLogParser.php`
+  - 解析 Nginx/Apache 的 common 和 combined 日志行。
+- 创建 `app/Services/Admin/Analytics/CrawlerClassifier.php`
+  - 将用户代理分类为 `human`、`search_bot`、`ai_bot`、`other_bot` 和 `unknown`。
+- 创建 `app/Services/Admin/Analytics/AnalyticsLogImporter.php`
+  - 导入行数据，存储规范化事件，并更新聚合表。
+- 创建 `app/Console/Commands/GeoFlowImportAnalyticsLogsCommand.php`
+  - 命令：`php artisan geoflow:analytics-import-logs --source=local --date=2026-05-21`
+- 修改 `routes/console.php`，或修改调度器注册（如果项目在那里使用定时命令）。
 
-### Views
+### 视图
 
-- Create `resources/views/admin/analytics/index.blade.php`
-  - Uses existing admin page shell and card styles.
-  - Includes filter form, KPI cards, content analytics section, log analytics section, and empty states.
-- Create partials:
+- 创建 `resources/views/admin/analytics/index.blade.php`
+  - 使用现有的管理后台页面外壳和卡片样式。
+  - 包含筛选表单、KPI 卡片、内容分析部分、日志分析部分和空状态。
+- 创建局部模板：
   - `resources/views/admin/analytics/_filters.blade.php`
   - `resources/views/admin/analytics/_kpis.blade.php`
   - `resources/views/admin/analytics/_content-section.blade.php`
@@ -108,78 +108,78 @@
   - `resources/views/admin/analytics/_bar-chart.blade.php`
   - `resources/views/admin/analytics/_funnel.blade.php`
 
-### Tests
+### 测试
 
-- Create `tests/Feature/AdminAnalyticsPageTest.php`
-- Create `tests/Unit/AnalyticsFilterTest.php`
-- Create `tests/Unit/AccessLogParserTest.php`
-- Create `tests/Unit/CrawlerClassifierTest.php`
-- Create `tests/Unit/AnalyticsLogImporterTest.php`
-- Update `tests/Feature/AdminDashboardQuickStartTest.php` if dashboard metrics extraction changes rendered strings.
-
----
-
-## UI Design
-
-### Page Layout
-
-1. Header row
-   - Title: `数据分析`
-   - Subtitle: `按日期、站点、内容和日志来源查看内容生产与访问趋势`
-   - Right side: last updated time and refresh button
-
-2. Filter band
-   - Date preset buttons: 今天、昨天、近 7 天、近 30 天、近 90 天
-   - Custom date range inputs
-   - Channel selector
-   - Task/category/article selectors
-   - Traffic type selector
-   - Log source selector
-
-3. KPI grid
-   - 8 cards, responsive 4 columns desktop, 2 columns tablet, 1 column mobile
-   - Short labels never wrap; descriptions can wrap
-
-4. Content analytics section
-   - Two-column chart grid on desktop
-   - Tables below charts for top content and distribution status
-
-5. Log analytics section
-   - Empty state before logs are imported
-   - After import: traffic trend, AI crawler breakdown, top pages, status code distribution, top referrers
-
-### Visual Constraints
-
-- Follow current admin UI: white cards, light gray background, blue primary actions, restrained borders.
-- Use Lucide icons already loaded by the admin.
-- Do not introduce a new JS chart dependency in the first slice. Use Blade-generated SVG charts and tables to match the current dashboard.
-- Keep operational data dense. Avoid marketing-style hero panels.
-- Long titles and URLs may wrap; short numeric/status fields should use `whitespace-nowrap`.
+- 创建 `tests/Feature/AdminAnalyticsPageTest.php`
+- 创建 `tests/Unit/AnalyticsFilterTest.php`
+- 创建 `tests/Unit/AccessLogParserTest.php`
+- 创建 `tests/Unit/CrawlerClassifierTest.php`
+- 创建 `tests/Unit/AnalyticsLogImporterTest.php`
+- 如果仪表盘指标提取会改变渲染字符串，请更新 `tests/Feature/AdminDashboardQuickStartTest.php`。
 
 ---
 
-## Data Model
+## UI 设计
+
+### 页面布局
+
+1. 表头行
+   - 标题：`数据分析`
+   - 副标题：`按日期、站点、内容和日志来源查看内容生产与访问趋势`
+   - 右侧：最后更新时间和刷新按钮
+
+2. 筛选栏
+   - 日期预设按钮：今天、昨天、近 7 天、近 30 天、近 90 天
+   - 自定义日期范围输入
+   - Channel 选择器
+   - 任务/分类/文章选择器
+   - 流量类型选择器
+   - 日志来源选择器
+
+3. KPI 网格
+   - 8 张卡片，响应式：桌面 4 列、平板 2 列、移动端 1 列
+   - 短标签从不换行；描述可以换行
+
+4. 内容分析部分
+   - 桌面端双列图表网格
+   - 热门内容和分发状态图表下方的表格
+
+5. 日志分析部分
+   - 导入日志前的空状态
+   - 导入后：流量趋势、AI 爬虫细分、热门页面、状态码分布、热门来源
+
+### 视觉约束
+
+- 遵循当前管理后台 UI：白色卡片、浅灰色背景、蓝色主操作、克制的边框。
+- 使用管理后台已加载的 Lucide 图标。
+- 不要在第一个切片中引入新的 JS 图表依赖项。使用 Blade 生成的 SVG 图表和表格来匹配当前仪表盘。
+- 保持运营数据密集展示。避免营销风格的主视觉面板。
+- 长标题和 URL 可以换行；短数字/状态字段应使用 `whitespace-nowrap`。
+
+---
+
+## 数据模型
 
 ### `analytics_log_sources`
 
-Purpose: defines where logs come from.
+用途：定义日志来源。
 
-Columns:
+列：
 
 - `id`
 - `name`
 - `source_type`: `local_file`, `uploaded_file`, `channel_agent`
-- `channel_id`: nullable FK to `distribution_channels`
-- `path_pattern`: nullable string, e.g. `/www/wwwlogs/example.com.log`
+- `channel_id`：指向 `distribution_channels` 的可空外键
+- `path_pattern`：可为空的字符串，例如 `/www/wwwlogs/example.com.log`
 - `status`: `active`, `paused`
 - `last_imported_at`
 - `created_at`, `updated_at`
 
 ### `analytics_log_imports`
 
-Purpose: records each import run.
+用途：记录每次导入运行。
 
-Columns:
+列：
 
 - `id`
 - `source_id`
@@ -196,9 +196,9 @@ Columns:
 
 ### `analytics_log_events`
 
-Purpose: stores normalized parsed requests for drill-down and re-aggregation.
+用途：存储规范化后的解析请求，用于下钻和重新聚合。
 
-Columns:
+列：
 
 - `id`
 - `source_id`
@@ -220,7 +220,7 @@ Columns:
 - `referer_host`
 - `created_at`
 
-Indexes:
+索引：
 
 - `(occurred_at)`
 - `(channel_id, occurred_at)`
@@ -229,14 +229,14 @@ Indexes:
 - `(crawler_family, occurred_at)`
 - `(path, occurred_at)`
 
-### Aggregate Tables
+### 聚合表
 
-- `analytics_daily_metrics`: one row per date/channel/source.
-- `analytics_path_daily_metrics`: one row per date/path/channel/source.
-- `analytics_article_daily_metrics`: one row per date/article/channel/source.
-- `analytics_bot_daily_metrics`: one row per date/crawler_family/channel/source.
+- `analytics_daily_metrics`：每个日期/渠道/来源一行。
+- `analytics_path_daily_metrics`：每个日期/路径/渠道/来源一行。
+- `analytics_article_daily_metrics`：每个日期/文章/渠道/来源一行。
+- `analytics_bot_daily_metrics`：每个日期/crawler_family/渠道/来源一行。
 
-Aggregates should store:
+聚合应存储：
 
 - `pv`
 - `unique_ip_count`
@@ -249,97 +249,97 @@ Aggregates should store:
 
 ---
 
-## Task Plan
+## 任务计划
 
-### Task 1: Add Analytics Navigation and Empty Page
+### 任务 1：添加分析导航和空页面
 
-**Files:**
+**文件：**
 
-- Create: `app/Http/Controllers/Admin/AnalyticsController.php`
-- Create: `resources/views/admin/analytics/index.blade.php`
-- Modify: `routes/web.php`
-- Modify: `resources/views/admin/partials/header.blade.php`
-- Modify: `lang/zh_CN/admin.php`
-- Modify: `lang/en/admin.php`
-- Test: `tests/Feature/AdminAnalyticsPageTest.php`
+- 创建：`app/Http/Controllers/Admin/AnalyticsController.php`
+- 创建：`resources/views/admin/analytics/index.blade.php`
+- 修改：`routes/web.php`
+- 修改：`resources/views/admin/partials/header.blade.php`
+- 修改：`lang/zh_CN/admin.php`
+- 修改：`lang/en/admin.php`
+- 测试: `tests/Feature/AdminAnalyticsPageTest.php`
 
-- [ ] Step 1: Write feature test for route and nav.
+- [ ] 第 1 步：为路由和导航编写功能测试。
 
-Test expectations:
+测试预期：
 
-- `route('admin.analytics')` returns 200 for authenticated admin.
-- Page contains `数据分析`.
-- Header menu contains 首页 before 数据分析.
-- Data analysis menu is active on `/admin/analytics`.
+- `route('admin.analytics')` 对已认证管理员返回 200。
+- 页面包含 `数据分析`。
+- 顶部菜单中，首页位于数据分析之前。
+- 数据分析菜单在 `/admin/analytics` 上处于活动状态。
 
-Run:
+运行：
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminAnalyticsPageTest.php --filter=analytics_page
 ```
 
-Expected before implementation: route not defined or page not found.
+实现前的预期：路由未定义或页面未找到。
 
-- [ ] Step 2: Add route and controller shell.
+- [ ] 第 2 步：添加路由和控制器骨架。
 
-Controller returns:
+控制器返回：
 
 - `pageTitle`: `__('admin.analytics.page_title')`
 - `activeMenu`: `analytics`
-- `filters`: default normalized values
-- empty arrays for `kpis`, `content`, and `logs`
+- `filters`：默认规范化值
+- `kpis`、`content` 和 `logs` 的空数组
 
-- [ ] Step 3: Add Blade page shell.
+- [ ] 第 3 步：添加 Blade 页面骨架。
 
-Use existing admin layout:
+使用现有管理后台布局：
 
 - `@extends('admin.layouts.app')`
-- header row
-- filter section with default date and source controls
-- KPI empty cards
-- content analytics empty state
-- log analytics empty state
+- 页眉行
+- 带有默认日期和来源控件的筛选区域
+- KPI 空白卡片
+- 内容分析空状态
+- 日志分析空状态
 
-- [ ] Step 4: Add menu item.
+- [ ] 第 4 步：添加菜单项。
 
-In `$menu`, insert:
+在 `$menu` 中，插入：
 
 ```php
 'analytics' => ['route' => 'admin.analytics', 'name' => __('admin.nav.analytics')],
 ```
 
-immediately after `dashboard`.
+紧接在 `dashboard` 之后。
 
-- [ ] Step 5: Run test and targeted header tests.
+- [ ] 第 5 步：运行测试和针对性标头测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminAnalyticsPageTest.php tests/Feature/AdminHeaderNotificationTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 2: Extract Reusable Dashboard Metrics
+### 任务 2：提取可复用的仪表盘指标
 
-**Files:**
+**文件：**
 
-- Create: `app/Services/Admin/AdminDashboardMetricsService.php`
-- Modify: `app/Http/Controllers/Admin/DashboardController.php`
-- Test: `tests/Feature/AdminDashboardQuickStartTest.php`
+- 创建：`app/Services/Admin/AdminDashboardMetricsService.php`
+- 修改：`app/Http/Controllers/Admin/DashboardController.php`
+- 测试: `tests/Feature/AdminDashboardQuickStartTest.php`
 
-- [ ] Step 1: Write regression test for dashboard rendering.
+- [ ] 第 1 步：为仪表盘渲染编写回归测试。
 
-Use existing `AdminDashboardQuickStartTest` and add assertions for:
+使用现有的 `AdminDashboardQuickStartTest`，并为以下内容添加断言：
 
-- total articles card
-- active tasks card
-- popular articles section
-- content funnel section
+- 文章总数卡片
+- 活动任务卡片
+- 热门文章区块
+- 内容漏斗区块
 
-- [ ] Step 2: Move private query methods from `DashboardController` into `AdminDashboardMetricsService`.
+- [ ] 第 2 步：将私有查询方法从 `DashboardController` 移到 `AdminDashboardMetricsService`。
 
-Service public methods:
+服务公共方法：
 
 - `stats(): array`
 - `todayStats(): array`
@@ -357,44 +357,44 @@ Service public methods:
 - `popularArticles(int $limit = 5): array`
 - `todoItems(array $stats, array $materialHealth, array $aiHealth, array $urlImportHealth): array`
 
-- [ ] Step 3: Update `DashboardController` to call the service.
+- [ ] 第 3 步：更新 `DashboardController` 以调用该服务。
 
-The view payload must stay the same so the dashboard UI does not change.
+视图负载必须保持不变，以便仪表板 UI 不发生改变。
 
-- [ ] Step 4: Run dashboard tests.
+- [ ] 第 4 步：运行仪表板测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminDashboardQuickStartTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 3: Add Analytics Filters
+### 任务 3：添加分析过滤器
 
-**Files:**
+**文件：**
 
-- Create: `app/Services/Admin/Analytics/AnalyticsFilter.php`
-- Modify: `app/Http/Controllers/Admin/AnalyticsController.php`
-- Modify: `resources/views/admin/analytics/_filters.blade.php`
-- Modify: `resources/views/admin/analytics/index.blade.php`
-- Test: `tests/Unit/AnalyticsFilterTest.php`
+- 创建：`app/Services/Admin/Analytics/AnalyticsFilter.php`
+- 修改：`app/Http/Controllers/Admin/AnalyticsController.php`
+- 修改：`resources/views/admin/analytics/_filters.blade.php`
+- 修改：`resources/views/admin/analytics/index.blade.php`
+- 测试: `tests/Unit/AnalyticsFilterTest.php`
 
-- [ ] Step 1: Write filter normalization unit tests.
+- [ ] 第 1 步：编写筛选条件归一化单元测试。
 
-Cases:
+案例：
 
-- no input defaults to last 7 days
-- `preset=today` sets both dates to current date
-- `preset=30d` sets `date_from` to today minus 29 days and `date_to` to today
-- invalid date falls back to default range
-- `date_from` later than `date_to` swaps or clamps to a valid range
-- channel/task/category/article IDs are integers or null
+- 无输入时默认最近 7 天
+- `preset=today` 将两个日期都设置为当前日期
+- `preset=30d` 将 `date_from` 设置为今天往前 29 天，并将 `date_to` 设置为今天
+- 无效日期回退到默认范围
+- `date_from` 晚于 `date_to` 时会交换或钳制到有效范围
+- channel/task/category/article ID 为整数或 null
 
-- [ ] Step 2: Implement immutable filter value object.
+- [ ] 第 2 步：实现不可变的筛选值对象。
 
-Properties:
+属性：
 
 - `dateFrom`
 - `dateTo`
@@ -406,42 +406,42 @@ Properties:
 - `logSource`
 - `preset`
 
-- [ ] Step 3: Render filter form.
+- [ ] 第 3 步：渲染筛选表单。
 
-Use `GET` form so filtered URLs are shareable.
+使用 `GET` 表单，以便筛选后的 URL 可共享。
 
-- [ ] Step 4: Run filter tests.
+- [ ] 第 4 步：运行筛选器测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Unit/AnalyticsFilterTest.php tests/Feature/AdminAnalyticsPageTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 4: Content Analytics Query Service
+### 任务 4：内容分析查询服务
 
-**Files:**
+**文件：**
 
-- Create: `app/Services/Admin/Analytics/AnalyticsOverviewService.php`
-- Modify: `app/Http/Controllers/Admin/AnalyticsController.php`
-- Modify: `resources/views/admin/analytics/_kpis.blade.php`
-- Modify: `resources/views/admin/analytics/_content-section.blade.php`
-- Test: `tests/Feature/AdminAnalyticsPageTest.php`
+- 创建：`app/Services/Admin/Analytics/AnalyticsOverviewService.php`
+- 修改：`app/Http/Controllers/Admin/AnalyticsController.php`
+- 修改：`resources/views/admin/analytics/_kpis.blade.php`
+- 修改：`resources/views/admin/analytics/_content-section.blade.php`
+- 测试: `tests/Feature/AdminAnalyticsPageTest.php`
 
-- [ ] Step 1: Write feature test with seeded articles, tasks, task runs, AI models, and distributions.
+- [ ] 第 1 步：使用已填充的文章、任务、任务运行、AI 模型和分发数据编写功能测试。
 
-Assertions:
+断言：
 
-- KPI cards show total articles, published articles, running tasks, failed jobs, AI calls, distribution failures.
-- Publication trend includes seeded dates.
-- Top content table includes seeded article title.
-- Distribution status includes synced and failed counts.
+- KPI 卡片显示文章总数、已发布文章数、运行中任务数、失败作业数、AI 调用次数、分发失败次数。
+- 发布趋势包含预置日期。
+- 热门内容表包含种子数据中的文章标题。
+- 分发状态包括已同步和失败计数。
 
-- [ ] Step 2: Implement `AnalyticsOverviewService`.
+- [ ] 第2步：实现 `AnalyticsOverviewService`。
 
-Methods:
+方法：
 
 - `kpis(AnalyticsFilter $filter): array`
 - `publicationTrend(AnalyticsFilter $filter): array`
@@ -451,9 +451,9 @@ Methods:
 - `topContent(AnalyticsFilter $filter, int $limit = 10): array`
 - `aiUsageSummary(AnalyticsFilter $filter): array`
 
-- [ ] Step 3: Wire service into controller.
+- [ ] 第 3 步：将服务接入控制器。
 
-Controller passes:
+控制器传递：
 
 - `kpis`
 - `publicationTrend`
@@ -463,103 +463,103 @@ Controller passes:
 - `topContent`
 - `aiUsageSummary`
 
-- [ ] Step 4: Render content analytics section.
+- [ ] 第 4 步：渲染内容分析部分。
 
-Charts:
+图表：
 
-- publication trend line chart
-- task status stacked bars
-- content funnel horizontal bars
-- distribution status cards
-- top content table
+- 发布趋势折线图
+- 任务状态堆叠条形图
+- 内容漏斗横向条形图
+- 分发状态卡片
+- 热门内容表格
 
-- [ ] Step 5: Run feature tests.
+- [ ] 第 5 步：运行功能测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminAnalyticsPageTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 5: Analytics Log Schema and Models
+### 任务 5：分析日志 Schema 与模型
 
-**Files:**
+**文件：**
 
-- Create: `database/migrations/2026_05_21_000000_create_analytics_tables.php`
-- Create: `app/Models/AnalyticsLogSource.php`
-- Create: `app/Models/AnalyticsLogImport.php`
-- Create: `app/Models/AnalyticsLogEvent.php`
-- Create: `app/Models/AnalyticsDailyMetric.php`
-- Create: `app/Models/AnalyticsPathDailyMetric.php`
-- Create: `app/Models/AnalyticsArticleDailyMetric.php`
-- Create: `app/Models/AnalyticsBotDailyMetric.php`
-- Test: `tests/Unit/AnalyticsSchemaMigrationTest.php`
+- 创建：`database/migrations/2026_05_21_000000_create_analytics_tables.php`
+- 创建：`app/Models/AnalyticsLogSource.php`
+- 创建：`app/Models/AnalyticsLogImport.php`
+- 创建：`app/Models/AnalyticsLogEvent.php`
+- 创建：`app/Models/AnalyticsDailyMetric.php`
+- 创建：`app/Models/AnalyticsPathDailyMetric.php`
+- 创建：`app/Models/AnalyticsArticleDailyMetric.php`
+- 创建：`app/Models/AnalyticsBotDailyMetric.php`
+- 测试: `tests/Unit/AnalyticsSchemaMigrationTest.php`
 
-- [ ] Step 1: Write schema migration test.
+- [ ] 第 1 步：编写模式（schema）迁移测试。
 
-Assertions:
+断言：
 
-- all analytics tables exist
-- required columns exist
-- indexes exist for date, channel, article, traffic type, crawler family
+- 所有分析表均存在
+- 必需列存在
+- 存在针对日期、渠道、文章、流量类型、爬虫系列的索引
 
-- [ ] Step 2: Create migration.
+- [ ] 第 2 步：创建迁移。
 
-Use guarded `Schema::hasTable` checks to keep migrations safe across local iterations.
+使用带保护的 `Schema::hasTable` 检查，确保迁移在本地迭代中保持安全。
 
-- [ ] Step 3: Create Eloquent models.
+- [ ] 第 3 步：创建 Eloquent 模型。
 
-Each model should define:
+每个模型都应定义：
 
 - `$fillable`
 - `$casts`
-- relationships where applicable
+- 适用情况下的关联关系
 
-- [ ] Step 4: Run schema tests.
+- [ ] 第 4 步：运行架构测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Unit/AnalyticsSchemaMigrationTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 6: Access Log Parser and Crawler Classifier
+### 任务 6：访问日志解析器和爬虫分类器
 
-**Files:**
+**文件：**
 
-- Create: `app/Services/Admin/Analytics/AccessLogParser.php`
-- Create: `app/Services/Admin/Analytics/CrawlerClassifier.php`
-- Test: `tests/Unit/AccessLogParserTest.php`
-- Test: `tests/Unit/CrawlerClassifierTest.php`
+- 创建：`app/Services/Admin/Analytics/AccessLogParser.php`
+- 创建：`app/Services/Admin/Analytics/CrawlerClassifier.php`
+- 测试: `tests/Unit/AccessLogParserTest.php`
+- 测试: `tests/Unit/CrawlerClassifierTest.php`
 
-- [ ] Step 1: Write parser tests.
+- [ ] 第 1 步：编写解析器测试。
 
-Supported examples:
+支持的示例：
 
 ```text
 127.0.0.1 - - [21/May/2026:10:15:30 +0800] "GET /article/demo HTTP/1.1" 200 1234 "-" "Mozilla/5.0"
 127.0.0.1 - - [21/May/2026:10:15:31 +0800] "GET /geoflow/article/demo HTTP/1.1" 404 512 "https://example.com" "Googlebot/2.1"
 ```
 
-Expected parsed fields:
+预期的解析字段：
 
 - IP
 - occurred_at
-- method
-- path
-- protocol
+- 方法
+- 路径
+- 协议
 - status_code
 - bytes_sent
 - referer
 - user_agent
 
-- [ ] Step 2: Write classifier tests.
+- [ ] 第 2 步：编写分类器测试。
 
-Required classifications:
+必需的分类：
 
 - `Googlebot` => `search_bot`
 - `Baiduspider` => `search_bot`
@@ -569,113 +569,113 @@ Required classifications:
 - `ClaudeBot` => `ai_bot`
 - `PerplexityBot` => `ai_bot`
 - `Bytespider` => `ai_bot`
-- normal browser UA => `human`
-- empty UA => `unknown`
+- 普通浏览器 UA => `human`
+- 空 UA => `unknown`
 
-- [ ] Step 3: Implement parser and classifier.
+- [ ] 第 3 步：实现解析器和分类器。
 
-Classifier should return:
+分类器应返回：
 
 - `traffic_type`
 - `crawler_family`
 - `is_bot`
 
-- [ ] Step 4: Run unit tests.
+- [ ] 第 4 步：运行单元测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Unit/AccessLogParserTest.php tests/Unit/CrawlerClassifierTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 7: Log Importer and Aggregation
+### 任务 7：日志导入器与聚合
 
-**Files:**
+**文件：**
 
-- Create: `app/Services/Admin/Analytics/AnalyticsLogImporter.php`
-- Create: `app/Console/Commands/GeoFlowImportAnalyticsLogsCommand.php`
-- Modify: `bootstrap/app.php` or command registration path used by this Laravel 12 app
-- Test: `tests/Unit/AnalyticsLogImporterTest.php`
-- Test: `tests/Feature/AnalyticsImportCommandTest.php`
+- 创建：`app/Services/Admin/Analytics/AnalyticsLogImporter.php`
+- 创建：`app/Console/Commands/GeoFlowImportAnalyticsLogsCommand.php`
+- 修改：`bootstrap/app.php`，或此 Laravel 12 应用使用的命令注册路径
+- 测试: `tests/Unit/AnalyticsLogImporterTest.php`
+- 测试: `tests/Feature/AnalyticsImportCommandTest.php`
 
-- [ ] Step 1: Write importer test.
+- [ ] 第 1 步：编写导入器测试。
 
-Seed:
+种子：
 
-- one log source
-- one article with slug `demo-article`
-- log lines for `/article/demo-article`, `/missing`, and `/`
+- 一个日志源
+- 一篇 slug 为 `demo-article` 的文章
+- `/article/demo-article`、`/missing` 和 `/` 的日志行
 
-Assertions:
+断言：
 
-- import row is completed
-- events are created
-- article_id is mapped for `/article/demo-article`
-- daily aggregate increments PV
-- path aggregate records `/missing` 404
-- bot aggregate records AI crawler counts
+- 导入行已完成
+- 事件已创建
+- article_id 映射到 `/article/demo-article`
+- 每日聚合增量 PV
+- 路径聚合记录 `/missing` 404
+- 机器人聚合记录 AI 爬虫计数
 
-- [ ] Step 2: Implement importer.
+- [ ] 第 2 步：实现导入器。
 
-Importer responsibilities:
+导入器职责：
 
-- read file line by line
-- parse each line
-- classify user agent
-- hash IP with HMAC using app key
-- map path to article when possible
-- create events in chunks
-- update aggregate tables
-- record skipped lines
+- 逐行读取文件
+- 解析每一行
+- 对用户代理进行分类
+- 使用应用密钥通过 HMAC 对 IP 进行哈希
+- 尽可能将路径映射到文章
+- 分块创建事件
+- 更新聚合表
+- 记录跳过的行
 
-- [ ] Step 3: Implement artisan command.
+- [ ] 第 3 步：实现 artisan 命令。
 
-Command:
+命令：
 
 ```bash
 php artisan geoflow:analytics-import-logs --source=local --date=2026-05-21
 ```
 
-Behavior:
+行为：
 
-- finds active source by name or ID
-- builds file path from source pattern and date
-- imports once per hash unless `--force` is passed
-- prints parsed, skipped, and status summary
+- 按名称或 ID 查找活动源
+- 根据源模式和日期构建文件路径
+- 除非传入 `--force`，否则每个哈希只导入一次
+- 打印已解析、已跳过和状态摘要
 
-- [ ] Step 4: Run importer tests.
+- [ ] 第 4 步：运行导入器测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Unit/AnalyticsLogImporterTest.php tests/Feature/AnalyticsImportCommandTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 8: Log Analytics Query and UI
+### 任务 8：日志分析查询与 UI
 
-**Files:**
+**文件：**
 
-- Modify: `app/Services/Admin/Analytics/AnalyticsLogQueryService.php`
-- Modify: `app/Http/Controllers/Admin/AnalyticsController.php`
-- Modify: `resources/views/admin/analytics/_log-section.blade.php`
-- Test: `tests/Feature/AdminAnalyticsPageTest.php`
+- 修改：`app/Services/Admin/Analytics/AnalyticsLogQueryService.php`
+- 修改：`app/Http/Controllers/Admin/AnalyticsController.php`
+- 修改：`resources/views/admin/analytics/_log-section.blade.php`
+- 测试: `tests/Feature/AdminAnalyticsPageTest.php`
 
-- [ ] Step 1: Write feature test with aggregate rows.
+- [ ] 第 1 步：使用聚合行编写功能测试。
 
-Assertions:
+断言：
 
-- traffic trend shows PV and AI crawler count
-- bot breakdown shows GPTBot or ChatGPT family
-- top pages table shows URL and status code counts
-- empty state is hidden when log data exists
+- 流量趋势显示 PV 和 AI 爬虫数量
+- 机器人细分显示 GPTBot 或 ChatGPT 系列
+- 热门页面表格显示 URL 和状态码计数
+- 当日志数据存在时，空状态会被隐藏
 
-- [ ] Step 2: Implement query service.
+- [ ] 第 2 步：实现查询服务。
 
-Methods:
+方法：
 
 - `trafficKpis(AnalyticsFilter $filter): array`
 - `trafficTrend(AnalyticsFilter $filter): array`
@@ -685,136 +685,136 @@ Methods:
 - `statusCodeSummary(AnalyticsFilter $filter): array`
 - `topReferrers(AnalyticsFilter $filter, int $limit = 10): array`
 
-- [ ] Step 3: Render log analytics section.
+- [ ] 第 3 步：渲染日志分析区块。
 
-Cards:
+卡片：
 
 - PV
-- unique IP
-- AI crawler PV
-- 4xx/5xx error count
+- 唯一 IP
+- AI 爬虫 PV
+- 4xx/5xx 错误计数
 
-Charts/tables:
+图表/表格：
 
-- traffic trend line chart
-- crawler breakdown bar chart
-- top pages table
-- top articles table
-- status code distribution
+- 流量趋势折线图
+- 爬虫细分柱状图
+- 热门页面表格
+- 热门文章表格
+- 状态码分布
 
-- [ ] Step 4: Run analytics page tests.
+- [ ] 第 4 步：运行分析页面测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminAnalyticsPageTest.php --compact
 ```
 
-Expected: pass.
+预期：pass。
 
 ---
 
-### Task 9: Polish, Cache, and Full Verification
+### 任务 9：润色、缓存与完整验证
 
-**Files:**
+**文件：**
 
-- Modify only files touched by earlier tasks.
+- 仅修改之前任务涉及的文件。
 
-- [ ] Step 1: Run formatter.
+- [ ] 第 1 步：运行格式化工具。
 
 ```bash
 docker exec geoflow-app ./vendor/bin/pint app/Http/Controllers/Admin/AnalyticsController.php app/Services/Admin/AdminDashboardMetricsService.php app/Services/Admin/Analytics tests/Feature/AdminAnalyticsPageTest.php tests/Unit/AnalyticsFilterTest.php tests/Unit/AccessLogParserTest.php tests/Unit/CrawlerClassifierTest.php tests/Unit/AnalyticsLogImporterTest.php
 ```
 
-Expected: PASS.
+预期：PASS。
 
-- [ ] Step 2: Run targeted analytics tests.
+- [ ] 第 2 步：运行针对性的分析测试。
 
 ```bash
 docker exec geoflow-app php artisan test tests/Feature/AdminAnalyticsPageTest.php tests/Unit/AnalyticsFilterTest.php tests/Unit/AccessLogParserTest.php tests/Unit/CrawlerClassifierTest.php tests/Unit/AnalyticsLogImporterTest.php --compact
 ```
 
-Expected: all pass.
+预期：全部通过。
 
-- [ ] Step 3: Run full suite.
+- [ ] 第 3 步：运行完整测试套件。
 
 ```bash
 docker exec geoflow-app php artisan test --compact
 ```
 
-Expected: all pass.
+预期：全部通过。
 
-- [ ] Step 4: Clear cache.
+- [ ] 第 4 步：清除缓存。
 
 ```bash
 docker exec geoflow-app php artisan optimize:clear
 ```
 
-Expected: config, cache, compiled, events, routes, and views cleared.
+预期：配置、缓存、编译文件、事件、路由和视图均已清除。
 
-- [ ] Step 5: Browser smoke test.
+- [ ] 第 5 步：浏览器冒烟测试。
 
-Open:
+打开：
 
 - `http://localhost:18080/admin/analytics`
 - `http://localhost:18080/admin/dashboard`
 
-Verify:
+验证：
 
-- menu order is correct
-- analytics menu active state works
-- date filters submit without layout breakage
-- content cards render
-- log section shows empty state when no imports exist
-- dashboard still renders existing quick-start and health modules
-
----
-
-## Recommended Implementation Split
-
-### First Development Batch
-
-Implement Tasks 1 through 4.
-
-Outcome:
-
-- New “数据分析” menu and page exists.
-- Current dashboard data is available in analytics form.
-- Content operation analytics is usable without waiting for log parsing.
-
-### Second Development Batch
-
-Implement Tasks 5 through 8.
-
-Outcome:
-
-- Log tables, parser, crawler classifier, importer command, and log analytics UI exist.
-- Local Nginx/Apache logs can be imported manually and analyzed.
-
-### Third Development Batch
-
-Add target channel-site log sync.
-
-Outcome:
-
-- Target site package can expose or push daily access logs.
-- Main admin can analyze group-site/channel traffic and AI crawler visits by channel.
+- 菜单顺序正确
+- 分析菜单的激活状态正常工作
+- 日期筛选器提交时不会破坏布局
+- 内容卡片渲染
+- 当不存在导入时，日志部分显示空状态
+- 仪表盘仍渲染现有的快速开始和健康模块
 
 ---
 
-## Acceptance Criteria
+## 推荐的实现拆分
 
-- Admin menu shows `首页` followed by `数据分析`.
-- `/admin/analytics` is protected by admin auth and follows the existing backend UI style.
-- Date filters affect content operation metrics.
-- Content analytics shows publication trend, task trend, funnel, AI/API summary, distribution status, and top content.
-- Log analytics shows a useful empty state before import.
-- After importing a supported access log, analytics show PV, unique IP count, AI crawler PV, top paths, top articles, status codes, and crawler breakdown.
-- Tests cover route access, filter normalization, dashboard regression, parser behavior, crawler classification, import aggregation, and analytics rendering.
-- Full test suite passes before implementation is considered complete.
+### 首批开发
+
+实现任务 1 至 4。
+
+结果：
+
+- 存在新的“数据分析”菜单和页面。
+- 当前仪表盘数据可在分析表单中获取。
+- 内容运营分析无需等待日志解析即可使用。
+
+### 第二批开发
+
+实现任务 5 至 8。
+
+结果：
+
+- 日志表、解析器、爬虫分类器、导入器命令和日志分析 UI 均已存在。
+- 本地 Nginx/Apache 日志可以手动导入并分析。
+
+### 第三开发批次
+
+添加目标渠道站点日志同步。
+
+结果：
+
+- 目标站点包可以暴露或推送每日访问日志。
+- 主管理员可以按渠道分析群站/渠道流量和 AI 爬虫访问。
 
 ---
 
-## Open Decision Before Development
+## 验收标准
 
-Recommended first build scope: **Tasks 1 through 4 only**, then review the page in the browser. This creates a useful analytics page quickly and reduces risk before adding log ingestion tables and parser behavior.
+- 管理菜单显示 `首页`，随后显示 `数据分析`。
+- `/admin/analytics` 受管理员认证保护，并遵循现有后端 UI 风格。
+- 日期筛选器会影响内容运营指标。
+- 内容分析展示发布趋势、任务趋势、漏斗、AI/API 摘要、分发状态和热门内容。
+- 日志分析在导入前显示有用的空状态。
+- 导入受支持的访问日志后，分析会显示 PV、独立 IP 数、AI 爬虫 PV、热门路径、热门文章、状态码和爬虫细分。
+- 测试覆盖路由访问、过滤器归一化、仪表盘回归、解析器行为、爬虫分类、导入聚合和分析渲染。
+- 完整测试套件通过后，实现才被视为完成。
 
-If the first development batch is approved, implementation should start with Task 1 and stop after Task 4 for a visual and functional review.
+---
+
+## 开发前待定决策
+
+推荐的首次构建范围：**仅任务 1 到 4**，然后在浏览器中审查页面。这样能快速创建有用的分析页面，并在添加日志摄取表和解析器行为之前降低风险。
+
+如果第一批开发已获批准，实现应从任务 1 开始，并在任务 4 之后停止，以进行视觉和功能审查。

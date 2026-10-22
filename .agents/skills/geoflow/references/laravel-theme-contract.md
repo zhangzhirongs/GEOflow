@@ -1,80 +1,80 @@
 <!--
-Copyright © 2026 姚金刚. All rights reserved.
-Project: geoflow
-Created by: 姚金刚
-Date: 2026-05-16
+版权所有 © 2026 姚金刚。保留所有权利。
+项目：geoflow
+创建者：姚金刚
+日期：2026-05-16
 X: https://x.com/yaojingang
 -->
 
-# Laravel Theme Contract
+# Laravel 主题契约
 
-This contract supersedes the legacy PHP-entrypoint assumptions for the current GEOFlow rewrite.
+本契约取代当前 GEOFlow 重写中关于旧版 PHP 入口点的假设。
 
-## Workspace Detection
+## 工作区检测
 
-A current GEOFlow workspace is detected by these files and directories:
+当前 GEOFlow 工作区通过以下文件和目录进行检测：
 
 - `artisan`
 - `routes/web.php`
 - `app/Support/Site/SiteThemeViewResolver.php`
-- `app/Support/Site/HomepageModuleBuilder.php` when homepage builder support is available
+- 当首页构建器支持可用时，使用 `app/Support/Site/HomepageModuleBuilder.php`
 - `resources/views/site`
-- `resources/views/site/partials/homepage-modules.blade.php` when homepage builder rendering is available
+- 当首页构建器渲染可用时，`resources/views/site/partials/homepage-modules.blade.php`
 - `resources/views/theme`
 - `resources/views/admin/site-settings/index.blade.php`
 
-Legacy GEOFlow workspaces may still contain root `index.php`, `article.php`, `category.php`, `archive.php`, and `/themes`. Support them only as fallback.
+旧版 GEOFlow 工作区可能仍包含根级 `index.php`、`article.php`、`category.php`、`archive.php` 和 `/themes`。仅将它们作为回退方案来支持。
 
-## Runtime Theme Root
+## 运行时主题根目录
 
-Current theme packages live under:
+当前主题包位于：
 
 ```text
 resources/views/theme/{theme_id}/
 ```
 
-The default built-in frontend lives under:
+默认内置前端位于：
 
 ```text
 resources/views/site/
 ```
 
-Current runtime assets commonly live under:
+当前运行时资源通常位于：
 
 ```text
 public/themes/{theme_id}/theme.css
 public/themes/{theme_id}/theme.js
 ```
 
-Older or draft packages may also contain `resources/views/theme/{theme_id}/assets/theme.css`. Inspect the current `layout.blade.php` before deciding which CSS/JS files must be edited.
+较旧或草稿包也可能包含 `resources/views/theme/{theme_id}/assets/theme.css`。在决定必须编辑哪些 CSS/JS 文件之前，请检查当前的 `layout.blade.php`。
 
-`SiteThemeViewResolver::first($template, $data)` resolves:
+`SiteThemeViewResolver::first($template, $data)` 解析为：
 
 ```text
 theme.{active_theme}.{template}
 site.{template}
 ```
 
-Theme IDs must match:
+主题 ID 必须匹配：
 
 ```text
 ^[a-zA-Z0-9_-]+$
 ```
 
-The active theme is stored in site settings as `active_theme`; when empty, GEOFlow renders the built-in `resources/views/site` views.
+活动主题存储在站点设置中为 `active_theme`；当为空时，GEOFlow 渲染内置的 `resources/views/site` 视图。
 
-The admin base path is configurable. Do not hard-code `/geo_admin` in theme packages, previews, docs, or generated links.
+管理后台基础路径可配置。不要在主题包、预览、文档或生成的链接中硬编码 `/geo_admin`。
 
-## Theme Package Shape
+## 主题包结构
 
-Minimal package:
+最小软件包：
 
 ```text
 resources/views/theme/{theme_id}/
   manifest.json
 ```
 
-Typical package:
+典型包：
 
 ```text
 resources/views/theme/{theme_id}/
@@ -99,19 +99,19 @@ public/themes/{theme_id}/
   theme.js
 ```
 
-Any missing Blade template automatically falls back to `resources/views/site`.
-Admin theme discovery can list a directory when it has a valid `manifest.json` or at least a `home.blade.php`, but a real theme package should include `manifest.json`.
+任何缺失的 Blade 模板都会自动回退到 `resources/views/site`。
+当目录具有有效的 `manifest.json` 或至少一个 `home.blade.php` 时，Admin 主题发现可以列出该目录，但真正的主题包应包含 `manifest.json`。
 
-## Homepage Builder Contract
+## 首页构建器契约
 
-Current GEOFlow can expose a configurable homepage builder in addition to Blade theme packages. The builder stores:
+当前 GEOFlow 除 Blade 主题包外，还可以提供可配置的首页构建器。该构建器存储：
 
 ```text
 site_settings.homepage_modules
 site_settings.homepage_style
 ```
 
-The site `HomeController` may pass these variables into the home view:
+站点 `HomeController` 可能会将这些变量传入主页视图：
 
 ```text
 homepageModules
@@ -119,13 +119,13 @@ homepageStyle
 showHomepageModules
 ```
 
-The built-in renderer is:
+内置渲染器为：
 
 ```text
 resources/views/site/partials/homepage-modules.blade.php
 ```
 
-Supported builder module types are:
+支持的构建器模块类型包括：
 
 ```text
 hero
@@ -140,9 +140,9 @@ lead_form
 custom_html
 ```
 
-`lead_form` requires a canonical top-level `lead_form_slug` for an existing active form. A theme or homepage design payload may reference that slug; form creation and activation remain authenticated operations.
+`lead_form` 要求为现有的活动表单提供一个规范的顶级 `lead_form_slug`。主题或首页设计载荷可以引用该 slug；表单创建和激活仍属于需要身份验证的操作。
 
-Supported style tokens are:
+支持的样式令牌包括：
 
 ```text
 accent_color
@@ -155,28 +155,28 @@ section_spacing
 radius
 ```
 
-The admin settings page may expose save, preset, and import routes for these settings. A design run may prepare `homepage-design.json`, but it should not apply it directly unless the operator confirms the exact JSON and `replace` or `append` mode.
+管理后台设置页面可能会为这些设置暴露保存、预设和导入路由。设计运行可以准备 `homepage-design.json`，但除非操作员确认确切的 JSON 以及 `replace` 或 `append` 模式，否则不应直接应用它。
 
-## Editable Files
+## 可编辑文件
 
-Safe edits:
+安全编辑：
 
 - `manifest.json`
 - `tokens.json`
 - `mapping.json`
-- root `*.blade.php`
+- 根 `*.blade.php`
 - `partials/*.blade.php`
 - `assets/theme.css`
 - `public/themes/{theme_id}/theme.css`
-- `public/themes/{theme_id}/theme.js` when the current theme already uses it
-- homepage design artifacts such as `homepage-design.json` and `homepage-composition-plan.md`
-- design notes such as `edit-session.json`, `change-plan.md`, `preview-notes.md`
+- 当当前主题已经使用它时，`public/themes/{theme_id}/theme.js`
+- 诸如 `homepage-design.json` 和 `homepage-composition-plan.md` 的首页设计产物
+- 设计说明，例如 `edit-session.json`、`change-plan.md`、`preview-notes.md`
 
-Do not edit controllers, models, migrations, routes, or database queries for a design-only run.
+在仅设计运行中，不要编辑控制器、模型、迁移、路由或数据库查询。
 
-## Page Templates
+## 页面模板
 
-Stable template names:
+稳定的模板名称：
 
 - `home`
 - `article`
@@ -188,7 +188,7 @@ Stable template names:
 - `partials.footer`
 - `partials.article-card`
 
-Stable public routes:
+稳定的公共路由：
 
 - `/`
 - `/article/{slug}`
@@ -196,24 +196,24 @@ Stable public routes:
 - `/archive`
 - `/archive/{year}/{month}`
 
-Stable public data/rendering expectations:
+稳定的公共数据/渲染预期：
 
-- page title, meta description, keywords, canonical URL, and JSON-LD/schema blocks must remain in the layout flow
-- article body content is already rendered HTML; do not re-escape it as plain markdown
-- image captions that are only filenames such as `333.png` should not be displayed
-- frontend language follows system/site behavior; do not add an independent public language selector unless the system contract changes
-- footer copyright should remain public-facing and centered/minimal unless a theme explicitly owns footer layout
-- default homepage can use `homepageCarouselSlides`, `featuredArticles`, `hotArticles`, `articles`, and `cardSummaries` to compose richer portal or corporate sections
-- when the homepage builder exists, default homepage can also use `homepageModules`, `homepageStyle`, and `showHomepageModules`
-- search/category/category-missing homepage states must keep clear result context and should not inherit every default-homepage marketing module by accident
+- 页面标题、元描述、关键词、canonical URL 以及 JSON-LD/schema 块必须保留在布局流中
+- 文章正文内容已是渲染后的 HTML；不要将其作为纯 Markdown 重新转义
+- 仅为文件名的图片说明（如 `333.png`）不应显示
+- 前端语言遵循系统/站点行为；除非系统契约发生变化，否则不要添加独立的公开语言选择器
+- 页脚版权应保持面向公众且居中/极简，除非主题明确拥有页脚布局
+- 默认首页可以使用 `homepageCarouselSlides`、`featuredArticles`、`hotArticles`、`articles` 和 `cardSummaries` 来组合更丰富的门户或企业版块
+- 当首页构建器存在时，默认首页也可以使用 `homepageModules`、`homepageStyle` 和 `showHomepageModules`
+- 搜索/分类/分类缺失的首页状态必须保持清晰的结果上下文，并且不应意外继承所有默认首页营销模块
 
-## Preview Reality
+## 预览实际情况
 
-Current GEOFlow does not expose an isolated `/preview/{theme}` runtime route by default. Treat preview as one of these:
+当前 GEOFlow 默认不暴露独立的 `/preview/{theme}` 运行时路由。将预览视为以下之一：
 
-- static preview files generated in `public_frontend`, or
-- a preview theme package that appears in Admin -> Site Settings and is activated only after operator confirmation, or
-- the admin theme editor preview when `SiteThemeEditorController` and `SiteThemeEditorService` exist, or
-- a future dedicated preview route if the application adds one.
+- 在 `public_frontend` 中生成的静态预览文件，或
+- 一个预览主题包，出现在 Admin -> Site Settings 中，仅在操作员确认后激活，或者
+- 当 `SiteThemeEditorController` 和 `SiteThemeEditorService` 存在时的管理后台主题编辑器预览，或
+- 若应用未来添加专用预览路由，则使用该路由。
 
-Never claim a live preview route exists until `routes/web.php` confirms it.
+在 `routes/web.php` 确认之前，绝不要声称存在实时预览路由。

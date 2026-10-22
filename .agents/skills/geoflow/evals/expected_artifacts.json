@@ -62,11 +62,31 @@
     "templates/homepage-design-template.json"
   ],
   "mode_outputs": {
-    "development": ["changed-files", "contract-impact", "verification-result"],
-    "operations": ["surface-used", "resource-readback", "final-state"],
-    "public_frontend": ["target-theme-or-payload", "preview-evidence", "contract-check"],
-    "channel_frontend": ["capability-status", "sync-preview", "rollback-note"],
-    "legacy_migration": ["legacy-inventory", "laravel-mapping", "migration-handoff"]
+    "development": [
+      "changed-files",
+      "contract-impact",
+      "verification-result"
+    ],
+    "operations": [
+      "surface-used",
+      "resource-readback",
+      "final-state"
+    ],
+    "public_frontend": [
+      "target-theme-or-payload",
+      "preview-evidence",
+      "contract-check"
+    ],
+    "channel_frontend": [
+      "capability-status",
+      "sync-preview",
+      "rollback-note"
+    ],
+    "legacy_migration": [
+      "legacy-inventory",
+      "laravel-mapping",
+      "migration-handoff"
+    ]
   },
   "required_report_fields": [
     "selected-mode",
@@ -78,28 +98,28 @@
   ],
   "quality_expectations": {
     "development": [
-      "discover current code and route contracts before editing",
-      "include focused tests for changed backend, admin, API, CLI, queue, or frontend behavior"
+      "在编辑前发现当前代码和路由契约",
+      "为变更的后端、管理端、API、CLI、队列或前端行为包含有针对性的测试"
     ],
     "operations": [
-      "use a supported CLI, API v1, or authenticated admin surface",
-      "run preflight before mutation and read back persisted state"
+      "使用受支持的 CLI、API v1 或经过身份验证的管理界面",
+      "在变更前运行预检，并回读已持久化状态"
     ],
     "public_frontend": [
-      "preserve Laravel theme, route, SEO, article-data, and lead-form contracts",
-      "use preview-first theme staging and require confirmation for live replacement"
+      "保留 Laravel 主题、路由、SEO、文章数据和线索表单契约",
+      "使用预览优先的主题暂存，并要求对实时替换进行确认"
     ],
     "channel_frontend": [
-      "compare default, packaged, cached, and live target capabilities before sync",
-      "surface unsupported modules, confirmation requirements, and rollback guidance"
+      "在同步前比较默认、打包、缓存和实时目标能力",
+      "展示不受支持的模块、确认要求和回滚指引"
     ],
     "legacy_migration": [
-      "inventory old PHP entrypoints and data contracts before mapping",
-      "store replacement backups outside a legacy web root and verify the Laravel target"
+      "在映射前清点旧 PHP 入口点和数据契约",
+      "将替换备份存储在旧版 Web 根目录之外，并验证 Laravel 目标"
     ],
     "package": [
-      "retain every required file across source, archive, and installed skill roots",
-      "exclude caches, local logs, screenshots, credentials, and temporary outputs"
+      "在源、归档和已安装技能根目录中保留每个必需文件",
+      "排除缓存、本地日志、截图、凭据和临时输出"
     ]
   },
   "forbidden_behaviors": [

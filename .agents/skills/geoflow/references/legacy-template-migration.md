@@ -1,40 +1,40 @@
-# Legacy GEOFlow Template Migration
+# 旧版 GEOFlow 模板迁移
 
-Use this reference when the input explicitly contains historical GEOFlow PHP template packages or mentions the retired template skill.
+当输入明确包含历史 GEOFlow PHP 模板包或提及已停用的模板技能时，使用此参考。
 
-## Legacy Signals
+## 遗留信号
 
-- root `index.php`, `article.php`, `category.php`, or `archive.php`
-- `includes/header.php`, `includes/footer.php`, or `includes/functions.php`
-- output packages with `tokens.json`, `mapping.json`, and `manifest.json`
-- Tailwind CDN or root `assets/css/custom.css` assumptions
+- 根 `index.php`、`article.php`、`category.php` 或 `archive.php`
+- `includes/header.php`、`includes/footer.php` 或 `includes/functions.php`
+- 输出包含 `tokens.json`、`mapping.json` 和 `manifest.json` 的包
+- Tailwind CDN 或根 `assets/css/custom.css` 假设
 
-These signals describe the historical PHP frontend contract.
+这些信号描述的是历史 PHP 前端契约。
 
-## Current Laravel Destination
+## 当前 Laravel 目标
 
-Map reusable visual decisions into current GEOFlow surfaces:
+将可复用的视觉决策映射到当前 GEOFlow 界面：
 
-| Legacy artifact | Current destination |
+| 遗留产物 | 当前目标位置 |
 |---|---|
-| page-level PHP file | `resources/views/theme/{theme_id}/*.blade.php` or built-in `site.*` fallback |
-| includes header/footer | theme `partials/` and `layout.blade.php` |
-| CSS tokens | `tokens.json`, theme CSS, or homepage style JSON |
-| module mapping | `mapping.json` plus supported homepage modules |
-| static homepage sections | HomepageModuleBuilder payload when the module type exists |
-| activation notes | preview theme, reviewed import, or explicit theme activation handoff |
+| 页面级 PHP 文件 | `resources/views/theme/{theme_id}/*.blade.php` 或内置 `site.*` 回退 |
+| 包含页眉/页脚 | 主题 `partials/` 和 `layout.blade.php` |
+| CSS 令牌 | `tokens.json`、主题 CSS 或首页样式 JSON |
+| 模块映射 | `mapping.json` 加上支持的首页模块 |
+| 静态首页区块 | 当模块类型存在时使用 HomepageModuleBuilder 载荷 |
+| 激活说明 | 预览主题、已审核的导入，或明确的主题激活交接 |
 
-Preserve public routes, controller-provided data, SEO/schema, markdown-rendered article content, lead-form slugs, and channel capability checks.
+保留公共路由、控制器提供的数据、SEO/schema、Markdown 渲染的文章内容、潜在客户表单 slug 以及渠道能力检查。
 
-## Migration Output
+## 迁移输出
 
-Produce:
+生成：
 
-1. detected legacy files and assumptions
-2. reusable tokens and layout patterns
-3. current Laravel theme and homepage-module mapping
-4. unsupported or data-dependent sections
-5. preview plan and verification routes
-6. activation or channel-sync handoff with rollback notes
+1. 检测到的遗留文件和假设
+2. 可复用的令牌和布局模式
+3. 当前 Laravel 主题和首页模块映射
+4. 不支持或依赖数据的章节
+5. 预览计划与验证路由
+6. 激活或渠道同步交接，并附回滚说明
 
-Historical preview files demonstrate design intent only. Validate every migrated artifact against the current workspace before activation.
+历史预览文件仅用于展示设计意图。在启用之前，请根据当前工作区验证每个迁移后的产物。

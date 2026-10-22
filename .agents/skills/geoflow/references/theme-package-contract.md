@@ -1,16 +1,16 @@
 <!--
-Copyright © 2026 姚金刚. All rights reserved.
-Project: geoflow
-Created by: 姚金刚
-Date: 2026-05-16
+版权所有 © 2026 姚金刚。保留所有权利。
+项目：geoflow
+创建者：姚金刚
+日期：2026-05-16
 X: https://x.com/yaojingang
 -->
 
-# Theme Edit and Package Contract
+# 主题编辑与包契约
 
-The output of a GEOFlow design run should be a preview-first session or package rather than a direct production overwrite.
+GEOFlow 设计运行的输出应是预览优先的会话或包，而不是直接覆盖生产环境。
 
-## Mode A: Full New Theme Package
+## 模式 A：完整新主题包
 
 ```text
 resources/views/theme/
@@ -37,7 +37,7 @@ public/themes/template-YYYYMMDD-XXX/
   theme.js
 ```
 
-## Mode B: Preview Theme Edit Session
+## 模式 B：预览主题编辑会话
 
 ```text
 resources/views/theme/
@@ -67,9 +67,9 @@ public/themes/target-theme-edit-YYYYMMDD-XXX/
   theme.js
 ```
 
-## Mode C: Homepage Builder Design JSON
+## 模式 C：主页构建器设计 JSON
 
-Use this mode when the current GEOFlow workspace exposes `HomepageModuleBuilder`, `homepage_modules`, `homepage_style`, and the admin import route.
+当当前 GEOFlow 工作区暴露 `HomepageModuleBuilder`、`homepage_modules`、`homepage_style` 以及管理后台导入路由时，使用此模式。
 
 ```text
 homepage-composition-plan.md
@@ -77,7 +77,7 @@ homepage-design.json
 preview-notes.md
 ```
 
-Preferred JSON shape:
+首选 JSON 结构：
 
 ```json
 {
@@ -113,16 +113,16 @@ Preferred JSON shape:
 }
 ```
 
-For this mode, include:
+对于此模式，请包含：
 
-- import mode: `replace` or `append`
-- module type, layout, source, and fallback notes
-- route safety for every `link_url` and `image_url`
-- an existing active `lead_form_slug` for each `lead_form` module, with form creation or activation kept in an authenticated operations phase
-- `custom_html` safety note when used
-- warning that import can affect the live default homepage unless applied in staging
+- 导入模式：`replace` 或 `append`
+- 模块类型、布局、来源和回退说明
+- 每个 `link_url` 和 `image_url` 的路由安全
+- 每个 `lead_form` 模块都有一个现有的活动 `lead_form_slug`，表单创建或激活保留在经过身份验证的运营阶段
+- 使用时的 `custom_html` 安全说明
+- 警告：除非在暂存环境应用，否则导入可能会影响线上默认首页
 
-## Minimum Manifest Fields
+## 最小清单字段
 
 - `id`
 - `name`
@@ -132,7 +132,7 @@ For this mode, include:
 - `compatible_modules`
 - `preview_routes`
 - `notes`
-- Optional:
+- 可选：
   - `source_reference_url`
   - `base_template_id`
   - `target_theme_id`
@@ -140,25 +140,25 @@ For this mode, include:
   - `change_scope`
   - `session_state`
 
-Recommended Laravel fields:
+推荐的 Laravel 字段：
 
 - `framework`: `laravel`
 - `geoflow_contract`: `site-theme-view-resolver`
-- `requires_admin_activation`: `true` when no isolated preview route exists
-- `blade_templates`: list of provided Blade templates
-- `fallback_templates`: list of templates expected to fall back to `resources/views/site`
+- `requires_admin_activation`：当不存在隔离的预览路由时，`true`
+- `blade_templates`：提供的 Blade 模板列表
+- `fallback_templates`：预期回退到 `resources/views/site` 的模板列表
 
-## Minimum Edit-Session Fields
+## 最小编辑会话字段
 
 - `base_theme_id`
 - `preview_theme_id`
-- `public_assets_dir` when runtime CSS/JS has been forked
+- 当运行时 CSS/JS 已被分叉时，`public_assets_dir`
 - `created_at`
 - `change_request`
 - `preview_routes`
 - `finalize_options`
 
-## Minimum Mapping Output
+## 最小映射输出
 
 - `header`
 - `footer`
@@ -191,49 +191,49 @@ Recommended Laravel fields:
 - `article.sticky_ad`
 - `archive.overview_row`
 - `archive.article_card`
-- When `mode = edit_theme` or `mode = optimize`:
+- 当 `mode = edit_theme` 或 `mode = optimize` 时：
   - `change_scope`
   - `unchanged_contracts`
   - `delta_strategy`
   - `edited_files`
 
-## Finalize Paths
+## 最终确定路径
 
-- `publish_as_new_theme`: keep or rename the preview fork so admin theme discovery can list it as a new template
-- `replace_base_theme`: back up the original target theme and then replace it from the confirmed preview fork
-- `activate_after_confirmation`: activate only after the operator confirms the reviewed preview session
-- `import_homepage_design_after_confirmation`: import the reviewed homepage builder payload only after the operator confirms the exact JSON and mode
+- `publish_as_new_theme`：保留或重命名预览分叉，以便管理端主题发现功能可以将其列为新模板
+- `replace_base_theme`：备份原始目标主题，然后从已确认的预览分叉替换它
+- `activate_after_confirmation`：仅在操作员确认已审核的预览会话后激活
+- `import_homepage_design_after_confirmation`：仅在操作员确认确切的 JSON 和模式后，才导入已审核的首页构建器负载
 
-## Preview Contract
+## 预览契约
 
-The package should be previewed on at least:
+该包应至少在以下环境中预览：
 
-- homepage preview
-- category preview
-- article detail preview
-- archive overview preview
+- 主页预览
+- 分类预览
+- 文章详情预览
+- 归档概览预览
 
-Current Laravel GEOFlow may not provide isolated `/preview/{theme}` URLs. Preview theme edit sessions should clearly say whether review uses static preview artifacts, temporary admin activation, or a real preview route discovered in `routes/web.php`.
+当前 Laravel GEOFlow 可能不提供独立的 `/preview/{theme}` URL。预览主题编辑会话应明确说明评审使用的是静态预览产物、临时管理端激活，还是在 `routes/web.php` 中发现的真实预览路由。
 
-Optimization runs should also include a short before/after rationale for each touched module.
+优化运行还应针对每个涉及的模块包含简短的优化前后理由说明。
 
-Homepage enrichment runs should also include:
+首页增强运行还应包括：
 
-- `homepage-composition-plan.md` or an equivalent section in `change-plan.md`
-- `homepage-design.json` when the current system supports homepage builder import
-- each added homepage module's data source
-- default, empty, search, category, and mobile behavior
-- whether CSS/JS is edited in `resources/views/theme/{theme_id}/assets` or `public/themes/{theme_id}`
-- whether module/style work is delivered through theme files or homepage builder import JSON
-- the `replace` or `append` import mode when builder JSON is used
-- any desired module that requires backend work instead of theme-only work
+- `homepage-composition-plan.md` 或 `change-plan.md` 中的等效部分
+- 当前系统支持首页构建器导入时的 `homepage-design.json`
+- 每个新增首页模块的数据源
+- 默认、空状态、搜索、分类和移动端行为
+- CSS/JS 是在 `resources/views/theme/{theme_id}/assets` 还是 `public/themes/{theme_id}` 中编辑
+- 模块/样式工作是经由主题文件还是首页构建器导入 JSON 交付
+- 使用构建器 JSON 时的 `replace` 或 `append` 导入模式
+- 任何需要后端工作而非仅主题工作的所需模块
 
-Preview must be isolated from the active public template until the operator confirms replacement, publish-as-new, or activation.
+在操作员确认替换、作为新内容发布或激活之前，预览必须与当前活动的公共模板隔离。
 
-## Non-Negotiable Rendering Rules
+## 不可妥协的渲染规则
 
-- keep layout-level title, description, keyword, canonical, and schema slots intact
-- do not render raw markdown markers in list excerpts or article bodies
-- do not display image captions when the caption is only a filename
-- do not hard-code admin URLs
-- do not change controllers, database queries, route definitions, or markdown rendering services in a design-only package
+- 保持布局级标题、描述、关键词、canonical 和 schema 槽位不变
+- 不要在列表摘要或文章正文中渲染原始 Markdown 标记
+- 当说明文字仅是文件名时，不要显示图片说明文字
+- 不要硬编码管理后台 URL
+- 在仅设计包中，不要更改控制器、数据库查询、路由定义或 Markdown 渲染服务

@@ -1,11 +1,11 @@
-# GEOFlow Failure Cases
+# GEOFlow 失败案例
 
-- Selected a remembered route or CLI command without inspecting the target workspace.
-- Treated an admin operation as an API v1 capability when no matching route exists.
-- Changed product code while following the operations-only safety boundary.
-- Edited an active theme in place when a preview fork or reviewed homepage payload was available.
-- Synced a default-site module to a channel target package without checking `supported_modules`.
-- Added backend fields or public modules without migrations, validation, localization, permissions, or tests.
-- Claimed a legacy PHP preview was compatible with the current Laravel theme contract.
-- Printed tokens, channel secrets, provider keys, passwords, or personal lead details.
-- Reported success without persisted readback, route rendering, test output, or capability evidence.
+- 在未检查目标工作区的情况下，选择了记住的路由或 CLI 命令。
+- 当不存在匹配路由时，将管理操作视为 API v1 能力。
+- 在遵循仅运维（operations-only）安全边界的同时更改了产品代码。
+- 在预览分支或已审核的首页载荷可用时，就地编辑了活动主题。
+- 已将默认站点模块同步到渠道目标包，但未检查 `supported_modules`。
+- 新增了没有迁移、验证、本地化、权限或测试的后端字段或公共模块。
+- 声称旧版 PHP 预览与当前 Laravel 主题契约兼容。
+- 打印出的令牌、渠道密钥、提供商密钥、密码或潜在客户个人详细信息。
+- 在没有持久化回读、路由渲染、测试输出或能力证据的情况下报告成功。

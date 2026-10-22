@@ -1,4 +1,4 @@
-# GEOFlow 部署脚本 / Deployment Scripts
+# GEOFlow 部署脚本（Deployment Scripts）
 
 这个目录用于存放 GEOFlow 的参考部署脚本，方便技术人员在常见云服务器、VPS、Docker 主机或面板服务器上快速完成环境自检和生产部署。
 
@@ -22,7 +22,7 @@
 - 2 核 CPU
 - 2 GB 内存，建议额外配置 2 GB swap
 - 20 GB 可用磁盘
-- Ubuntu 22.04+ / Debian 12+ / Rocky Linux 9+ / Alibaba Cloud Linux 3+
+- Ubuntu 22.04+ / Debian 12+ / Rocky Linux 9+ / 阿里云 Linux 3+
 - 可以稳定访问 Docker 镜像源、GitHub 和你配置的 AI API 服务商
 
 正式生产建议：
@@ -140,63 +140,63 @@ proxy_set_header X-Forwarded-Host $host;
 
 ---
 
-This folder contains reference scripts for technical operators who want a faster, repeatable GEOFlow deployment path.
+此文件夹包含参考脚本，供希望获得更快、可重复的 GEOFlow 部署路径的技术操作人员使用。
 
-## Scripts
+## 脚本
 
-| Script | Purpose |
+| 脚本 | 用途 |
 | --- | --- |
-| `geoflow-docker-deploy.sh` | First install on a fresh empty production database. It checks the server, prepares `.env.prod`, deploys PostgreSQL, Redis, web, app, queue, scheduler and Reverb, then runs a healthcheck. |
-| `geoflow-healthcheck.sh` | Post-deployment healthcheck. It validates Docker Compose services, the Laravel health endpoint and database connectivity. |
+| `geoflow-docker-deploy.sh` | 在全新的空生产数据库上首次安装。它会检查服务器、准备 `.env.prod`、部署 PostgreSQL、Redis、web、app、queue、scheduler 和 Reverb，然后运行健康检查。 |
+| `geoflow-healthcheck.sh` | 部署后健康检查。它验证 Docker Compose 服务、Laravel 健康端点和数据库连通性。 |
 
-## Recommended Server Profile
+## 推荐的服务器配置档案
 
-Minimum for testing:
+测试最低要求：
 
 - 2 vCPU
-- 2 GB RAM plus 2 GB swap
-- 20 GB free disk
-- Ubuntu 22.04+/Debian 12+/Rocky Linux 9+/Alibaba Cloud Linux 3+
-- Stable outbound network access to Docker registry, GitHub and your AI provider APIs
+- 2 GB 内存加 2 GB swap
+- 20 GB 可用磁盘空间
+- Ubuntu 22.04+/Debian 12+/Rocky Linux 9+/阿里云 Linux 3+
+- 稳定出站网络访问 Docker registry、GitHub 以及你的 AI 提供商 API
 
-Recommended for production:
+生产环境推荐：
 
 - 2-4 vCPU
-- 4-8 GB RAM
+- 4-8 GB 内存
 - 40-80 GB SSD
-- Reverse proxy or cloud load balancer for HTTPS
-- PostgreSQL and Redis ports not exposed to the public Internet
+- 用于 HTTPS 的反向代理或云负载均衡器
+- PostgreSQL 和 Redis 端口未暴露到公共互联网
 
-## One-Command First Install
+## 单命令首次安装
 
-On a fresh server with an empty database, run:
+在数据库为空的全新服务器上，运行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zhangzhirongs/GEOflow/main/deploy-scripts/geoflow-docker-deploy.sh -o geoflow-docker-deploy.sh
 bash geoflow-docker-deploy.sh
 ```
 
-Do not use this script to upgrade an existing deployment, and do not perform a rolling upgrade. Follow the stopped-and-drained upgrade protocol in section 3.1 of `docs/deployment/DEPLOYMENT.md`.
+不要使用此脚本升级现有部署，也不要执行滚动升级。遵循 `docs/deployment/DEPLOYMENT.md` 第 3.1 节中的停止并排空升级协议。
 
-The script will ask for:
+脚本将询问：
 
-- Public `APP_URL`
-- Web port, default `18080`
-- Reverb port, default `18081`
-- Admin base path, default `geo_admin`
+- 公共 `APP_URL`
+- Web 端口，默认 `18080`
+- Reverb 端口，默认 `18081`
+- 管理端基础路径，默认 `geo_admin`
 
-After deployment:
+部署之后：
 
-- Site: `APP_URL`
-- Admin: `APP_URL/geo_admin/login`
-- Default username: `admin`
-- Default password: `password`
+- 站点：`APP_URL`
+- 管理端：`APP_URL/geo_admin/login`
+- 默认用户名：`admin`
+- 默认密码：`password`
 
-Change the default admin password immediately after first login.
+首次登录后立即更改默认管理员密码。
 
-## Non-Interactive Deployment
+## 非交互式部署
 
-For CI, image templates or scripted server initialization:
+对于 CI、镜像模板或脚本化服务器初始化：
 
 ```bash
 GEOFLOW_NONINTERACTIVE=1 \
@@ -208,48 +208,48 @@ GEOFLOW_ADMIN_BASE_PATH=geo_admin \
 bash geoflow-docker-deploy.sh
 ```
 
-Optional variables:
+可选变量：
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 描述 |
 | --- | --- | --- |
-| `GEOFLOW_REPO_URL` | `https://github.com/zhangzhirongs/GEOflow.git` | Source repository URL |
-| `GEOFLOW_BRANCH` | `main` | Branch to deploy |
-| `GEOFLOW_APP_DIR` | `/opt/geoflow` | Server installation directory |
-| `GEOFLOW_INSTALL_DOCKER` | `auto` | `1` to install Docker automatically, `0` to fail if Docker is missing |
-| `GEOFLOW_DB_PASSWORD` | random | PostgreSQL password |
-| `GEOFLOW_REDIS_PASSWORD` | random | Redis password |
-| `GEOFLOW_TRUSTED_PROXIES` | empty | Set to the actual proxy IP/CIDR for reverse proxy/CDN/subdirectory deployments |
-| `GEOFLOW_SESSION_SECURE_COOKIE` | derived from `APP_URL` | `true` for HTTPS and `false` for direct HTTP access |
-| `GEOFLOW_SELF_DELETE` | `0` | Set to `1` to remove the deployment script after a successful deployment |
+| `GEOFLOW_REPO_URL` | `https://github.com/zhangzhirongs/GEOflow.git` | 源仓库 URL |
+| `GEOFLOW_BRANCH` | `main` | 要部署的分支 |
+| `GEOFLOW_APP_DIR` | `/opt/geoflow` | 服务器安装目录 |
+| `GEOFLOW_INSTALL_DOCKER` | `auto` | `1` 表示自动安装 Docker，`0` 表示在缺少 Docker 时失败 |
+| `GEOFLOW_DB_PASSWORD` | 随机 | PostgreSQL 密码 |
+| `GEOFLOW_REDIS_PASSWORD` | 随机 | Redis 密码 |
+| `GEOFLOW_TRUSTED_PROXIES` | 空 | 对于反向代理/CDN/子目录部署，设置为实际的代理 IP/CIDR |
+| `GEOFLOW_SESSION_SECURE_COOKIE` | 派生自 `APP_URL` | `true` 用于 HTTPS，`false` 用于直接 HTTP 访问 |
+| `GEOFLOW_SELF_DELETE` | `0` | 设置为 `1` 以在成功部署后移除部署脚本 |
 
-## Self-Delete Mode
+## 自删除模式
 
-If you download the script to a temporary location and want it removed after deployment:
+如果你将脚本下载到临时位置，并希望在部署后将其删除：
 
 ```bash
 GEOFLOW_SELF_DELETE=1 bash geoflow-docker-deploy.sh
 ```
 
-This only removes the executed script file. It does not remove the deployed GEOFlow source code.
+这仅移除已执行的脚本文件。它不会移除已部署的 GEOFlow 源代码。
 
-## Manual Healthcheck
+## 手动健康检查
 
-Run after DNS, HTTPS or reverse proxy changes:
+在 DNS、HTTPS 或反向代理变更后运行：
 
 ```bash
 cd /opt/geoflow
 bash deploy-scripts/geoflow-healthcheck.sh
 ```
 
-## Subdirectory Deployment
+## 子目录部署
 
-If the site is deployed under a first-level path, for example:
+如果站点部署在一级路径下，例如：
 
 ```text
 https://example.com/wiki
 ```
 
-Use:
+使用：
 
 ```env
 APP_URL=https://example.com/wiki
@@ -257,7 +257,7 @@ TRUSTED_PROXIES=203.0.113.10
 ADMIN_BASE_PATH=geo_admin
 ```
 
-Do not set `ADMIN_BASE_PATH=wiki/geo_admin`. The reverse proxy should strip or forward the prefix correctly and pass:
+不要设置 `ADMIN_BASE_PATH=wiki/geo_admin`。反向代理应正确剥离或转发该前缀，并传递：
 
 ```nginx
 proxy_set_header X-Forwarded-Prefix /wiki;
@@ -265,12 +265,12 @@ proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header X-Forwarded-Host $host;
 ```
 
-## Notes
+## 说明
 
-- The scripts are references, not a replacement for server security hardening.
-- Do not expose PostgreSQL or Redis to the public Internet.
-- Keep `.env.prod`, `storage/`, and PostgreSQL data backed up before upgrades.
-- If Docker image pulling is slow or unstable in mainland China, use the one-shot tunnel scripts below (no `docker restart`) or configure a registry mirror in `daemon.json`.
+- 这些脚本仅供参考，不能替代服务器安全加固。
+- 不要将 PostgreSQL 或 Redis 暴露到公共互联网。
+- 升级前确保 `.env.prod`、`storage/` 和 PostgreSQL 数据已备份。
+- 如果在中国大陆拉取 Docker 镜像缓慢或不稳定，请使用下方的一次性隧道脚本（无需 `docker restart`），或在 `daemon.json` 中配置镜像仓库镜像。
 
 ## 国内一次性拉镜像（不重启 Docker、不中断服务）
 
@@ -306,4 +306,4 @@ ECS_HOST=ecs-user@你的IP bash deploy-scripts/sync-images-from-local.sh
 
 本机用 Clash 拉镜像，经 SSH `docker save | docker load` 灌进 ECS。ECS 零配置。
 
-Apple Silicon 本机默认拉 `linux/amd64`（脚本已设 `DOCKER_PLATFORM=linux/amd64`）。
+Apple Silicon 本机默认拉取 `linux/amd64`（脚本已设置 `DOCKER_PLATFORM=linux/amd64`）。

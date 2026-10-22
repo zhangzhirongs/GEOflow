@@ -11,7 +11,7 @@ CLI 随 GEOFlow 源码提供，不需要单独下载。运行前需要：
 - PHP 8.3 或更高版本。
 - 已通过 Composer 安装项目依赖。
 - 可以访问一个已启用 `/api/v1` 的 GEOFlow 实例。
-- 登录账号，或一个具有所需 API scope 的 Token。
+- 登录账号，或使用具有所需 API scope 的 Token。
 
 ```bash
 git clone https://github.com/zhangzhirongs/GEOflow.git
@@ -56,7 +56,7 @@ CLI 每次只选择一个配置文件，顺序如下：
 | 配置项 | 环境变量 |
 |---|---|
 | 系统地址 | `GEOFLOW_BASE_URL` |
-| Token | `GEOFLOW_TOKEN`、`GEOFLOW_API_TOKEN` |
+| 令牌 | `GEOFLOW_TOKEN`、`GEOFLOW_API_TOKEN` |
 | 超时秒数 | `GEOFLOW_TIMEOUT` |
 | 允许远程 HTTP | `GEOFLOW_ALLOW_INSECURE_HTTP` |
 
@@ -356,7 +356,7 @@ bin/geoflow --config /path/to/profile.json task get 12
 bin/geoflow --config /path/to/profile.json --no-interaction task delete 12 --yes
 ```
 
-`--yes` 只确认当前 CLI 命令中的精确删除目标。Token scope、服务端权限、资源锁、业务校验和后台高风险确认仍然有效。
+`--yes` 只确认当前 CLI 命令中的精确删除目标。Token 作用域、服务端权限、资源锁、业务校验和后台高风险确认仍然有效。
 
 当前 DELETE 操作不使用幂等键。任务删除、素材库删除和素材条目删除都不要添加 `X-Idempotency-Key`。创建、更新、任务动作、文章审核/发布/回收和图片上传等受支持的 POST/PATCH 操作可以使用 `--idempotency-key`。
 
@@ -462,9 +462,9 @@ CLI 0.2.0 覆盖 API v1 中的目录、任务、执行记录、素材和文章�
 - 人工发布工作台。
 - 分发渠道、目标站点包、密钥、远端同步和渠道安全删除。
 - AI source provider 与模型绑定。
-- 文章 AI assistant、风险复扫、编辑器图片和批量操作。
-- 企业知识、线索管理、URL Import 和 System Updates。
-- 首页模块 GET 编辑器、网站设置和 Theme Replication。
+- 文章 AI 助手、风险复扫、编辑器图片和批量操作。
+- 企业知识、线索管理、URL 导入和系统更新。
+- 首页模块 GET 编辑器、站点设置和 Theme Replication。
 - API Token、管理员、密码和安全设置。
 
 后台前缀由 `ADMIN_BASE_PATH` 控制，仓库默认值为 `geo_admin`。先运行 `php artisan route:list --except-vendor` 获取目标实例的真实路由。当前仓库没有 live Theme Editor 路由。
@@ -502,7 +502,7 @@ bin/geoflow --config /path/to/profile.json config show
 
 ### 返回 HTML
 
-CLI 需要 JSON API。如果错误显示服务端返回非 JSON，请检查：
+CLI 需要 JSON API。如果错误显示服务器返回了非 JSON，请检查：
 
 - `base_url` 是否指向 GEOFlow Web 根地址。
 - 地址中是否错误包含 `/api/v1` 或后台路径。

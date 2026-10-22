@@ -1,22 +1,22 @@
-# HTTP Client Best Practices
+# HTTP 客户端最佳实践
 
-## Always Set Explicit Timeouts
+## 始终设置显式超时
 
-The default timeout is 30 seconds — too long for most API calls. Always set explicit `timeout` and `connectTimeout` to fail fast.
+默认超时是 30 秒——对大多数 API 调用来说太长。始终设置显式的 `timeout` 和 `connectTimeout` 以快速失败。
 
-Incorrect:
+错误：
 ```php
 $response = Http::get('https://api.example.com/users');
 ```
 
-Correct:
+正确：
 ```php
 $response = Http::timeout(5)
     ->connectTimeout(3)
     ->get('https://api.example.com/users');
 ```
 
-For service-specific clients, define timeouts in a macro:
+对于特定服务的客户端，请在宏中定义超时：
 
 ```php
 Http::macro('github', function () {
@@ -29,11 +29,11 @@ Http::macro('github', function () {
 $response = Http::github()->get('/repos/laravel/framework');
 ```
 
-## Use Retry with Backoff for External APIs
+## 对外部 API 使用带退避的重试
 
-External APIs have transient failures. Use `retry()` with increasing delays.
+外部 API 会出现瞬时故障。使用带有递增延迟的 `retry()`。
 
-Incorrect:
+错误：
 ```php
 $response = Http::post('https://api.stripe.com/v1/charges', $data);
 
@@ -42,14 +42,14 @@ if ($response->failed()) {
 }
 ```
 
-Correct:
+正确：
 ```php
 $response = Http::retry([100, 500, 1000])
     ->timeout(10)
     ->post('https://api.stripe.com/v1/charges', $data);
 ```
 
-Only retry on specific errors:
+仅对特定错误进行重试：
 
 ```php
 $response = Http::retry(3, 100, function (Throwable $exception, PendingRequest $request) {
@@ -58,17 +58,17 @@ $response = Http::retry(3, 100, function (Throwable $exception, PendingRequest $
 })->post('https://api.example.com/data');
 ```
 
-## Handle Errors Explicitly
+## 显式处理错误
 
-The HTTP Client does not throw on 4xx/5xx by default. Always check status or use `throw()`.
+HTTP Client 默认不会在 4xx/5xx 时抛出异常。始终检查 status 或使用 `throw()`。
 
-Incorrect:
+错误：
 ```php
 $response = Http::get('https://api.example.com/users/1');
 $user = $response->json(); // Could be an error body
 ```
 
-Correct:
+正确：
 ```php
 $response = Http::timeout(5)
     ->get('https://api.example.com/users/1')
@@ -77,7 +77,7 @@ $response = Http::timeout(5)
 $user = $response->json();
 ```
 
-For graceful degradation:
+为实现优雅降级：
 
 ```php
 $response = Http::get('https://api.example.com/users/1');
@@ -93,18 +93,18 @@ if ($response->notFound()) {
 $response->throw();
 ```
 
-## Use Request Pooling for Concurrent Requests
+## 使用请求池实现并发请求
 
-When making multiple independent API calls, use `Http::pool()` instead of sequential calls.
+进行多个独立 API 调用时，使用 `Http::pool()`，而不是顺序调用。
 
-Incorrect:
+错误：
 ```php
 $users = Http::get('https://api.example.com/users')->json();
 $posts = Http::get('https://api.example.com/posts')->json();
 $comments = Http::get('https://api.example.com/comments')->json();
 ```
 
-Correct:
+正确：
 ```php
 use Illuminate\Http\Client\Pool;
 
@@ -118,11 +118,11 @@ $users = $responses['users']->json();
 $posts = $responses['posts']->json();
 ```
 
-## Fake HTTP Calls in Tests
+## 测试中的伪造 HTTP 调用
 
-Never make real HTTP requests in tests. Use `Http::fake()` and `preventStrayRequests()`.
+绝不要在测试中发起真实 HTTP 请求。使用 `Http::fake()` 和 `preventStrayRequests()`。
 
-Incorrect:
+错误：
 ```php
 it('syncs user from API', function () {
     $service = new UserSyncService;
@@ -130,7 +130,7 @@ it('syncs user from API', function () {
 });
 ```
 
-Correct:
+正确：
 ```php
 it('syncs user from API', function () {
     Http::preventStrayRequests();
@@ -151,7 +151,7 @@ it('syncs user from API', function () {
 });
 ```
 
-Test failure scenarios too:
+也应测试失败场景：
 
 ```php
 Http::fake([

@@ -1,8 +1,8 @@
-# Advanced Query Patterns
+# 高级查询模式
 
-## Use `addSelect()` Subqueries for Single Values from Has-Many
+## 对 Has-Many 关系中的单值使用 `addSelect()` 子查询
 
-Instead of eager-loading an entire has-many relationship for a single value (like the latest timestamp), use a correlated subquery via `addSelect()`. This pulls the value directly in the main SQL query — zero extra queries.
+不要为单个值（如最新时间戳）预加载整个 has-many 关系，而应通过 `addSelect()` 使用相关子查询。这会在主 SQL 查询中直接获取该值——零额外查询。
 
 ```php
 public function scopeWithLastLoginAt($query): void
@@ -16,9 +16,9 @@ public function scopeWithLastLoginAt($query): void
 }
 ```
 
-## Create Dynamic Relationships via Subquery FK
+## 通过子查询外键创建动态关系
 
-Extend the `addSelect()` pattern to fetch a foreign key via subquery, then define a `belongsTo` relationship on that virtual attribute. This provides a fully-hydrated related model without loading the entire collection.
+扩展 `addSelect()` 模式，通过子查询获取外键，然后在该虚拟属性上定义 `belongsTo` 关系。这样无需加载整个集合即可提供完全填充的关联模型。
 
 ```php
 public function lastLogin(): BelongsTo
@@ -37,9 +37,9 @@ public function scopeWithLastLogin($query): void
 }
 ```
 
-## Use Conditional Aggregates Instead of Multiple Count Queries
+## 使用条件聚合替代多次计数查询
 
-Replace N separate `count()` queries with a single query using `CASE WHEN` inside `selectRaw()`. Use `toBase()` to skip model hydration when you only need scalar values.
+将 N 次独立的 `count()` 查询替换为在 `selectRaw()` 中使用 `CASE WHEN` 的单次查询。当你只需要标量值时，使用 `toBase()` 跳过模型水合。
 
 ```php
 $statuses = Feature::toBase()
@@ -49,50 +49,50 @@ $statuses = Feature::toBase()
     ->first();
 ```
 
-## Use `setRelation()` to Prevent Circular N+1
+## 使用 `setRelation()` 防止循环 N+1
 
-When a parent model is eager-loaded with its children, and the view also needs `$child->parent`, use `setRelation()` to inject the already-loaded parent rather than letting Eloquent fire N additional queries.
+当父模型与其子项一起被预加载，而视图还需要 `$child->parent` 时，使用 `setRelation()` 注入已加载的父模型，而不是让 Eloquent 触发 N 次额外查询。
 
 ```php
 $feature->load('comments.user');
 $feature->comments->each->setRelation('feature', $feature);
 ```
 
-## Prefer `whereIn` + Subquery Over `whereHas`
+## 优先使用 `whereIn` + 子查询而非 `whereHas`
 
-`whereHas()` emits a correlated `EXISTS` subquery that re-executes per row. Using `whereIn()` with a `select('id')` subquery lets the database use an index lookup instead, without loading data into PHP memory.
+`whereHas()` 会发出一个相关 `EXISTS` 子查询，该子查询会按行重新执行。将 `whereIn()` 与 `select('id')` 子查询配合使用，可让数据库改用索引查找，而无需将数据加载到 PHP 内存中。
 
-Incorrect (correlated EXISTS re-executes per row):
+错误（相关 EXISTS 会逐行重新执行）：
 
 ```php
 $query->whereHas('company', fn ($q) => $q->where('name', 'like', $term));
 ```
 
-Correct (index-friendly subquery, no PHP memory overhead):
+正确（对索引友好的子查询，无 PHP 内存开销）：
 
 ```php
 $query->whereIn('company_id', Company::where('name', 'like', $term)->select('id'));
 ```
 
-## Sometimes Two Simple Queries Beat One Complex Query
+## 有时两个简单查询胜过一个大查询
 
-Running a small, targeted secondary query and passing its results via `whereIn` is often faster than a single complex correlated subquery or join. The additional round-trip is worthwhile when the secondary query is highly selective and uses its own index.
+运行一个小的、有针对性的次要查询并通过 `whereIn` 传递其结果，通常比单个复杂的相关子查询或连接更快。当次要查询具有高度选择性并使用自己的索引时，额外的往返是值得的。
 
-## Use Compound Indexes Matching `orderBy` Column Order
+## 使用与 `orderBy` 列顺序匹配的复合索引
 
-When ordering by multiple columns, create a single compound index in the same column order as the `ORDER BY` clause. Individual single-column indexes cannot combine for multi-column sorts — the database will filesort without a compound index.
+按多列排序时，创建一个复合索引，其列顺序与 `ORDER BY` 子句相同。单独的单列索引无法组合用于多列排序——在没有复合索引的情况下，数据库将进行 filesort。
 
 ```php
-// Migration
+// 迁移
 $table->index(['last_name', 'first_name']);
 
-// Query — column order must match the index
+// 查询——列顺序必须与索引匹配
 User::query()->orderBy('last_name')->orderBy('first_name')->paginate();
 ```
 
-## Use Correlated Subqueries for Has-Many Ordering
+## 使用关联子查询实现一对多排序
 
-When sorting by a value from a has-many relationship, avoid joins (they duplicate rows). Use a correlated subquery inside `orderBy()` instead, paired with an `addSelect` scope for eager loading.
+按 has-many 关系中的值排序时，避免使用连接（它们会复制行）。改为在 `orderBy()` 内使用相关子查询，并配合 `addSelect` 作用域进行预加载。
 
 ```php
 public function scopeOrderByLastLogin($query): void

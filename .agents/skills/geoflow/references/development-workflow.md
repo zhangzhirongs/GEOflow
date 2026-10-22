@@ -1,58 +1,58 @@
-# GEOFlow Development Workflow
+# GEOFlow 开发工作流
 
-Use this workflow for changes to GEOFlow product code, including the public site, admin, API, CLI, workers, database, distribution, and target packages.
+在对 GEOFlow 产品代码进行更改时使用此工作流，包括公共站点、管理后台、API、CLI、worker、数据库、分发和目标包。
 
-## 1. Establish The Real Contract
+## 1. 建立真实契约
 
-1. Read repository instructions and dependency manifests.
-2. Run `scripts/discover_geoflow_workspace.py <workspace>`.
-3. Inspect current routes with `php artisan route:list --json` when the application boots successfully.
-4. Read the closest controller, request validation, model, service, view, test, and migration that already implement a similar capability.
-5. Record the affected surface: `backend`, `admin`, `api`, `cli`, `public_frontend`, `channel_frontend`, or `cross_surface`.
+1. 阅读仓库说明和依赖清单。
+2. 运行 `scripts/discover_geoflow_workspace.py <workspace>`。
+3. 当应用程序成功启动时，使用 `php artisan route:list --json` 检查当前路由。
+4. 阅读已实现类似功能的最近控制器、请求验证、模型、服务、视图、测试和迁移。
+5. 记录受影响面：`backend`、`admin`、`api`、`cli`、`public_frontend`、`channel_frontend` 或 `cross_surface`。
 
-Generated capability snapshots provide discovery evidence. Current code, routes, tests, and runtime output remain authoritative.
+生成的能力快照仅提供发现依据。当前代码、路由、测试和运行时输出仍是权威依据。
 
-## 2. Plan The Change By Layer
+## 2. 按层规划变更
 
-For each applicable layer, identify the exact contract before editing:
+对于每个适用的层，在编辑前确定确切的契约：
 
-- data: migrations, models, casts, relations, indexes, retention, and rollback
-- domain: service boundaries, state transitions, queues, retries, and idempotency
-- HTTP: routes, middleware, authorization, validation, responses, CSRF, and rate limits
-- admin: configurable admin prefix, permissions, navigation, forms, localization, readback, and audit logs
-- public site: controller-provided data, route helpers, SEO/schema, accessibility, responsive behavior, and empty states
-- distribution: channel type, signed requests, target-package version, capability negotiation, retries, and static rebuild behavior
-- CLI/API: discovered commands and routes, stable exit or response contracts, safe secret handling, and help text
+- 数据：迁移、模型、类型转换、关系、索引、保留和回滚
+- 领域：服务边界、状态转换、队列、重试和幂等性
+- HTTP：路由、中间件、授权、验证、响应、CSRF 和速率限制
+- 管理后台：可配置的管理后台前缀、权限、导航、表单、本地化、回读和审计日志
+- 公开站点：控制器提供的数据、路由辅助函数、SEO/schema、无障碍、响应式行为以及空状态
+- 分发：渠道类型、签名请求、目标包版本、能力协商、重试和静态重建行为
+- CLI/API：发现的命令和路由、稳定的退出或响应契约、安全的密钥处理以及帮助文本
 
-Keep shared business rules in services or support classes when several controllers, commands, jobs, or channels consume them.
+当多个控制器、命令、作业或渠道使用共享业务规则时，将其保留在服务类或支持类中。
 
-## 3. Implement Safely
+## 3. 安全实施
 
-- Scope changes to the requested feature and its required tests or documentation.
-- Preserve existing public routes and payload fields unless the request explicitly changes the contract.
-- Use reversible migrations and avoid relying on production-only data during schema changes.
-- Keep credentials in configuration or encrypted storage. Redact tokens, provider keys, channel secrets, passwords, and personal lead data from logs and summaries.
-- Resolve the admin prefix through the application configuration or route names.
-- Reuse the theme resolver, homepage module builder, lead form contract, distribution publisher interfaces, and target-package builders when present.
-- Update capability output when a channel renderer or signed endpoint gains a public feature.
+- 将变更范围限定在请求的功能及其所需测试或文档。
+- 除非请求明确更改契约，否则保留现有的公共路由和负载字段。
+- 使用可逆迁移，并避免在架构变更期间依赖仅生产环境的数据。
+- 将凭据保存在配置或加密存储中。在日志和摘要中脱敏令牌、提供商密钥、渠道密钥、密码和个人线索数据。
+- 通过应用配置或路由名称解析管理前缀。
+- 在存在时复用主题解析器、首页模块构建器、潜在客户表单契约、分发发布者接口和目标包构建器。
+- 当渠道渲染器或签名端点新增公开功能时，更新能力输出。
 
-## 4. Verification Matrix
+## 4. 验证矩阵
 
-Run the smallest meaningful checks first, then the repository's broader gate:
+先运行最小且有意义的检查，然后运行仓库更全面的门禁：
 
-| Changed surface | Minimum evidence |
+| 变更范围 | 最低证据 |
 |---|---|
-| PHP domain or service | focused unit test plus related feature test |
-| route, controller, middleware | route list plus request/permission feature test |
-| migration or model | migration test or fresh test database plus relation/cast coverage |
-| admin UI | feature test, localization check, validation path, and rendered-page readback |
-| public frontend or theme | page feature test, key route rendering, SEO/schema preservation, responsive preview |
-| queue or worker | job/service test, failure classification, retry/idempotency check |
-| distribution or target package | publisher/contract tests, capability response, signed request, static/rewrite behavior |
-| CLI/API | help or route discovery, success response, failure response, and installed/runtime invocation |
+| PHP 域或服务 | 聚焦单元测试加相关功能测试 |
+| 路由、控制器、中间件 | 路由列表加上请求/权限功能测试 |
+| 迁移或模型 | 迁移测试，或全新测试数据库加上关系/类型转换覆盖 |
+| 管理后台 UI | 功能测试、本地化检查、验证路径，以及渲染页面回读 |
+| 公共前台或主题 | 页面功能测试、关键路由渲染、SEO/schema 保留、响应式预览 |
+| 队列或工作进程 | 作业/服务测试、失败分类、重试/幂等性检查 |
+| 分发或目标包 | 发布者/契约测试、能力响应、签名请求、静态/重写行为 |
+| CLI/API | 帮助或路由发现、成功响应、失败响应，以及已安装/运行时调用 |
 
-Report the executed commands, test counts when available, observed failures, and unverified runtime layers.
+报告已执行的命令、可获得时的测试数量、观察到的失败以及未验证的运行时层。
 
-## 5. Operational Handoff
+## 5. 运维交接
 
-When implementation is complete, switch to `operations`, `public_frontend`, or `channel_frontend` for preview, import, sync, activation, or publication. State the exact target and rollback boundary before the finalize step.
+实现完成后，切换到 `operations`、`public_frontend` 或 `channel_frontend` 以进行预览、导入、同步、激活或发布。在最终确定步骤之前，说明确切目标和回滚边界。

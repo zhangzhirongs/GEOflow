@@ -1,4 +1,4 @@
 interface:
-  display_name: "GEOFlow"
-  short_description: "Build and operate GEOFlow across backend, admin, public frontend, themes, and channel sites"
-  default_prompt: "Use for GEOFlow development or operations across Laravel product code, admin, API/CLI, default-site themes, visitor flows, and GeoFlow Agent channel sites. Discover current capabilities, preserve contracts, verify changes, and require review before live or destructive actions."
+  display_name: GEOFlow 开发与运营
+  short_description: 开发与运营 GEOFlow 后端、管理后台、公共前端、主题及渠道站点
+  default_prompt: 使用 $geoflow 技能。用于 GEOFlow 的开发或运维，涵盖 Laravel 产品代码、管理后台、API/CLI、默认站点主题、访客流程以及 GeoFlow Agent 渠道站点。发现当前能力、保留契约、验证变更，并在上线或执行破坏性操作前要求审核。

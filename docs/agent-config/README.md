@@ -1,25 +1,25 @@
-# Agent Configuration
+# 智能体配置
 
-This folder keeps human-readable agent instructions in one place so the repository root stays focused on application files.
+此文件夹将人类可读的代理说明集中在一处，以便仓库根目录保持专注于应用程序文件。
 
-## Files
+## 文件
 
-- `AGENTS.md` - General agent instructions for GEOFlow.
-- `CODEX.md` - Codex / GPT-oriented instructions.
-- `CLAUDE.md` - Claude-oriented instructions.
-- `GEMINI.md` - Gemini-oriented instructions.
+- `AGENTS.md` - GEOFlow 的通用代理指令。
+- `CODEX.md` - 面向 Codex / GPT 的指令。
+- `CLAUDE.md` - 面向 Claude 的指令。
+- `GEMINI.md` - 面向 Gemini 的指令。
 
-## Required Root-Level Tooling
+## 必需的根级工具
 
-Some integration files intentionally remain at the repository root because the related tools discover them by convention. Do not move these into `docs/` unless the tool configuration is changed and verified:
+某些集成文件有意保留在仓库根目录，因为相关工具会按约定发现它们。除非已更改并验证工具配置，否则不要将这些文件移入 `docs/`：
 
-- `.mcp.json` - shared MCP server configuration for Laravel Boost.
-- `boost.json` - Laravel Boost install and skill configuration.
-- `opencode.json` - OpenCode MCP configuration.
-- `.codex/config.toml` - Codex MCP configuration.
-- `.cursor/mcp.json` - Cursor MCP configuration.
-- `.gemini/settings.json` - Gemini MCP configuration.
+- `.mcp.json` - 用于 Laravel Boost 的共享 MCP 服务器配置。
+- `boost.json` - Laravel Boost 安装与技能配置。
+- `opencode.json` - OpenCode MCP 配置。
+- `.codex/config.toml` - Codex MCP 配置。
+- `.cursor/mcp.json` - Cursor MCP 配置。
+- `.gemini/settings.json` - Gemini MCP 配置。
 
-The full Laravel Boost guidance lives in:
+完整的 Laravel Boost 指南位于：
 
 `../../.boost/guidelines.md`

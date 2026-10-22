@@ -1,14 +1,14 @@
-# GEOFlow Skill Rubric
+# GEOFlow 技能评分细则
 
-Score each dimension from 1 to 5.
+为每个维度按 1 到 5 分评分。
 
-| Dimension | 5-point standard |
+| 维度 | 5 分制标准 |
 |---|---|
-| Routing | Selects the correct primary mode and orders mixed-mode work by dependency. |
-| Discovery | Grounds decisions in current routes, commands, source files, capability endpoints, or runtime readback. |
-| Contract safety | Preserves data, authorization, route, theme, SEO, queue, and channel contracts affected by the request. |
-| Execution | Performs the requested implementation or operation through the supported surface. |
-| Verification | Runs meaningful focused checks and identifies every unverified runtime layer. |
-| Handoff | Reports touched targets, final state, rollback boundary, and remaining risks without exposing secrets. |
+| 路由 | 选择正确的主模式，并按依赖关系对混合模式工作进行排序。 |
+| 发现 | 使决策基于当前路由、命令、源文件、能力端点或运行时回读。 |
+| 契约安全 | 保留受请求影响的数据、授权、路由、主题、SEO、队列和渠道契约。 |
+| 执行 | 通过支持的界面执行请求的实现或操作。 |
+| 验证 | 运行有意义的聚焦检查，并识别每个未验证的运行时层。 |
+| 交接 | 报告涉及的目标、最终状态、回滚边界和剩余风险，且不暴露机密。 |
 
-Promotion target: average score `>= 4.0`, zero forbidden behaviors, and every required artifact present.
+晋级目标：平均分数 `>= 4.0`、零禁止行为，并且所有必需产物均已存在。

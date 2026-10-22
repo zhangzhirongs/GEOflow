@@ -1,58 +1,59 @@
 ---
 name: ai-sdk-development
-description: TRIGGER when working with ai-sdk which is Laravel official first-party AI SDK. Activate when building, editing AI agents, chatbots, text generation, image generation, audio/TTS, transcription/STT, embeddings, RAG, vector stores, reranking, structured output, streaming, conversation memory, tools, queueing, broadcasting, and provider failover across OpenAI, Anthropic, Gemini, Azure, Groq, xAI, DeepSeek, Mistral, Ollama, ElevenLabs, Cohere, Jina, and VoyageAI. Invoke when the user references ai-sdk, the `Laravel\Ai\` namespace, or this project's AI features — not for Prism PHP or other AI packages used directly.
+description: 在涉及 ai-sdk（Laravel 官方第一方 AI SDK）时触发。当构建、编辑 AI 智能体、聊天机器人、文本生成、图像生成、音频/TTS、转录/STT、嵌入、RAG、向量存储、重排序、结构化输出、流式传输、对话记忆、工具、队列、广播，以及跨 OpenAI、Anthropic、Gemini、Azure、Groq、xAI、DeepSeek、Mistral、Ollama、ElevenLabs、Cohere、Jina 和 VoyageAI 的提供方故障转移时激活。当用户提及 ai-sdk、`Laravel\Ai\` 命名空间或本项目的 AI 功能时调用——不适用于直接使用的 Prism PHP 或其他 AI 包。
 license: MIT
 metadata:
   author: laravel
+  display_name: Laravel AI SDK 开发
 ---
 
-# Developing with the Laravel AI SDK
+# Laravel AI SDK 开发
 
-The Laravel AI SDK (`laravel/ai`) is the official AI package for Laravel, providing a unified API for agents, images, audio, transcription, embeddings, reranking, vector stores, and file management across multiple AI providers.
+Laravel AI SDK（`laravel/ai`）是 Laravel 的官方 AI 包，为代理、图像、音频、转录、嵌入、重排序、向量存储和文件管理提供统一的 API，覆盖多个 AI 提供商。
 
-## Searching the Documentation
+## 搜索文档
 
-This package is new. Always search the documentation before implementing any feature. Never guess at APIs — the documentation is the single source of truth.
+此包是新的。在实现任何功能之前，请始终搜索文档。切勿猜测 API——文档是唯一事实来源。
 
-- Use broad, simple queries that match the documentation section headings below.
-- Do not add package names to queries — package information is shared automatically. Use `test agent fake`, not `laravel ai test agent fake`.
-- Run multiple queries at once — the most relevant results are returned first.
+- 使用与下面文档章节标题相匹配的宽泛、简单查询。
+- 不要将包名添加到查询中——包信息会自动共享。使用`test agent fake`，而不是`laravel ai test agent fake`。
+- 一次运行多个查询——最相关的结果会优先返回。
 
-### Documentation Sections
+### 文档章节
 
-Use these section headings as query terms for accurate results:
+将这些章节标题用作查询词以获得准确结果：
 
-- Introduction, Installation, Configuration, Provider Support
-- Agents: Prompting, Conversation Context, Structured Output, Attachments, Streaming, Broadcasting, Queueing, Tools, Provider Tools, Middleware, Anonymous Agents, Agent Configuration
-- Images
-- Audio (TTS)
-- Transcription (STT)
-- Embeddings: Querying Embeddings, Caching Embeddings
-- Reranking
-- Files
-- Vector Stores: Adding Files to Stores
-- Failover
-- Testing: Agents, Images, Audio, Transcriptions, Embeddings, Reranking, Files, Vector Stores
-- Events
+- 简介、安装、配置、提供商支持
+- 智能体：提示、对话上下文、结构化输出、附件、流式传输、广播、排队、工具、提供商工具、中间件、匿名智能体、智能体配置
+- 图片
+- 音频（TTS）
+- 转录（STT）
+- 嵌入：查询嵌入、缓存嵌入
+- 重排序
+- 文件
+- 向量存储：将文件添加到存储
+- 故障转移
+- 测试：智能体、图像、音频、转录、嵌入、重排序、文件、向量存储
+- 事件
 
-## Decision Workflow
+## 决策工作流
 
-Determine the right entry point before writing code:
+在编写代码之前确定正确的入口点：
 
-Text generation or chat? → Agent class with `Promptable` trait
-Chat with conversation history? → Agent + `Conversational` interface (manual) or `RemembersConversations` trait (automatic)
-Structured JSON output? → Agent + `HasStructuredOutput` interface
-Image generation? → `Image::of()->generate()`
-Audio synthesis? → `Audio::of()->generate()`
-Transcription? → `Transcription::fromPath()->generate()`
-Embeddings? → `Embeddings::for()->generate()`
-Reranking? → `Reranking::of()->rerank()`
-File storage? → `Document::fromPath()->put()`
-Vector stores? → `Stores::create()`
+文本生成还是聊天？→ 使用带有 `Promptable` trait 的智能体类
+需要带对话历史的聊天？→ 智能体 + `Conversational` 接口（手动）或 `RemembersConversations` trait（自动）
+结构化 JSON 输出？→ 代理 + `HasStructuredOutput` 接口
+图像生成？→ `Image::of()->generate()`
+音频合成？→ `Audio::of()->generate()`
+转录？→ `Transcription::fromPath()->generate()`
+嵌入？→ `Embeddings::for()->generate()`
+重排序？→ `Reranking::of()->rerank()`
+文件存储？→ `Document::fromPath()->put()`
+向量存储？→ `Stores::create()`
 
-## Basic Usage Examples
+## 基本用法示例
 
-### Agents
+### 智能体
 
 ```php
 use Laravel\Ai\Contracts\Agent;
@@ -69,14 +70,14 @@ class SalesCoach implements Agent
     }
 }
 
-// Prompting
+// 提示词
 $response = (new SalesCoach)->prompt('Analyze this transcript...');
 echo $response->text;
 
-// Container resolution with dependency injection
+// 使用依赖注入进行容器解析
 $agent = SalesCoach::make(user: $user);
 
-// Override provider, model, or timeout per-prompt
+// 按提示词覆盖 provider、model 或 timeout
 $response = (new SalesCoach)->prompt(
     'Analyze this transcript...',
     provider: Lab::Anthropic,
@@ -84,22 +85,22 @@ $response = (new SalesCoach)->prompt(
     timeout: 120,
 );
 
-// Streaming (returns SSE response from a route)
+// 流式传输（从路由返回 SSE 响应）
 return (new SalesCoach)->stream('Analyze this transcript...');
 
-// Queueing
+// 队列
 (new SalesCoach)->queue('Analyze this transcript...')
     ->then(fn ($response) => /* ... */);
 
-// Anonymous agents
+// 匿名智能体
 use function Laravel\Ai\{agent};
 
 $response = agent(instructions: 'You are a helpful assistant.')->prompt('Hello');
 ```
 
-### Conversation Context
+### 对话上下文
 
-Manual conversation history via the `Conversational` interface:
+通过 `Conversational` 接口手动管理对话历史：
 
 ```php
 use Laravel\Ai\Contracts\Agent;
@@ -125,7 +126,7 @@ class SalesCoach implements Agent, Conversational
 }
 ```
 
-Automatic conversation persistence via the `RemembersConversations` trait:
+通过`RemembersConversations` trait 实现对话自动持久化：
 
 ```php
 use Laravel\Ai\Concerns\RemembersConversations;
@@ -140,15 +141,15 @@ class SalesCoach implements Agent, Conversational
     public function instructions(): string { return 'You are a sales coach.'; }
 }
 
-// Start a new conversation
+// 开始新对话
 $response = (new SalesCoach)->forUser($user)->prompt('Hello!');
 $conversationId = $response->conversationId;
 
-// Continue an existing conversation
+// 继续现有对话
 $response = (new SalesCoach)->continue($conversationId, as: $user)->prompt('Tell me more.');
 ```
 
-### Structured Output
+### 结构化输出
 
 ```php
 use Illuminate\Contracts\JsonSchema\JsonSchema;
@@ -175,7 +176,7 @@ $response = (new Reviewer)->prompt('Review this...');
 echo $response['score']; // Access like an array
 ```
 
-### Images
+### 图片
 
 ```php
 use Laravel\Ai\Image;
@@ -188,7 +189,7 @@ $image = Image::of('A sunset over mountains')
 $path = $image->store(); // Store to default disk
 ```
 
-### Audio
+### 音频
 
 ```php
 use Laravel\Ai\Audio;
@@ -201,7 +202,7 @@ $audio = Audio::of('Hello from Laravel.')
 $path = $audio->store();
 ```
 
-### Transcription
+### 转录
 
 ```php
 use Laravel\Ai\Transcription;
@@ -213,7 +214,7 @@ $transcript = Transcription::fromStorage('audio.mp3')
 echo (string) $transcript;
 ```
 
-### Embeddings
+### 嵌入
 
 ```php
 use Laravel\Ai\Embeddings;
@@ -224,11 +225,11 @@ $response = Embeddings::for(['Text one', 'Text two'])
     ->cache()
     ->generate();
 
-// Single string via Stringable
+// 通过 Stringable 使用单个字符串
 $embedding = Str::of('Napa Valley has great wine.')->toEmbeddings();
 ```
 
-### Reranking
+### 重排序
 
 ```php
 use Laravel\Ai\Reranking;
@@ -240,24 +241,24 @@ $response = Reranking::of(['Django is Python.', 'Laravel is PHP.', 'React is JS.
 $response->first()->document; // "Laravel is PHP."
 ```
 
-### Files and Vector Stores
+### 文件与向量存储
 
 ```php
 use Laravel\Ai\Files\Document;
 use Laravel\Ai\Stores;
 
-// Store a file with the provider
+// 使用 provider 存储文件
 $file = Document::fromPath('/path/to/doc.pdf')->put();
 
-// Create a vector store and add files
+// 创建向量存储并添加文件
 $store = Stores::create('Knowledge Base');
 $store->add($file->id);
 $store->add(Document::fromStorage('manual.pdf')); // Store + add in one step
 ```
 
-## Agent Configuration
+## 智能体配置
 
-### PHP Attributes
+### PHP 属性
 
 ```php
 use Laravel\Ai\Attributes\{Provider, Model, MaxSteps, MaxTokens, Temperature, Timeout};
@@ -276,11 +277,11 @@ class MyAgent implements Agent
 }
 ```
 
-The `#[UseCheapestModel]` and `#[UseSmartestModel]` attributes are also available for automatic model selection.
+`#[UseCheapestModel]` 和 `#[UseSmartestModel]` 属性也可用于自动模型选择。
 
-### Tools
+### 工具
 
-Implement the `HasTools` interface and scaffold tools with `php artisan make:tool`:
+实现 `HasTools` 接口，并使用 `php artisan make:tool` 搭建工具脚手架：
 
 ```php
 use Laravel\Ai\Contracts\HasTools;
@@ -296,7 +297,7 @@ class MyAgent implements Agent, HasTools
 }
 ```
 
-### Provider Tools
+### 提供程序工具
 
 ```php
 use Laravel\Ai\Providers\Tools\{WebSearch, WebFetch, FileSearch};
@@ -311,7 +312,7 @@ public function tools(): iterable
 }
 ```
 
-### Conversation Memory
+### 对话记忆
 
 ```php
 use Laravel\Ai\Concerns\RemembersConversations;
@@ -327,108 +328,108 @@ $response = (new ChatBot)->forUser($user)->prompt('Hello!');
 $response = (new ChatBot)->continue($conversationId, as: $user)->prompt('More...');
 ```
 
-### Failover
+### 故障转移
 
 ```php
 $response = (new MyAgent)->prompt('Hello', provider: [Lab::OpenAI, Lab::Anthropic]);
 ```
 
-## Testing and Faking
+## 测试与伪造
 
-Each capability supports `fake()` with assertions:
+每项能力都支持 `fake()`，并带有断言：
 
 ```php
 use App\Ai\Agents\SalesCoach;
 use Laravel\Ai\{Image, Audio, Transcription, Embeddings, Reranking, Files, Stores};
 
-// Agents
+// 智能体
 SalesCoach::fake(['Response 1', 'Response 2']);
 SalesCoach::assertPrompted('query');
 SalesCoach::assertNotPrompted('query');
 SalesCoach::assertNeverPrompted();
 SalesCoach::fake()->preventStrayPrompts();
 
-// Images
+// 图像
 Image::fake();
 Image::assertGenerated(fn ($prompt) => $prompt->contains('sunset'));
 Image::assertNothingGenerated();
 
-// Audio
+// 音频
 Audio::fake();
 Audio::assertGenerated(fn ($prompt) => $prompt->contains('Hello'));
 
-// Transcription
+// 转录
 Transcription::fake(['Transcribed text.']);
 Transcription::assertGenerated(fn ($prompt) => $prompt->isDiarized());
 
-// Embeddings
+// 嵌入向量
 Embeddings::fake();
 Embeddings::assertGenerated(fn ($prompt) => $prompt->contains('Laravel'));
 
-// Reranking
+// 重排序
 Reranking::fake();
 Reranking::assertReranked(fn ($prompt) => $prompt->contains('PHP'));
 
-// Files
+// 文件
 Files::fake();
 Files::assertStored(fn ($file) => $file->mimeType() === 'text/plain');
 
-// Stores
+// 存储
 Stores::fake();
 Stores::assertCreated('Knowledge Base');
 $store = Stores::get('id');
 $store->assertAdded('file_id');
 ```
 
-## Key Patterns
+## 关键模式
 
-- Namespace: `Laravel\Ai\`
-- Package: `composer require laravel/ai`
-- Agent pattern: Implement the `Agent` interface and use the `Promptable` trait
-- Optional interfaces: `HasTools`, `HasMiddleware`, `HasStructuredOutput`, `Conversational`
-- Entry-point classes: `Image`, `Audio`, `Transcription`, `Embeddings`, `Reranking`, `Stores`
-- Provider enum: `Laravel\Ai\Enums\Lab` (prefer over plain strings)
-- Artisan commands: `php artisan make:agent`, `php artisan make:tool`
-- Global helper: `agent()` for anonymous agents
+- 命名空间：`Laravel\Ai\`
+- 包：`composer require laravel/ai`
+- 智能体模式：实现 `Agent` 接口并使用 `Promptable` trait
+- 可选接口：`HasTools`、`HasMiddleware`、`HasStructuredOutput`、`Conversational`
+- 入口类：`Image`、`Audio`、`Transcription`、`Embeddings`、`Reranking`、`Stores`
+- 提供商枚举：`Laravel\Ai\Enums\Lab`（优先于普通字符串）
+- Artisan 命令：`php artisan make:agent`、`php artisan make:tool`
+- 全局辅助函数：用于匿名代理的 `agent()`
 
-## Common Pitfalls
+## 常见陷阱
 
-### Wrong Namespace
+### 命名空间错误
 
-The namespace is `Laravel\Ai`, not `Illuminate\Ai` or `Laravel\AI`.
+命名空间是 `Laravel\Ai`，不是 `Illuminate\Ai` 或 `Laravel\AI`。
 
 ```php
-// Correct
+// 正确
 use Laravel\Ai\Image;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Promptable;
 
-// Wrong — these do not exist
+// 错误——这些不存在
 use Illuminate\Ai\Image;
 use Laravel\AI\Agent;
 ```
 
-### Unsupported Provider Capability
+### 不支持的提供方能力
 
-Calling a capability not supported by a provider throws a `LogicException`. Refer to the provider support table below.
+调用提供程序不支持的能力会抛出 `LogicException`。请参阅下方的提供程序支持表。
 
-### Never Use Prism Directly
+### 切勿直接使用 Prism
 
-Use agents and entry-point classes (`Image`, `Audio`, etc.) — not `Prism::text()` directly. The AI SDK wraps Prism internally.
+使用代理和入口点类（`Image`、`Audio` 等）——不要直接使用 `Prism::text()`。AI SDK 在内部封装了 Prism。
 
-## Provider Support
+## 提供商支持
 
-| Feature    | Providers                                                       |
+| 功能    | 提供商                                                       |
 | ---------- | --------------------------------------------------------------- |
-| Text       | OpenAI, Anthropic, Gemini, Azure, Groq, xAI, DeepSeek, Mistral, Ollama |
-| Images     | OpenAI, Gemini, xAI                                            |
-| TTS        | OpenAI, ElevenLabs                                              |
-| STT        | OpenAI, ElevenLabs, Mistral                                     |
-| Embeddings | OpenAI, Gemini, Azure, Cohere, Mistral, Jina, VoyageAI         |
-| Reranking  | Cohere, Jina                                                    |
-| Files      | OpenAI, Anthropic, Gemini                                       |
+| 文本 | OpenAI, Anthropic, Gemini, Azure, Groq, xAI, DeepSeek, Mistral, Ollama |
+| 图像     | OpenAI、Gemini、xAI                                            |
+| TTS | OpenAI, ElevenLabs |
+| STT | OpenAI, ElevenLabs, Mistral |
+| 嵌入 | OpenAI、Gemini、Azure、Cohere、Mistral、Jina、VoyageAI         |
+| 重排序 | Cohere, Jina |
+| 文件      | OpenAI、Anthropic、Gemini                                       |
 
-Use the `Laravel\Ai\Enums\Lab` enum to reference providers in code instead of plain strings:
+在代码中使用 `Laravel\Ai\Enums\Lab` 枚举引用提供者，而不是使用普通字符串：
 
 ```php
 use Laravel\Ai\Enums\Lab;

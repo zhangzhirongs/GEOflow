@@ -1,37 +1,37 @@
 <!--
-Copyright © 2026 姚金刚. All rights reserved.
-Project: geoflow
-Created by: 姚金刚
-Date: 2026-05-16
+版权所有 © 2026 姚金刚。保留所有权利。
+项目：geoflow
+创建者：姚金刚
+日期：2026-05-16
 X: https://x.com/yaojingang
 -->
 
-# GEOFlow Frontend Module And Variable Map
+# GEOFlow 前端模块与变量映射
 
-This document is the current GEOFlow frontend contract for `geoflow`. It is based on the Laravel rewrite, not the older root-level PHP frontend.
+本文档是 `geoflow` 的当前 GEOFlow 前端契约。它基于 Laravel 重写版，而不是较早的根级 PHP 前端。
 
-## 1. Current Workspace Baseline
+## 1. 当前工作区基线
 
-Current GEOFlow signals:
+当前 GEOFlow 信号：
 
-- Laravel entry: `artisan`
-- Public routes: `routes/web.php`
-- Site controllers: `app/Http/Controllers/Site/*`
-- Theme resolver: `app/Support/Site/SiteThemeViewResolver.php`
-- Homepage module builder when present: `app/Support/Site/HomepageModuleBuilder.php`
-- Built-in frontend views: `resources/views/site`
-- Built-in homepage module partial when present: `resources/views/site/partials/homepage-modules.blade.php`
-- Selectable themes: `resources/views/theme/{theme_id}`
-- Admin theme selection: `resources/views/admin/site-settings/index.blade.php`
-- Admin page theme editor when present: `app/Http/Controllers/Admin/SiteThemeEditorController.php`
-- Theme editor service when present: `app/Services/Admin/SiteThemeEditorService.php`
-- Public theme assets when present: `public/themes/{theme_id}/theme.css` and optional `theme.js`
+- Laravel 入口：`artisan`
+- 公共路由：`routes/web.php`
+- 站点控制器：`app/Http/Controllers/Site/*`
+- 主题解析器：`app/Support/Site/SiteThemeViewResolver.php`
+- 存在首页模块构建器时：`app/Support/Site/HomepageModuleBuilder.php`
+- 内置前端视图：`resources/views/site`
+- 存在时使用内置首页模块局部视图：`resources/views/site/partials/homepage-modules.blade.php`
+- 可选主题：`resources/views/theme/{theme_id}`
+- 管理主题选择：`resources/views/admin/site-settings/index.blade.php`
+- 管理页面主题编辑器（若存在）：`app/Http/Controllers/Admin/SiteThemeEditorController.php`
+- 主题编辑器服务（存在时）：`app/Services/Admin/SiteThemeEditorService.php`
+- 存在时的公共主题资源：`public/themes/{theme_id}/theme.css` 以及可选的 `theme.js`
 
-Legacy PHP signals such as root `index.php`, `article.php`, `category.php`, `archive.php`, and `/themes` are fallback-only.
+诸如根级 `index.php`、`article.php`、`category.php`、`archive.php` 和 `/themes` 之类的旧版 PHP 信号仅作为回退方案。
 
-## 2. Route Contract
+## 2. 路由契约
 
-Do not change these public routes during a design-only run:
+在仅设计运行期间，不要更改这些公共路由：
 
 - `/`
 - `/article/{slug}`
@@ -41,43 +41,43 @@ Do not change these public routes during a design-only run:
 - `/forms/{slug}`
 - `/forms/{slug}/submissions`
 
-Admin route base may be customized through `config/geoflow.php`; never hard-code `/geo_admin` in theme output.
-Themes should not add admin links unless the current application passes such links explicitly.
+Admin 路由基础路径可通过 `config/geoflow.php` 自定义；切勿在主题输出中硬编码 `/geo_admin`。
+除非当前应用显式传入此类链接，否则主题不应添加管理链接。
 
-Current homepage-module admin routes, when present under the configurable admin prefix:
+当前首页模块管理路由（当存在于可配置的管理前缀下时）：
 
-- `admin.site-settings.homepage-modules`: save `homepage_modules` and `homepage_style`
-- `admin.site-settings.homepage-modules.preset`: apply a built-in preset in `replace` or `append` mode
-- `admin.site-settings.homepage-modules.import`: import reviewed homepage design JSON in `replace` or `append` mode
+- `admin.site-settings.homepage-modules`：保存 `homepage_modules` 和 `homepage_style`
+- `admin.site-settings.homepage-modules.preset`：在 `replace` 或 `append` 模式下应用内置预设
+- `admin.site-settings.homepage-modules.import`：在 `replace` 或 `append` 模式下导入已审核的首页设计 JSON
 
-Do not call these routes automatically. Treat import or preset application as a finalize step that needs operator review of the exact payload and mode.
+不要自动调用这些路由。将导入或预设应用视为最终确定步骤，需要操作员审查确切的负载和模式。
 
-## 3. Theme Resolution Contract
+## 3. 主题解析契约
 
-`SiteThemeViewResolver::first($template, $data)` resolves:
+`SiteThemeViewResolver::first($template, $data)` 解析为：
 
 ```text
 theme.{active_theme}.{template}
 site.{template}
 ```
 
-If a theme does not provide a Blade view, GEOFlow falls back to `resources/views/site`.
+如果主题未提供 Blade 视图，GEOFlow 会回退到 `resources/views/site`。
 
-Allowed theme ID pattern:
+允许的主题 ID 模式：
 
 ```text
 ^[a-zA-Z0-9_-]+$
 ```
 
-## 4. Theme Package Files
+## 4. 主题包文件
 
-Current theme root:
+当前主题根目录：
 
 ```text
 resources/views/theme/{theme_id}/
 ```
 
-Recommended files:
+推荐的文件：
 
 ```text
 manifest.json
@@ -95,20 +95,20 @@ partials/article-card.blade.php
 assets/theme.css
 ```
 
-Only `manifest.json` is required for discovery. Missing Blade views fall back to built-in `site.*`.
+发现流程仅需要 `manifest.json`。缺失的 Blade 视图会回退到内置的 `site.*`。
 
-Current runtime themes may also load CSS/JS from:
+当前运行时主题还可能从以下位置加载 CSS/JS：
 
 ```text
 public/themes/{theme_id}/theme.css
 public/themes/{theme_id}/theme.js
 ```
 
-When both `resources/views/theme/{theme_id}/assets/theme.css` and `public/themes/{theme_id}/theme.css` exist, inspect the current layout before deciding which file is authoritative for runtime styling.
+当 `resources/views/theme/{theme_id}/assets/theme.css` 和 `public/themes/{theme_id}/theme.css` 都存在时，在决定哪个文件是运行时样式的权威来源之前，检查当前布局。
 
-## 5. Built-In Frontend Views
+## 5. 内置前端视图
 
-Stable built-in views:
+稳定的内置视图：
 
 - `resources/views/site/layout.blade.php`
 - `resources/views/site/home.blade.php`
@@ -121,46 +121,46 @@ Stable built-in views:
 - `resources/views/site/partials/article-card.blade.php`
 - `resources/views/site/partials/lead-form.blade.php`
 
-## 6. Shared Layout Modules
+## 6. 共享布局模块
 
 ### `layout`
 
-Owns:
+负责：
 
-- HTML shell
-- page title and meta description
-- canonical URL when provided
-- JSON-LD / schema blocks when provided
-- header / content / footer slots
+- HTML 外壳
+- 页面标题和元描述
+- 提供时的规范 URL
+- 若提供，则包含 JSON-LD / schema 块
+- 页眉 / 内容 / 页脚插槽
 
-Do not remove SEO, canonical, or schema output.
+不要移除 SEO、canonical 或 schema 输出。
 
 ### `partials.header`
 
-Owns:
+负责：
 
-- site name / logo
-- Home link
-- category navigation
-- archive link when present
-- responsive navigation
+- 站点名称 / 徽标
+- 首页链接
+- 分类导航
+- 存在时的归档链接
+- 响应式导航
 
-Inputs are controller-provided site settings and category collections. Do not query the database directly in a theme.
+输入是由控制器提供的站点设置和分类集合。不要在主题中直接查询数据库。
 
 ### `partials.footer`
 
-Owns:
+负责：
 
-- public copyright line
-- footer links and minimal public metadata
+- 公开版权行
+- 页脚链接和极简的公开元数据
 
-Keep it public-facing. Admin copyright/version UI is separate.
+保持其面向公众。管理端的版权/版本 UI 是独立的。
 
-## 7. Home Page Modules
+## 7. 首页模块
 
-View: `home`
+查看：`home`
 
-Stable modules:
+稳定的模块：
 
 - `home.hero`
 - `home.hero_carousel`
@@ -186,47 +186,47 @@ Stable modules:
 - `home.empty_state`
 - `home.pagination`
 
-Typical data:
+典型数据：
 
-- site settings
-- categories
-- homepage carousel slides
-- homepage module records
-- homepage style tokens
-- active lead forms keyed by slug
-- featured articles
-- hot articles
-- paginated latest articles
-- article summaries
-- pagination metadata
+- 站点设置
+- 分类
+- 首页轮播幻灯片
+- 首页模块记录
+- 主页样式令牌
+- 按 slug 索引的活动潜在客户表单
+- 精选文章
+- 热门文章
+- 分页的最新文章
+- 文章摘要
+- 分页元数据
 
-Current upgrade signals:
+当前升级信号：
 
-- `homepageCarouselSlides`: up to three enabled slides from site settings; fields are `image_url`, `title`, and `link_url`.
-- `homepageModules`: enabled homepage module records normalized from `site_settings.homepage_modules`.
-- `homepageStyle`: normalized global homepage style tokens from `site_settings.homepage_style`.
-- `leadFormsBySlug`: active lead forms available to default-site homepage modules when the growth-center tables exist.
-- `showHomepageModules`: true only for the default first homepage state: no search, no category, no missing category, and page 1.
-- `hotArticles`: published articles marked hot, normally available only on the default first homepage.
-- `featuredArticles`: published featured articles, normally available only on the default first homepage.
-- `cardSummaries`: safe article card summaries keyed by article id.
+- `homepageCarouselSlides`：来自站点设置的最多三张已启用幻灯片；字段为 `image_url`、`title` 和 `link_url`。
+- `homepageModules`：从 `site_settings.homepage_modules` 规范化得到的已启用首页模块记录。
+- `homepageStyle`：从 `site_settings.homepage_style` 规范化得到的全局首页样式令牌。
+- `leadFormsBySlug`：当增长中心表存在时，可供默认站点首页模块使用的活跃线索表单。
+- `showHomepageModules`：仅在默认首页第一页状态下为 true：无搜索、无分类、无缺失分类，且为第 1 页。
+- `hotArticles`：标记为热门的已发布文章，通常仅在默认的第一个首页上可用。
+- `featuredArticles`：已发布的精选文章，通常仅在默认的第一个首页上可用。
+- `cardSummaries`：以文章 ID 为键的安全文章卡片摘要。
 
-Homepage enrichment may compose fuller front pages from these inputs without backend changes. Safe examples include large hero images from carousel slides, hot-article rails, KPI cards based on current collection counts, chart-lite bars based on loaded article categories or view counts, text/value modules from site copy, homepage builder modules, and CTA sections pointing to public routes.
+首页增强可以在不修改后端的情况下，从这些输入中组合出更完整的首页。安全的示例包括：来自轮播幻灯片的大幅主视觉图片、热门文章栏、基于当前集合计数的 KPI 卡片、基于已加载文章分类或浏览量的轻量图表条形、来自站点文案的文本/数值模块、首页构建器模块，以及指向公共路由的 CTA 区块。
 
-Do not make rich homepage modules appear above search results, category filtering, or category-missing states unless the user explicitly asks for that behavior.
+除非用户明确要求该行为，否则不要让富首页模块出现在搜索结果、分类筛选或分类缺失状态之上。
 
-## 7.1 Homepage Module Builder Contract
+## 7.1 首页模块构建器契约
 
-When `HomepageModuleBuilder` exists, the system can store and render configurable homepage modules through site settings instead of requiring Blade-only customization.
+当 `HomepageModuleBuilder` 存在时，系统可以通过站点设置存储和渲染可配置的首页模块，而无需仅依赖 Blade 自定义。
 
-Style fields:
+样式字段：
 
 - `accent_color`, `background_color`, `surface_color`, `text_color`, `muted_color`
 - `container_width`: `narrow`, `default`, `wide`
 - `section_spacing`: `compact`, `normal`, `relaxed`
 - `radius`: `none`, `soft`, `round`
 
-Module fields:
+模块字段：
 
 - `id`, `type`, `layout`, `data_source`, `enabled`, `sort_order`
 - `title`, `subtitle`, `body`, `image_url`, `link_text`, `link_url`, `limit`
@@ -234,7 +234,7 @@ Module fields:
 - `lead_form_slug`
 - `accent_color`, `surface_color`, `text_color`, `muted_color`, `alignment`
 
-Supported module types:
+支持的模块类型：
 
 - `hero`
 - `rich_text`
@@ -247,15 +247,15 @@ Supported module types:
 - `lead_form`
 - `custom_html`
 
-Supported layouts are `single`, `split`, `grid`, and `compact`. Supported article sources are `featured`, `hot`, and `latest`. Supported alignments are `left` and `center`. Current validation caps modules at `HomepageModuleBuilder::MAX_MODULES`, normally `30`, and caps article collection limits at `12`.
+支持的布局为 `single`、`split`、`grid` 和 `compact`。支持的文章来源为 `featured`、`hot` 和 `latest`。支持的对齐方式为 `left` 和 `center`。当前校验将模块数量上限设为 `HomepageModuleBuilder::MAX_MODULES`（通常为 `30`），并将文章集合数量上限设为 `12`。
 
-`lead_form` is a default-site homepage module type. It renders `resources/views/site/partials/lead-form.blade.php` and requires a canonical top-level `lead_form_slug` that points to an existing active lead form. Imported design drafts may use aliases such as `form_slug`, `lead_form`, `form`, or `conversion_form`, but skill-authored payloads should output `lead_form_slug` explicitly.
+`lead_form` 是默认站点首页模块类型。它会渲染 `resources/views/site/partials/lead-form.blade.php`，并要求一个规范的顶级 `lead_form_slug` 指向现有的活动线索表单。导入的设计草稿可能使用诸如 `form_slug`、`lead_form`、`form` 或 `conversion_form` 之类的别名，但技能编写的载荷应显式输出 `lead_form_slug`。
 
-The `public_frontend` mode does not create lead forms. If no active form slug is available, use a `cta_band` that links to the intended public form URL or switch to `operations` for authenticated lead-form creation.
+`public_frontend` 模式不会创建线索表单。如果不存在可用的已启用表单 slug，请使用 `cta_band` 链接到目标公共表单 URL，或切换到 `operations` 进行经过身份验证的线索表单创建。
 
-Default-site supported modules and remote target-package supported modules are separate contracts. The current default site can support `lead_form`; the current managed GeoFlow Agent target package may not expose `lead_form` in `/geoflow-agent/v1/frontend-capabilities`. When remote support is missing, downgrade the channel payload to CTA/link or require target package upgrade before sync.
+默认站点支持的模块与远程目标包支持的模块是彼此独立的契约。当前默认站点可以支持 `lead_form`；当前受管理的 GeoFlow Agent 目标包可能不会在 `/geoflow-agent/v1/frontend-capabilities` 中暴露 `lead_form`。当远程支持缺失时，将渠道负载降级为 CTA/链接，或要求在同步前升级目标包。
 
-Built-in presets, when present:
+内置预设（若存在）：
 
 - `enterprise_brand`
 - `content_portal`
@@ -263,7 +263,7 @@ Built-in presets, when present:
 - `report_hub`
 - `product_launch`
 
-Agent output can be imported as JSON through `homepage-modules/import`. Preferred top-level shape:
+智能体输出可通过 `homepage-modules/import` 以 JSON 形式导入。首选顶层结构：
 
 ```json
 {
@@ -297,13 +297,13 @@ Agent output can be imported as JSON through `homepage-modules/import`. Preferre
 }
 ```
 
-The importer also accepts common aliases such as `sections`, `blocks`, `style_tokens`, `kind`, `headline`, `copy`, `cta_label`, and `cta_url`. Still prefer the canonical field names above so reviews are explicit.
+导入器还接受常见别名，例如 `sections`、`blocks`、`style_tokens`、`kind`、`headline`、`copy`、`cta_label` 和 `cta_url`。仍应优先使用上面的规范字段名，以便审查明确。
 
-## 8. Category Page Modules
+## 8. 分类页模块
 
-View: `category`
+查看：`category`
 
-Stable modules:
+稳定的模块：
 
 - `category.header`
 - `category.description`
@@ -312,17 +312,17 @@ Stable modules:
 - `category.pagination`
 - `category.empty_state`
 
-Typical data:
+典型数据：
 
-- category
-- articles
-- pagination metadata
+- 分类
+- 文章
+- 分页元数据
 
-## 9. Article Page Modules
+## 9. 文章页模块
 
-View: `article`
+查看：`article`
 
-Stable modules:
+稳定的模块：
 
 - `article.header`
 - `article.cover_image`
@@ -332,26 +332,26 @@ Stable modules:
 - `article.related_articles`
 - `article.ad_slot`
 
-Typical data:
+典型数据：
 
-- article
-- author
-- category
-- tags
-- related articles
-- rendered article HTML
-- article images
-- article detail ad
-- canonical URL and structured data
+- 文章
+- 作者
+- 分类
+- 标签
+- 相关文章
+- 渲染后的文章 HTML
+- 文章图片
+- 文章详情广告
+- 规范 URL 和结构化数据
 
-Important rendering rule: do not show image captions that are only filenames such as `333.png`; keep article images visual unless the system provides meaningful captions.
-Important markdown rule: article content is passed to the theme as rendered HTML. The theme should style standard HTML nodes such as `h2`, `h3`, `p`, `ul`, `ol`, `blockquote`, `table`, `pre`, and `code`; it should not expose raw markdown markers in list cards or article detail views.
+重要的渲染规则：不要显示仅包含文件名（如 `333.png`）的图片说明；除非系统提供有意义的说明文字，否则文章图片应保持视觉呈现。
+重要的 markdown 规则：文章内容以渲染后的 HTML 传递给主题。主题应为标准 HTML 节点（如 `h2`、`h3`、`p`、`ul`、`ol`、`blockquote`、`table`、`pre` 和 `code`）设置样式；不应在列表卡片或文章详情视图中暴露原始 markdown 标记。
 
-## 10. Archive Modules
+## 10. 归档模块
 
-Views: `archive-index`, `archive-month`
+视图：`archive-index`、`archive-month`
 
-Stable modules:
+稳定的模块：
 
 - `archive.overview`
 - `archive.month_group`
@@ -359,47 +359,47 @@ Stable modules:
 - `archive.article_card`
 - `archive.pagination`
 
-Typical data:
+典型数据：
 
-- archive months
-- selected year/month
-- articles
-- pagination metadata
+- 归档月份
+- 选定的年份/月份
+- 文章
+- 分页元数据
 
-## 11. Safe Editing Surface
+## 11. 安全编辑面
 
-Safe in theme packages:
+主题包中安全的内容包括：
 
-- Blade markup inside existing page/module boundaries
-- CSS tokens, spacing, shadows, colors, borders, typography, responsive behavior
-- card layouts and metadata presentation
-- homepage composition modules that derive from current view variables or clearly static theme copy
-- header/footer presentation
-- ad slot presentation
+- 现有页面/模块边界内的 Blade 标记
+- CSS 令牌、间距、阴影、颜色、边框、排版、响应式行为
+- 卡片布局和元数据呈现
+- 从当前视图变量或明确的静态主题文案中衍生的首页组成模块
+- 页眉/页脚呈现
+- 广告位呈现
 - `manifest.json`, `tokens.json`, `mapping.json`
-- public theme CSS/JS files when the current layout loads `asset('themes/{theme_id}/...')`
+- 当前布局加载 `asset('themes/{theme_id}/...')` 时的公开主题 CSS/JS 文件
 
-Unsafe without explicit system-change approval:
+未经明确的系统变更批准，这样做不安全：
 
-- controllers
-- models
-- migrations
-- routing
-- markdown renderer
-- SEO/schema generation
-- database queries
-- admin theme activation
-- admin base path behavior
-- multilingual persistence behavior
-- dynamic corporate data such as customers, logos, testimonials, products, plans, or analytics unless GEOFlow already passes it to the view or the user explicitly expands scope
+- 控制器
+- 模型
+- 迁移
+- 路由
+- markdown 渲染器
+- SEO/schema 生成
+- 数据库查询
+- 管理后台主题激活
+- 管理后台基础路径行为
+- 多语言持久化行为
+- 动态企业数据，例如客户、徽标、客户评价、产品、套餐或分析数据，除非 GEOFlow 已将其传递到视图，或用户明确扩大范围
 
-## 12. Preview Notes
+## 12. 预览说明
 
-Current Laravel GEOFlow does not guarantee an isolated `/preview/{theme}` route. A design run should either:
+当前 Laravel GEOFlow 不保证存在独立的 `/preview/{theme}` 路由。设计运行应采用以下任一方式：
 
-- generate static preview artifacts for review, or
-- create a preview theme under `resources/views/theme` and ask the operator to activate it only after review, or
-- use the admin theme editor preview when the current app exposes `SiteThemeEditorController`, or
-- use a dedicated preview route only when the current app actually provides one.
+- 生成用于评审的静态预览产物，或
+- 在 `resources/views/theme` 下创建预览主题，并要求操作员仅在审核后激活它，或
+- 当前应用提供 `SiteThemeEditorController` 时，使用后台主题编辑器预览，或者
+- 仅当当前应用实际提供专用预览路由时，才使用该路由。
 
-Never invent preview URLs from the legacy PHP system.
+绝不要根据旧版 PHP 系统臆造预览 URL。

@@ -1,10 +1,10 @@
 # GEOFlow 分发管理统一实施方案
 
-> **给 Agent 执行者：** 必须使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans` 按任务逐步执行。本文中的步骤使用复选框（`- [ ]`）语法，便于执行时跟踪进度。
+> **给智能体执行者：** 必须使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans` 按任务逐步执行。本文中的步骤使用复选框（`- [ ]`）语法，便于执行时跟踪进度。
 
-**目标：** 将 GEOFlow 的内容分发能力建设为 Agent 优先、异步执行、可扩展 Provider 的内容同步层，并确保远端分发失败不会阻塞或回滚本地文章发布。
+**目标：** 将 GEOFlow 的内容分发能力建设为智能体优先、异步执行、可扩展 Provider 的内容同步层，并确保远端分发失败不会阻塞或回滚本地文章发布。
 
-**架构：** GEOFlow 继续作为文章生成、审核和本地发布的事实源。当本地文章进入 `published` 状态后，GEOFlow 创建 `article_distributions` 记录，并把任务投递到专用的 `distribution` 队列；队列任务通过 `DistributionPublisherManager` 按渠道类型选择发布器，当前支持 `geoflow_agent` 目标站 Agent 和 `wordpress_rest` WordPress REST API 两类渠道，并记录远端 ID、URL、状态、元数据和日志。Ghost、微信公众号、Telegram 和社交平台等第三方 Provider 仍作为后续适配器扩展。
+**架构：** GEOFlow 继续作为文章生成、审核和本地发布的事实源。当本地文章进入 `published` 状态后，GEOFlow 创建 `article_distributions` 记录，并把任务投递到专用的 `distribution` 队列；队列任务通过 `DistributionPublisherManager` 按渠道类型选择发布器，当前支持 `geoflow_agent` 目标站智能体和 `wordpress_rest` WordPress REST API 两类渠道，并记录远端 ID、URL、状态、元数据和日志。Ghost、微信公众号、Telegram 和社交平台等第三方 Provider 仍作为后续适配器扩展。
 
 **技术栈：** Laravel 12、PHP 8.2+、Blade 管理后台、Tailwind CSS、lucide 图标、Eloquent 模型、Laravel 队列、Laravel HTTP Client、PHPUnit、Laravel Pint。
 
@@ -19,15 +19,15 @@
 
 统一结论：
 
-- 第一版采用 Agent 优先路线；GEOFlow 2.x 已在同一分发抽象层上补充 WordPress REST 渠道。
+- 第一版采用智能体优先路线；GEOFlow 2.x 已在同一分发抽象层上补充 WordPress REST 渠道。
 - `multi-platform-distribution-plan.md` 保留为长期 Provider 路线参考。
-- `distribution-management-agent-plan.md` 的 Agent 架构成为当前实施基线，但本文补齐后台功能逻辑、UI 设计约束、代码调用链和数据库逻辑。
+- `distribution-management-agent-plan.md` 的智能体架构成为当前实施基线，但本文补齐后台功能逻辑、UI 设计约束、代码调用链和数据库逻辑。
 
 ## 2. 产品边界与设计原则
 
 ### 2.1 第一版产品边界
 
-第一版只解决“本地已发布文章如何可靠同步到目标站点 Agent”的问题。
+第一版只解决“本地已发布文章如何可靠同步到目标站点智能体”的问题。
 
 纳入第一版：
 
@@ -59,14 +59,14 @@
 
 这样可以保证分发能力是附加能力，而不是发布链路里的硬依赖。
 
-### 2.3 Agent 优先
+### 2.3 智能体优先
 
-GEOFlow 的第一类目标仍是自有目标站 Agent，目标站点只需要实现一组稳定 Agent 接口：
+GEOFlow 的第一类目标仍是自有目标站智能体，目标站点只需要实现一组稳定智能体接口：
 
 - `GET /geoflow-agent/v1/health`
 - `POST /geoflow-agent/v1/articles`
 
-GEOFlow 只关心 Agent 协议，不直接关心目标站点底层是 WordPress、静态站、Laravel、Next.js 还是其他系统。第三方平台应通过独立发布器接入，保持和 Agent 相同的队列、状态、日志、重试和远端元数据模型，而不是把平台 API 直接塞进文章发布主流程。
+GEOFlow 只关心智能体协议，不直接关心目标站点底层是 WordPress、静态站、Laravel、Next.js 还是其他系统。第三方平台应通过独立发布器接入，保持和智能体相同的队列、状态、日志、重试和远端元数据模型，而不是把平台 API 直接塞进文章发布主流程。
 
 ### 2.5 WordPress 渠道
 
@@ -74,7 +74,7 @@ GEOFlow 2.x 支持通过 WordPress Core REST API 将文章分发到 WordPress �
 
 首版 WordPress 渠道支持：
 
-- Application Password 鉴权，不保存或展示 WordPress 登录密码。
+- 使用 Application Password 鉴权，不保存或展示 WordPress 登录密码。
 - 文章发布、更新和删除，对应 `/wp/v2/posts` 接口。
 - 图片上传到 WordPress 媒体库，并把正文中的本地图片链接替换为媒体库 URL。
 - 分类匹配、分类创建、固定分类和关键词转标签。
@@ -94,7 +94,7 @@ WordPress 渠道不需要目标站点包、伪静态规则或 GEOFlow Agent 签�
 - secret 存库必须加密。
 - 日志不得保存 secret 明文、Authorization 请求头、Cookie 或完整敏感响应。
 - 每次请求必须带 timestamp、nonce、body hash、signature 和 idempotency key。
-- Agent 必须拒绝过期 timestamp、重复 nonce、未知 key、禁用 key 和签名不匹配请求。
+- 智能体必须拒绝过期 timestamp、重复 nonce、未知 key、禁用 key 和签名不匹配请求。
 
 ## 3. 用户角色与核心对象
 
@@ -105,13 +105,13 @@ WordPress 渠道不需要目标站点包、伪静态规则或 GEOFlow Agent 签�
 | 后台管理员 | 创建渠道、复制 secret、健康检查、查看队列和日志 | 渠道是否可用、分发是否成功、错误原因 |
 | 内容运营人员 | 在任务中选择分发渠道、发布文章、查看分发状态 | 文章发布后是否同步到目标站点 |
 | Worker 进程 | 生成草稿、发布到期草稿、触发分发入队 | 不阻塞生成和本地发布 |
-| 目标站 Agent | 验签、接收文章、返回远端 ID 和 URL | 幂等、安全、可诊断 |
+| 目标站智能体 | 验签、接收文章、返回远端 ID 和 URL | 幂等、安全、可诊断 |
 
 ### 3.2 核心对象
 
 | 对象 | 数据表 | 说明 |
 |---|---|---|
-| 分发渠道 | `distribution_channels` | 一个目标站点或 Agent 端点 |
+| 分发渠道 | `distribution_channels` | 一个目标站点或智能体端点 |
 | 渠道密钥 | `distribution_channel_secrets` | 渠道可用 key 与加密 secret |
 | 任务渠道绑定 | `task_distribution_channels` | 任务生成的文章需要同步到哪些渠道 |
 | 文章分发记录 | `article_distributions` | 一篇文章对一个渠道的一次分发动作 |
@@ -122,16 +122,16 @@ WordPress 渠道不需要目标站点包、伪静态规则或 GEOFlow Agent 签�
 ### 4.1 完整业务闭环
 
 1. 管理员进入“分发管理”。
-2. 管理员创建目标站点渠道，填写名称、域名、Agent endpoint、状态和描述。
+2. 管理员创建目标站点渠道，填写名称、域名、智能体 endpoint、状态和描述。
 3. 系统生成 `key_id` 和 secret，secret 加密保存，明文只通过 session 在创建成功后展示一次。
-4. 管理员把 `key_id` 和 secret 配置到目标站点 Agent。
-5. 管理员在渠道详情页发起健康检查，确认 Agent 可达且验签正常。
+4. 管理员把 `key_id` 和 secret 配置到目标站点智能体。
+5. 管理员在渠道详情页发起健康检查，确认智能体可达且验签正常。
 6. 内容运营人员在任务创建或编辑页勾选活跃分发渠道。
 7. 任务生成文章后，文章仍先进入 GEOFlow 本地审核和发布流程。
 8. 当文章本地状态变为 `published` 后，系统为文章和渠道创建或更新 `article_distributions` 记录。
 9. 系统向 `distribution` 队列投递 `ProcessArticleDistributionJob`。
-10. 队列任务构造 payload，生成 HMAC 请求头，向目标站 Agent 发送文章。
-11. 目标站 Agent 返回 `remote_id`、`remote_url` 和远端状态。
+10. 队列任务构造 payload，生成 HMAC 请求头，向目标站智能体发送文章。
+11. 目标站智能体返回 `remote_id`、`remote_url` 和远端状态。
 12. GEOFlow 将分发记录更新为 `synced`，保存远端信息，并写入日志。
 13. 如果请求失败，分发记录更新为 `failed`，保存错误信息和日志，本地文章保持已发布。
 
@@ -145,7 +145,7 @@ WordPress 渠道不需要目标站点包、伪静态规则或 GEOFlow Agent 签�
 渠道创建逻辑：
 
 - `domain` 用于后台展示和识别，入库前应规范化为 host。
-- `endpoint_url` 用于请求目标站 Agent，后台表单允许输入裸域名或完整 URL；未填写协议时默认补 `https://`，入库前去掉末尾 `/`。
+- `endpoint_url` 用于请求目标站智能体，后台表单允许输入裸域名或完整 URL；未填写协议时默认补 `https://`，入库前去掉末尾 `/`。
 - `channel_type` 第一版固定为 `geoflow_agent`。
 - `template_key` 是可选字段，预留给目标站主题、栏目或模板映射。
 - `site_settings` 保存当前渠道的目标站点设置，包括网站名称、副标题、描述、关键词、版权、Logo、Favicon、SEO 模板、列表数量等；它只影响目标渠道站点，不修改 GEOFlow 本站的网站设置。
@@ -338,7 +338,7 @@ failed -> queued -> sending -> synced
 页面结构：
 
 - 顶部标题：`分发管理`。
-- 顶部说明：说明这是外部站点 Agent 和文章分发队列管理入口。
+- 顶部说明：说明这是外部站点智能体和文章分发队列管理入口。
 - 右侧操作：
   - “分发任务”次按钮，图标 `list-checks`。
   - “新增渠道”主按钮，图标 `plus`。
@@ -380,7 +380,7 @@ failed -> queued -> sending -> synced
 |---|---|---|---|---|
 | `name` | text | 是 | string, max:120 | 后台识别名称，如“官网主站” |
 | `domain` | text | 是 | string, max:255 | 展示域名，保存前规范化为 host |
-| `endpoint_url` | text | 是 | string, max:500，规范化后必须是 http/https URL | Agent 基础地址。可输入 `www.example.com` 或 `https://www.example.com`，未填写协议时默认补 `https://`，保存前去掉末尾 `/` |
+| `endpoint_url` | 文本 | 是 | string, max:500，规范化后必须是 http/https URL | 智能体基础地址。可输入 `www.example.com` 或 `https://www.example.com`，未填写协议时默认补 `https://`，保存前去掉末尾 `/` |
 | `template_key` | text | 否 | string, max:120 | 创建页可留空；编辑页通过模板单选卡片维护 |
 | `status` | select | 是 | active/paused | 默认 active |
 | `description` | textarea | 否 | string, max:1000 | 备注 |
@@ -397,7 +397,7 @@ failed -> queued -> sending -> synced
 - 表单提交失败时保留 `old()` 输入。
 - 创建成功后跳回分发首页，使用 session 临时展示 secret。
 - secret 提示文案必须说明：刷新后会隐藏，超级管理员可在渠道详情页输入当前密码再次临时显示。
-- 不在创建页直接展示后续配置教程，避免挤压表单；配置说明放在渠道详情页的 Agent 接入引导和 Agent 示例文档中。
+- 不在创建页直接展示后续配置教程，避免挤压表单；配置说明放在渠道详情页的智能体接入引导和智能体示例文档中。
 
 ### 5.6 渠道详情页 UI
 
@@ -409,13 +409,13 @@ failed -> queued -> sending -> synced
 - 标题为渠道名称，副标题为域名。
 - 右侧健康检查按钮，图标 `activity`。
 - 基本信息卡片：
-  - endpoint URL。
+  - 端点 URL。
   - status。
-  - template key。
-  - health status。
+  - 模板键。
+  - 健康状态。
 - 密钥信息卡片：
-  - active key ID。
-  - last used at。
+  - 活动密钥 ID。
+  - 上次使用时间。
   - 默认不显示 secret 明文。
   - 超级管理员可输入当前管理员密码，验证通过后临时显示 active secret。
   - 非超级管理员显示权限提示，不展示密码输入框。
@@ -425,13 +425,13 @@ failed -> queued -> sending -> synced
   - 功能标签展示：测试连接接口、文章接收接口、首页列表页、文章详情页。
   - 下载前必须由超级管理员输入当前管理员密码，因为包内会写入当前渠道的 `key_id` 和 secret。
   - 下载得到的目标站点包可以上传到目标服务器并解压。推荐 Web 根目录指向 `public`；如果只能把整个目录放到 Web 根目录下，根目录 `.htaccess` 必须阻止读取 `config.php` 和 `storage`，并把正常访问转发到 `public`。
-  - 如果 Agent 基础地址带二级目录，例如 `https://example.com/geoflow-target-site`，站点包应在 `config.php` 中写入 `base_path`，目标站前端链接和签名校验都基于归一化后的路径处理。
+  - 如果智能体基础地址带二级目录，例如 `https://example.com/geoflow-target-site`，站点包应在 `config.php` 中写入 `base_path`，目标站前端链接和签名校验都基于归一化后的路径处理。
 - 目标站点设置区：
   - 复用网站设置中的站点信息字段：网站名称、副标题、描述、关键词、版权、Logo、Favicon、SEO 标题模板、SEO 描述模板、推荐数量和每页数量。
   - 复用网站设置中的前台模板发现能力，从 `resources/views/theme/*/manifest.json` 读取可选模板，在渠道编辑页以单选卡片展示。
   - 保存后写入当前渠道的 `site_settings` JSON 和 `template_key`，不会影响 GEOFlow 本站设置。
-  - 渠道详情页提供“同步设置”操作，将这些设置通过签名接口发送到目标站 Agent。
-- Agent 接入引导卡片：
+  - 渠道详情页提供“同步设置”操作，将这些设置通过签名接口发送到目标站智能体。
+- 智能体接入引导卡片：
   - 展示示例文件路径 `docs/distribution/agent-sample/php/geoflow-agent.php`。
   - 展示部署、配置密钥、测试连接、任务绑定四个步骤。
   - 明确目标站至少配置 `GEOFLOW_KEY_ID`、`GEOFLOW_SECRET` 和可写存储目录。
@@ -456,9 +456,9 @@ failed -> queued -> sending -> synced
 - 渠道名称。
 - action。
 - status。
-- remote URL。
-- attempt count。
-- last error。
+- 远程 URL。
+- 尝试次数。
+- 上次错误。
 
 状态徽标建议：
 
@@ -469,8 +469,8 @@ failed -> queued -> sending -> synced
 
 后续增强列：
 
-- next retry at。
-- last attempt at。
+- 下次重试时间。
+- 上次尝试时间。
 - 操作列，失败记录显示“重试”按钮。
 - 失败类型或错误摘要。
 
@@ -493,7 +493,7 @@ failed -> queued -> sending -> synced
 
 交互约束：
 
-- 不要把渠道选择做成多选下拉。当前后台任务表单已经大量使用 section card，checkbox 卡片更容易扫描。
+- 不要把渠道选择做成多选下拉框。当前后台任务表单已经大量使用分区卡片，复选框卡片更容易浏览。
 - 不要展示 paused 渠道，避免运营人员误选不可用目标。
 - 不在任务表单里展示 secret 或健康检查按钮。渠道诊断留在分发管理模块。
 
@@ -542,7 +542,7 @@ $adminPrefix = trim((string) config('geoflow.admin_base_path', '/geo_admin'), '/
 | POST | `distribution/{channelId}/rotate-secret` | `admin.distribution.rotate-secret` | `DistributionController::rotateSecret` | 重置 secret |
 | POST | `distribution/{channelId}/reveal-secret` | `admin.distribution.reveal-secret` | `DistributionController::revealSecret` | 超级管理员验证密码后临时显示 active secret |
 | POST | `distribution/{channelId}/download-package` | `admin.distribution.download-package` | `DistributionController::downloadPackage` | 超级管理员验证密码后下载目标站点包 |
-| POST | `distribution/{channelId}/sync-settings` | `admin.distribution.sync-settings` | `DistributionController::syncSettings` | 通过目标站 Agent 同步渠道站点设置 |
+| POST | `distribution/{channelId}/sync-settings` | `admin.distribution.sync-settings` | `DistributionController::syncSettings` | 通过目标站智能体同步渠道站点设置 |
 | POST | `distribution/{channelId}/health` | `admin.distribution.health` | `DistributionController::health` | 健康检查 |
 
 后续建议路由：
@@ -558,7 +558,7 @@ $adminPrefix = trim((string) config('geoflow.admin_base_path', '/geo_admin'), '/
 - 第一版不强制 `admin.super`，普通后台管理员可以管理渠道。
 - 后续如果要限制 secret 重置和渠道删除，可单独把这些高风险动作放入 `admin.super`。
 
-## 7. Agent 协议设计
+## 7. 智能体协议设计
 
 ### 7.1 健康检查
 
@@ -580,7 +580,7 @@ GET /geoflow-agent/v1/health
 
 GEOFlow 处理规则：
 
-- HTTP 2xx 且可解析 JSON 即认为 Agent 可响应。
+- HTTP 2xx 且可解析 JSON 即认为智能体可响应。
 - 成功时写入 `last_health_status = ok`。
 - 失败时写入 `last_health_status = failed` 和错误信息。
 - 如果渠道存在 active secret，健康检查也应签名。
@@ -631,7 +631,7 @@ POST /geoflow-agent/v1/articles
 
 - `remote_id` 为标量时保存为字符串。
 - `remote_url` 为标量时保存为字符串。
-- 响应中缺少 `remote_id` 或 `remote_url` 不应导致本次请求失败，但会降低可观测性；后续可在 Agent 示例中要求必须返回。
+- 响应中缺少 `remote_id` 或 `remote_url` 不应导致本次请求失败，但会降低可观测性；后续可在智能体示例中要求必须返回。
 
 ### 7.3 HMAC 请求头
 
@@ -659,7 +659,7 @@ NONCE + "\n" +
 SHA256(BODY)
 ```
 
-Agent 校验规则：
+智能体校验规则：
 
 - 拒绝超出允许时间窗口的 timestamp。
 - 拒绝重复 nonce。
@@ -862,7 +862,7 @@ DistributionSigningService::headers()
 
 ### 9.1 `distribution_channels`
 
-用途：保存目标站点 Agent 渠道。
+用途：保存目标站点智能体渠道。
 
 字段：
 
@@ -871,11 +871,11 @@ DistributionSigningService::headers()
 | `id` | bigint | 主键 |
 | `name` | string(120) | 渠道名称 |
 | `domain` | string(255) | 展示域名，规范化 host |
-| `endpoint_url` | string(500) | Agent 根地址 |
+| `endpoint_url` | string(500) | 智能体根地址 |
 | `channel_type` | string(60) | 第一版固定 `geoflow_agent` |
 | `template_key` | string(120), nullable | 目标站模板或栏目映射 |
 | `site_settings` | json, nullable | 目标站点设置：站点名、描述、SEO、版权、Logo、Favicon、列表数量等 |
-| `status` | string(30), index | `active`、`paused` |
+| `status` | string(30)，索引 | `active`、`paused` |
 | `description` | text, nullable | 备注 |
 | `last_health_status` | string(30), nullable | 最近健康状态 |
 | `last_health_checked_at` | timestamp, nullable | 最近健康检查时间 |
@@ -887,7 +887,7 @@ DistributionSigningService::headers()
 
 - hasMany `DistributionChannelSecret`
 - hasOne `activeSecret`
-- belongsToMany `Task` through `task_distribution_channels`
+- belongsToMany `Task` 通过 `task_distribution_channels`
 - hasMany `ArticleDistribution`
 - hasMany `DistributionLog`
 
@@ -901,7 +901,7 @@ DistributionSigningService::headers()
 |---|---|---|
 | `id` | bigint | 主键 |
 | `distribution_channel_id` | foreignId | 关联渠道，级联删除 |
-| `key_id` | string(80), unique | 对外 key ID |
+| `key_id` | string(80)，唯一 | 对外 key ID |
 | `secret_ciphertext` | text | 加密 secret |
 | `status` | string(30), index | `active`、后续可加 `revoked` |
 | `scopes` | json, nullable | 权限范围 |
@@ -954,7 +954,7 @@ task_id + distribution_channel_id
 | `article_id` | foreignId | 关联文章，级联删除 |
 | `distribution_channel_id` | foreignId | 关联渠道，级联删除 |
 | `action` | string(30) | 当前为 `publish` |
-| `status` | string(30), index | `queued`、`sending`、`synced`、`failed` |
+| `status` | string(30)，索引 | `queued`、`sending`、`synced`、`failed` |
 | `remote_id` | string(120), nullable | 目标站返回 ID |
 | `remote_url` | string(500), nullable | 目标站文章 URL |
 | `idempotency_key` | string(120), unique | 幂等 key |
@@ -962,7 +962,7 @@ task_id + distribution_channel_id
 | `next_retry_at` | timestamp, nullable, index | 下次重试时间 |
 | `last_attempt_at` | timestamp, nullable | 最近尝试时间 |
 | `last_error_message` | text, nullable | 最近错误 |
-| `payload_hash` | string(64), nullable | payload SHA-256 |
+| `payload_hash` | string(64)，可空 | payload SHA-256 |
 | `created_at` / `updated_at` | timestamp | 时间戳 |
 
 唯一约束：
@@ -1018,11 +1018,11 @@ article_id + distribution_channel_id + action
 | 错误类型 | 示例 | 第一版处理 | 后续处理 |
 |---|---|---|---|
 | 配置错误 | endpoint URL 错误、缺少 active secret | 标记 failed，记录错误 | 后台详情页提示配置问题 |
-| 鉴权错误 | 401、403、签名不匹配 | 标记 failed | 不自动重试，提示重置 secret 或检查 Agent |
+| 鉴权错误 | 401、403、签名不匹配 | 标记 failed | 不自动重试，提示重置 secret 或检查智能体 |
 | 网络错误 | timeout、connection refused | 标记 failed | 可自动延迟重试 |
 | 远端限流 | 429 | 标记 failed | 可自动延迟重试 |
 | 远端服务错误 | 500、502、503、504 | 标记 failed | 可自动延迟重试 |
-| 载荷错误 | 422、字段缺失 | 标记 failed | 不自动重试，提示修正 Agent 或 payload |
+| 载荷错误 | 422、字段缺失 | 标记 failed | 不自动重试，提示修正智能体或 payload |
 
 ### 10.2 一致性策略
 
@@ -1045,7 +1045,7 @@ article_id + distribution_channel_id + action
 - 本地事务提交后再 dispatch 分发任务。
 - 分发任务通过 `afterCommit()` 避免读取未提交数据。
 - 远端失败不会回滚本地事务。
-- 重复入队依赖唯一约束和 idempotency key 防止重复创建远端文章。
+- 重复入队依赖唯一约束和 idempotency key，防止重复创建远端文章。
 
 ## 11. 开发计划
 
@@ -1055,13 +1055,13 @@ article_id + distribution_channel_id + action
 
 建议开发顺序：
 
-1. **DP-0：整理当前 Phase 1/2 基线**。锁定已经跑通的 Agent-first 闭环，筛掉不应提交的 longtask 输出。
+1. **DP-0：整理当前 Phase 1/2 基线**。锁定已经跑通的智能体-first 闭环，筛掉不应提交的 longtask 输出。
 2. **DP-1：渠道生命周期完善**。补渠道编辑、暂停、启用、secret 重置。
 3. **DP-2：分发任务运营能力**。补失败筛选、手动重试、重试策略。
 4. **DP-3：文章和任务侧状态可见性**。让运营人员从文章列表和任务列表看到分发结果。
-5. **DP-4：Agent 示例、目标站点包与接入文档**。提供可本地运行的 PHP Agent 示例、可下载目标站点 ZIP 包和协议说明。
+5. **DP-4：智能体示例、目标站点包与接入文档**。提供可本地运行的 PHP 智能体示例、可下载目标站点 ZIP 包和协议说明。
 6. **DP-5：发布硬化与首版提交**。补齐测试、文案、路由检查、提交范围。
-7. **DP-6：后续 Provider 基础**。在 Agent-first 稳定后再抽象通用 Webhook 或特定平台适配器。
+7. **DP-6：后续 Provider 基础**。在智能体-first 稳定后再抽象通用 Webhook 或特定平台适配器。
 
 每个开发包完成后都至少运行：
 
@@ -1128,7 +1128,7 @@ php artisan test --compact
 - 渠道编辑：修改 `name`、`domain`、`endpoint_url`、`template_key`、`site_settings`、`status`、`description`。
 - 暂停渠道：将 `status` 改为 `paused`。
 - 启用渠道：将 `status` 改为 `active`。
-- 重置 secret：旧 active secret 改为 `revoked`，生成新的 `key_id` 和 secret。
+- 重置 secret：将旧 active secret 改为 `revoked`，生成新的 `key_id` 和 secret。
 - 详情页展示最近错误和健康检查时间。
 
 UI 设计：
@@ -1187,7 +1187,7 @@ UI 设计：
 
 重试策略：
 
-- 不自动重试：401、403、signature invalid、payload validation error。
+- 不自动重试：401、403、签名无效、请求负载验证错误。
 - 可重试：timeout、connection、429、500、502、503、504。
 - 重试间隔：按 attempt 指数退避，最大不超过 1 小时。
 - 最大次数：读取 `task_distribution_channels.max_attempts`，默认 3。
@@ -1195,7 +1195,7 @@ UI 设计：
 UI 设计：
 
 - 分发任务页顶部增加筛选表单，沿用当前后台筛选区样式。
-- 状态使用彩色徽标：queued 蓝色、sending amber、synced 绿色、failed 红色。
+- 状态使用彩色徽标：queued 蓝色、sending 琥珀色、synced 绿色、failed 红色。
 - 失败记录操作列显示“重试”。
 - 非失败记录操作列显示灰色空状态。
 
@@ -1253,7 +1253,7 @@ UI 设计：
 - 列表查询没有明显 N+1。
 - 现有文章和任务页面测试通过。
 
-### 11.6 DP-4：Agent 示例、目标站点包与接入文档
+### 11.6 DP-4：智能体示例、目标站点包与接入文档
 
 目标：让目标站点开发者可以按示例快速接入 GEOFlow 分发协议，同时让普通新站点可以直接下载 ZIP 站点包、上传解压后进入测试。
 
@@ -1274,14 +1274,14 @@ UI 设计：
 - 校验 key ID。
 - 校验 timestamp 时间窗口。
 - 校验 body SHA-256。
-- 校验 HMAC signature。
-- 使用 idempotency key 返回相同结果。
+- 校验 HMAC 签名。
+- 使用幂等键返回相同结果。
 - 将接收到的文章写为本地 JSON 文件，便于开发验证和后续替换成 CMS 写入逻辑。
 
 目标站点包能力：
 
 - 按渠道动态生成 ZIP 包，文件名形如 `geoflow-target-site-{domain}.zip`。
-- 包内 `config.php` 写入当前渠道站点名、站点描述、关键词、版权、SEO 模板、目标模板标识、域名、Agent 基础地址、`base_path`、`key_id` 和 secret。
+- 包内 `config.php` 写入当前渠道站点名、站点描述、关键词、版权、SEO 模板、目标模板标识、域名、智能体基础地址、`base_path`、`key_id` 和 secret。
 - 包内 `public/index.php` 同时提供：
   - `GET /geoflow-agent/v1/health`
   - `POST /geoflow-agent/v1/articles`
@@ -1297,7 +1297,7 @@ UI 设计：
 
 文档内容：
 
-- 如何启动本地 Agent 示例。
+- 如何启动本地智能体示例。
 - 如何在 GEOFlow 创建渠道。
 - 如何复制 `key_id` 和 secret；忘记 secret 时，超级管理员如何通过当前密码临时重新显示。
 - 如何从渠道详情页下载目标站点包。
@@ -1305,7 +1305,7 @@ UI 设计：
 - 如何从渠道详情页点击“同步设置”，把站点标题、版权、SEO 和模板标识写入目标站。
 - 如何上传解压、将 Web 根目录指向 `public`，并确认 `storage/articles` 可写。
 - 如果无法设置 Web 根目录，如何依赖根目录 `.htaccess` 转发访问并保护敏感文件。
-- 如果 Agent 基础地址带二级目录，如何确认 `base_path`、首页链接、详情页链接和签名校验一致。
+- 如果智能体基础地址带二级目录，如何确认 `base_path`、首页链接、详情页链接和签名校验一致。
 - 如何配置 endpoint。
 - 如何触发一篇测试文章分发。
 - 常见错误说明：401、403、422、500、timeout。
@@ -1316,11 +1316,11 @@ UI 设计：
 - 临时生成的站点包中 `config.php` 和 `public/index.php` 语法检查通过。
 - 站点包 ZIP 中包含当前渠道的 `key_id`、secret、首页列表页和文章详情页代码。
 - 站点包 ZIP 中包含根目录 `.htaccess`、`storage/.htaccess` 和 Nginx 敏感路径拒绝配置。
-- 带二级目录的 Agent 地址可以通过生成包的健康检查、文章发布和前台链接烟测。
+- 带二级目录的智能体地址可以通过生成包的健康检查、文章发布和前台链接烟测。
 - 目标站点设置可以通过签名接口同步到生成包，并影响首页标题、SEO 和页脚版权。
 - 密码错误不能下载站点包。
 - 本地启动示例后，GEOFlow 健康检查可成功。
-- 发布测试文章后，示例 Agent 能收到并保存文章。
+- 发布测试文章后，示例智能体能收到并保存文章。
 
 ### 11.7 DP-5：发布硬化与首版提交
 
@@ -1361,12 +1361,12 @@ git diff --check
 
 ### 11.8 DP-6：后续 Provider 基础
 
-目标：在 Agent-first 稳定后，开始抽象 Provider，但不破坏第一版协议。
+目标：在智能体-first 稳定后，开始抽象 Provider，但不破坏第一版协议。
 
 建议顺序：
 
 1. 通用 Webhook Provider，只转发签名 payload。
-2. WordPress Agent 插件或 WordPress Provider。
+2. WordPress 智能体插件或 WordPress Provider。
 3. Ghost Provider。
 4. 微信公众号草稿和发布能力。
 5. 通知型适配器，例如 Telegram、Discord。
@@ -1424,27 +1424,27 @@ Tests: 151 passed (705 assertions)
 
 后续继续完成：
 
-- [ ] Agent PHP 示例。
+- [ ] 智能体 PHP 示例。
 
 阶段 2 的验收标准：
 
 - 管理员不需要进数据库即可处理常见失败。
 - 文章列表能快速看到分发状态。
-- 目标站开发者可以照 Agent 示例接入。
+- 目标站开发者可以照智能体示例接入。
 - 失败重试不会影响本地文章状态。
 
 ### 12.3 阶段 3：Provider 路线图
 
-Agent 优先基础能力稳定后，再推进：
+智能体优先基础能力稳定后，再推进：
 
 1. 通用签名 Webhook Provider：只转发 payload。
-2. WordPress Provider 或 WordPress Agent 插件：文章、媒体 REST API、分类、标签、原文链接。
+2. WordPress Provider 或 WordPress 智能体插件：文章、媒体 REST API、分类、标签、原文链接。
 3. Ghost Provider：Admin API 文章、标签、canonical URL。
 4. 微信公众号：只有权限检测明确后，再接入草稿和发布 API。
 5. Telegram/Discord：作为通知适配器，不作为长篇 SEO 文章目标。
 6. Dev.to、Mastodon、Bluesky：短内容或垂直社区适配器。
 
-不要把微信、社交媒体或 OAuth 流程放进第一版 Agent 协议提交。
+不要把微信、社交媒体或 OAuth 流程放进第一版智能体协议提交。
 
 ## 13. 测试策略
 
@@ -1458,14 +1458,14 @@ Agent 优先基础能力稳定后，再推进：
 - 渠道编辑页展示目标站点设置和可选前台模板。
 - 保存渠道时写入目标站点设置 JSON 和模板标识。
 - 管理员可以重置 secret，旧 key 失效。
-- 超级管理员可以输入当前密码临时重新显示 active secret。
+- 超级管理员可以输入当前密码，临时重新显示 active secret。
 - 密码错误或非超级管理员不能重新显示 active secret。
-- 渠道详情页展示 Agent 接入引导和示例文件路径。
+- 渠道详情页展示智能体接入引导和示例文件路径。
 - 超级管理员可以输入当前密码下载目标站点包。
 - 密码错误不能下载目标站点包。
 - 目标站点包包含敏感文件访问保护配置。
-- 目标站点包支持 Agent 基础地址部署在二级目录下。
-- 目标站点设置可以通过签名请求同步到目标 Agent。
+- 目标站点包支持智能体基础地址部署在二级目录下。
+- 目标站点设置可以通过签名请求同步到目标智能体。
 - 任务创建页展示活跃分发渠道。
 - 创建任务时保存已选择渠道。
 - 发布任务文章后创建 `article_distributions` 记录。

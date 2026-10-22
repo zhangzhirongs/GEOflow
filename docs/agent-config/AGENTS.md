@@ -1,19 +1,19 @@
-# GEOFlow Agent Instructions
+# GEOFlow Agent 指令
 
-Laravel Boost support is installed for this repository.
+此仓库已安装 Laravel Boost 支持。
 
-Before making Laravel, PHP, Tailwind, Horizon, or AI SDK changes, read:
+在进行 Laravel、PHP、Tailwind、Horizon 或 AI SDK 更改之前，请阅读：
 
 `../../.boost/guidelines.md`
 
-The Boost MCP server is configured in:
+Boost MCP 服务器配置在：
 
 `../../.mcp.json`
 
-Tool-specific configuration files are kept at their default discovery paths in the repository root or hidden tool folders.
+工具特定的配置文件保留在仓库根目录或隐藏工具文件夹中的默认发现路径。
 
-## Distribution Channel Deletion Safety
+## 分发渠道删除安全性
 
-- Run channel-scoped remote calls and credential/package exports through `DistributionChannelOperationLeaseService` so final deletion can detect in-flight work.
-- Lock the distribution channel row before channel writes, task-channel binding changes, queue claims, retries, or immediate distribution actions, and reject work while the channel status is `deleting`.
-- Keep final deletion behind the two-step impact review. Recompute and verify the impact fingerprint inside the locked deletion transaction before removing local data.
+- 通过 `DistributionChannelOperationLeaseService` 运行渠道范围的远程调用以及凭据/包导出，以便最终删除能够检测进行中的工作。
+- 在渠道写入、任务-渠道绑定变更、队列认领、重试或立即分发操作之前锁定分发渠道行，并在渠道状态为 `deleting` 时拒绝工作。
+- 最终删除必须经过两步影响审查。在移除本地数据之前，应在已锁定的删除事务中重新计算并验证影响指纹。

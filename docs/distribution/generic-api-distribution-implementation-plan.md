@@ -1,12 +1,12 @@
 # GEOFlow 通用 API 分发渠道开发方案
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use `executing-plans` or `subagent-driven-development` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **面向智能体工作者：** 必需子技能：使用 `executing-plans` 或 `subagent-driven-development` 逐项实现此计划任务。步骤使用复选框（`- [ ]`）语法进行跟踪。
 
-**Goal:** 在现有 GEOFlow 分发管理中新增“通用 API 渠道”，让文章发布、更新、删除和站点设置同步可以通过可配置 HTTP API 对接第三方 CMS、自动化平台和自研内容系统。
+**目标：** 在现有 GEOFlow 分发管理中新增“通用 API 渠道”，让文章发布、更新、删除和站点设置同步可以通过可配置 HTTP API 对接第三方 CMS、自动化平台和自研内容系统。
 
 **Architecture:** 沿用当前 `DistributionPublisherInterface`、`DistributionPublisherManager`、`DistributionPayloadBuilder` 和 `ArticleDistribution` 队列机制，新增 `generic_http_api` 渠道类型和 `GenericHttpApiPublisher`。第一版不追求“自动适配所有平台”，而是提供稳定的 GEOFlow 标准载荷、认证配置、端点配置、响应字段映射和可测试的通用 HTTP 分发能力。
 
-**Tech Stack:** Laravel 12、Eloquent、Blade、Laravel HTTP Client、PHPUnit Feature/Unit Tests、现有分发队列 `distribution`。
+**技术栈：** Laravel 12、Eloquent、Blade、Laravel HTTP Client、PHPUnit 功能/单元测试、现有分发队列 `distribution`。
 
 ---
 
@@ -34,7 +34,7 @@
   - 无认证
   - Bearer Token
   - Basic Auth
-  - Header API Key
+  - 请求头 API 密钥
   - GEOFlow HMAC 签名
 - 支持每个动作配置独立 HTTP 方法和路径。
 - 支持响应字段映射：
@@ -229,8 +229,8 @@
 
 - Bearer Token：`secret_ciphertext` 保存 token
 - Basic Auth：`key_id` 可保存用户名标识，`secret_ciphertext` 保存密码；用户名仍建议存 `channel_config.generic_basic_username`
-- Header API Key：`secret_ciphertext` 保存 API key
-- HMAC：`key_id` 保存 key id，`secret_ciphertext` 保存签名密钥
+- 请求头 API 密钥：`secret_ciphertext` 保存 API 密钥
+- HMAC：`key_id` 保存密钥 ID，`secret_ciphertext` 保存签名密钥
 - 无认证：不创建 secret，或创建 scopes 为空的 secret；建议不创建 secret，Publisher 根据认证方式判断
 
 建议 scopes：
@@ -366,7 +366,7 @@ HMAC 模式可复用现有 `DistributionSigningService`，但要注意通用 API
   - 替换 `{slug}`、`{remote_id}` 等路径变量
   - 校验缺失变量
 
-### 5.2 Controller
+### 5.2 控制器
 
 - 修改：`app/Http/Controllers/Admin/DistributionController.php`
   - `validateChannel()` 增加通用 API 字段
@@ -375,7 +375,7 @@ HMAC 模式可复用现有 `DistributionSigningService`，但要注意通用 API
   - `update()` 支持敏感值留空不变、填写则轮换
   - `createChannelSecret()` 或新增 `createGenericHttpSecret()`
 
-### 5.3 Blade UI
+### 5.3 Blade 界面
 
 - 修改：`resources/views/admin/distribution/create.blade.php`
   - 增加通用 API 渠道类型卡片
@@ -387,7 +387,7 @@ HMAC 模式可复用现有 `DistributionSigningService`，但要注意通用 API
 
 - 修改：`resources/views/admin/distribution/show.blade.php`
   - 通用 API 渠道显示 API 配置摘要、响应映射、示例 Payload
-  - 不展示 Agent 包下载模块
+  - 不展示智能体包下载模块
   - 不展示 WordPress 专属引导
 
 - 修改：`resources/views/admin/distribution/index.blade.php`
@@ -427,7 +427,7 @@ HMAC 模式可复用现有 `DistributionSigningService`，但要注意通用 API
 - 修改：`tests/Feature/AdminDistributionPageTest.php`
   - 测试创建通用 API 渠道
   - 测试编辑通用 API 渠道保留敏感值
-  - 测试详情页显示通用 API 配置，不显示 Agent 包和 WordPress 引导
+  - 测试详情页显示通用 API 配置，不显示智能体包和 WordPress 引导
   - 测试任务分发通用 API 成功记录远程链接
 
 ## 6. 分阶段开发计划
@@ -444,9 +444,9 @@ HMAC 模式可复用现有 `DistributionSigningService`，但要注意通用 API
 
 - 后台可以创建、编辑、查看通用 API 渠道。
 - 敏感值不会明文回显。
-- 现有 GEOFlow Agent 和 WordPress 页面不回归。
+- 现有 GEOFlow Agent 和 WordPress 页面无回归。
 
-### Phase 2：通用 HTTP Publisher
+### 阶段 2：通用 HTTP Publisher
 
 - [ ] 新增 `GenericHttpResponseMapper`。
 - [ ] 新增 `GenericHttpRequestFactory`。
@@ -534,7 +534,7 @@ Payload 包装：none
 
 通用 API 不能自动理解所有第三方平台的字段语义。第一版应明确定位为：
 
-> 适配能接收 HTTP JSON 的系统；复杂平台用原生 Connector。
+> 适配能接收 HTTP JSON 的系统；复杂平台使用原生 Connector。
 
 ### 9.2 第二风险：配置复杂
 
@@ -556,7 +556,7 @@ Payload 包装：none
   - Make Webhook
   - Zapier Webhook
   - Pipedream Webhook
-  - Ghost Admin API
+  - Ghost 管理接口
   - Strapi
   - Directus
 - 字段映射模板：
@@ -582,7 +582,7 @@ Payload 包装：none
 
 ### 11.2 范围检查
 
-方案没有引入新运行时、没有新增队列系统、没有重构现有 Agent/WordPress 分发。第一版可以独立上线，即使后续不做预设模板，也能通过通用 HTTP API 对接外部系统。
+方案没有引入新运行时、没有新增队列系统、没有重构现有智能体/WordPress 分发。第一版可以独立上线，即使后续不做预设模板，也能通过通用 HTTP API 对接外部系统。
 
 ### 11.3 风险检查
 

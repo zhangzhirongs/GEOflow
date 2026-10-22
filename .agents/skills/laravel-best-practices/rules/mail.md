@@ -1,27 +1,27 @@
-# Mail Best Practices
+# 邮件最佳实践
 
-## Implement `ShouldQueue` on the Mailable Class
+## 在 Mailable 类上实现 `ShouldQueue`
 
-Makes queueing the default regardless of how the mailable is dispatched. No need to remember `Mail::queue()` at every call site — `Mail::send()` also queues it.
+无论邮件类如何分发，都会将队列设为默认方式。无需在每个调用点记住 `Mail::queue()`——`Mail::send()` 也会将其排队。
 
-## Use `afterCommit()` on Mailables Inside Transactions
+## 在事务内对 Mailables 使用 `afterCommit()`
 
-A queued mailable dispatched inside a transaction may process before the commit. Use `$this->afterCommit()` in the constructor.
+在事务内派发的队列邮件可能在提交前被处理。请在构造函数中使用 `$this->afterCommit()`。
 
-## Use `assertQueued()` Not `assertSent()` for Queued Mailables
+## 对于队列邮件（Queued Mailables），应使用 `assertQueued()` 而非 `assertSent()`
 
-`Mail::assertSent()` only catches synchronous mail. Queued mailables fail `assertSent` with a "Did you mean to use assertQueued()?" hint.
+`Mail::assertSent()` 只捕获同步邮件。排队的 Mailable 会使 `assertSent` 失败，并给出“你是想使用 assertQueued() 吗？”的提示。
 
-Incorrect: `Mail::assertSent(OrderShipped::class);` when mailable implements `ShouldQueue`.
+错误：当 mailable 实现 `ShouldQueue` 时，`Mail::assertSent(OrderShipped::class);`。
 
-Correct: `Mail::assertQueued(OrderShipped::class);`
+正确：`Mail::assertQueued(OrderShipped::class);`
 
-## Use Markdown Mailables for Transactional Emails
+## 使用 Markdown 可邮寄类发送事务性邮件
 
-Markdown mailables auto-generate both HTML and plain-text versions, use responsive components, and allow global style customization. Generate with `--markdown` flag.
+Markdown 邮件类会自动生成 HTML 和纯文本两个版本，使用响应式组件，并允许全局样式定制。使用 `--markdown` 标志生成。
 
-## Separate Content Tests from Sending Tests
+## 将内容测试与发送测试分离
 
-Content tests: instantiate the mailable directly, call `assertSeeInHtml()`.
-Sending tests: use `Mail::fake()` and `assertSent()`/`assertQueued()`.
-Don't mix them — it conflates concerns and makes tests brittle.
+内容测试：直接实例化 mailable，调用 `assertSeeInHtml()`。
+发送测试：使用 `Mail::fake()` 和 `assertSent()`/`assertQueued()`。
+不要将它们混在一起——这会使关注点混杂并使测试变得脆弱。

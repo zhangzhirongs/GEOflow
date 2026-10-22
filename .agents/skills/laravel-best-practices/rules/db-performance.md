@@ -1,10 +1,10 @@
-# Database Performance Best Practices
+# 数据库性能最佳实践
 
-## Always Eager Load Relationships
+## 始终预加载关联关系
 
-Lazy loading causes N+1 query problems — one query per loop iteration. Always use `with()` to load relationships upfront.
+延迟加载会导致 N+1 查询问题——每次循环迭代都会执行一次查询。应始终使用 `with()` 预先加载关联关系。
 
-Incorrect (N+1 — executes 1 + N queries):
+错误（N+1 — 执行 1 + N 次查询）：
 ```php
 $posts = Post::all();
 foreach ($posts as $post) {
@@ -12,7 +12,7 @@ foreach ($posts as $post) {
 }
 ```
 
-Correct (2 queries total):
+正确（总共 2 个查询）：
 ```php
 $posts = Post::with('author')->get();
 foreach ($posts as $post) {
@@ -20,7 +20,7 @@ foreach ($posts as $post) {
 }
 ```
 
-Constrain eager loads to select only needed columns (always include the foreign key):
+限制预加载仅选择所需列（始终包含外键）：
 
 ```php
 $users = User::with(['posts' => function ($query) {
@@ -31,9 +31,9 @@ $users = User::with(['posts' => function ($query) {
 }])->get();
 ```
 
-## Prevent Lazy Loading in Development
+## 在开发中防止延迟加载
 
-Enable this in `AppServiceProvider::boot()` to catch N+1 issues during development.
+在 `AppServiceProvider::boot()` 中启用此项，以便在开发期间捕获 N+1 问题。
 
 ```php
 public function boot(): void
@@ -42,31 +42,31 @@ public function boot(): void
 }
 ```
 
-Throws `LazyLoadingViolationException` when a relationship is accessed without being eager-loaded.
+当访问未预加载的关系时抛出 `LazyLoadingViolationException`。
 
-## Select Only Needed Columns
+## 仅选择所需的列
 
-Avoid `SELECT *` — especially when tables have large text or JSON columns.
+避免`SELECT *`——尤其是当表包含大型文本或 JSON 列时。
 
-Incorrect:
+错误：
 ```php
 $posts = Post::with('author')->get();
 ```
 
-Correct:
+正确：
 ```php
 $posts = Post::select('id', 'title', 'user_id', 'created_at')
     ->with(['author:id,name,avatar'])
     ->get();
 ```
 
-When selecting columns on eager-loaded relationships, always include the foreign key column or the relationship won't match.
+在预加载关系上选择列时，始终包含外键列，否则关系将无法匹配。
 
-## Chunk Large Datasets
+## 分块处理大型数据集
 
-Never load thousands of records at once. Use chunking for batch processing.
+绝不要一次加载数千条记录。批处理时使用分块。
 
-Incorrect:
+错误：
 ```php
 $users = User::all();
 foreach ($users as $user) {
@@ -74,7 +74,7 @@ foreach ($users as $user) {
 }
 ```
 
-Correct:
+正确：
 ```php
 User::where('subscribed', true)->chunk(200, function ($users) {
     foreach ($users as $user) {
@@ -83,7 +83,7 @@ User::where('subscribed', true)->chunk(200, function ($users) {
 });
 ```
 
-Use `chunkById()` when modifying records during iteration — standard `chunk()` uses OFFSET which shifts when rows change:
+在迭代期间修改记录时使用 `chunkById()`——标准 `chunk()` 使用 OFFSET，而行发生变化时 OFFSET 会偏移：
 
 ```php
 User::where('active', false)->chunkById(200, function ($users) {
@@ -91,11 +91,11 @@ User::where('active', false)->chunkById(200, function ($users) {
 });
 ```
 
-## Add Database Indexes
+## 添加数据库索引
 
-Index columns that appear in `WHERE`, `ORDER BY`, `JOIN`, and `GROUP BY` clauses.
+为出现在 `WHERE`、`ORDER BY`、`JOIN` 和 `GROUP BY` 子句中的列建立索引。
 
-Incorrect:
+错误：
 ```php
 Schema::create('orders', function (Blueprint $table) {
     $table->id();
@@ -105,7 +105,7 @@ Schema::create('orders', function (Blueprint $table) {
 });
 ```
 
-Correct:
+正确：
 ```php
 Schema::create('orders', function (Blueprint $table) {
     $table->id();
@@ -116,13 +116,13 @@ Schema::create('orders', function (Blueprint $table) {
 });
 ```
 
-Add composite indexes for common query patterns (e.g., `WHERE status = ? ORDER BY created_at`).
+为常见查询模式添加复合索引（例如 `WHERE status = ? ORDER BY created_at`）。
 
-## Use `withCount()` for Counting Relations
+## 使用 `withCount()` 统计关联数量
 
-Never load entire collections just to count them.
+绝不要仅仅为了计数而加载整个集合。
 
-Incorrect:
+错误：
 ```php
 $posts = Post::all();
 foreach ($posts as $post) {
@@ -130,7 +130,7 @@ foreach ($posts as $post) {
 }
 ```
 
-Correct:
+正确：
 ```php
 $posts = Post::withCount('comments')->get();
 foreach ($posts as $post) {
@@ -138,7 +138,7 @@ foreach ($posts as $post) {
 }
 ```
 
-Conditional counting:
+条件计数：
 
 ```php
 $posts = Post::withCount([
@@ -149,38 +149,38 @@ $posts = Post::withCount([
 ])->get();
 ```
 
-## Use `cursor()` for Memory-Efficient Iteration
+## 使用 `cursor()` 进行内存高效的迭代
 
-For read-only iteration over large result sets, `cursor()` loads one record at a time via a PHP generator.
+对于大型结果集的只读迭代，`cursor()` 会通过 PHP 生成器一次加载一条记录。
 
-Incorrect:
+错误：
 ```php
 $users = User::where('active', true)->get();
 ```
 
-Correct:
+正确：
 ```php
 foreach (User::where('active', true)->cursor() as $user) {
     ProcessUser::dispatch($user->id);
 }
 ```
 
-Use `cursor()` for read-only iteration. Use `chunk()` / `chunkById()` when modifying records.
+使用 `cursor()` 进行只读迭代。修改记录时使用 `chunk()` / `chunkById()`。
 
-## No Queries in Blade Templates
+## Blade 模板中禁止查询
 
-Never execute queries in Blade templates. Pass data from controllers.
+绝不要在 Blade 模板中执行查询。从控制器传递数据。
 
-Incorrect:
+错误：
 ```blade
 @foreach (User::all() as $user)
     {{ $user->profile->name }}
 @endforeach
 ```
 
-Correct:
+正确：
 ```php
-// Controller
+// 控制器
 $users = User::with('profile')->get();
 return view('users.index', compact('users'));
 ```

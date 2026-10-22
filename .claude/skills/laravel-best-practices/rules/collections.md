@@ -1,42 +1,42 @@
-# Collection Best Practices
+# Collection 最佳实践
 
-## Use Higher-Order Messages for Simple Operations
+## 对简单操作使用高阶消息
 
-Incorrect:
+错误：
 ```php
 $users->each(function (User $user) {
     $user->markAsVip();
 });
 ```
 
-Correct: `$users->each->markAsVip();`
+正确：`$users->each->markAsVip();`
 
-Works with `each`, `map`, `sum`, `filter`, `reject`, `contains`, etc.
+可与 `each`、`map`、`sum`、`filter`、`reject`、`contains` 等配合使用。
 
-## Choose `cursor()` vs. `lazy()` Correctly
+## 正确选择 `cursor()` 与 `lazy()`
 
-- `cursor()` — one model in memory, but cannot eager-load relationships (N+1 risk).
-- `lazy()` — chunked pagination returning a flat LazyCollection, supports eager loading.
+- `cursor()` —— 内存中一个模型，但无法预加载关系（N+1 风险）。
+- `lazy()` — 分块分页返回扁平的 LazyCollection，支持预加载。
 
-Incorrect: `User::with('roles')->cursor()` — eager loading silently ignored.
+错误：`User::with('roles')->cursor()` — 预加载被静默忽略。
 
-Correct: `User::with('roles')->lazy()` for relationship access; `User::cursor()` for attribute-only work.
+正确：关系访问用 `User::with('roles')->lazy()`；仅属性操作使用 `User::cursor()`。
 
-## Use `lazyById()` When Updating Records While Iterating
+## 在迭代过程中更新记录时使用 `lazyById()`
 
-`lazy()` uses offset pagination — updating records during iteration can skip or double-process. `lazyById()` uses `id > last_id`, safe against mutation.
+`lazy()` 使用偏移分页——在迭代期间更新记录可能会跳过或重复处理。`lazyById()` 使用 `id > last_id`，可安全应对变更。
 
-## Use `toQuery()` for Bulk Operations on Collections
+## 对集合执行批量操作时使用 `toQuery()`
 
-Avoids manual `whereIn` construction.
+避免手动构造`whereIn`。
 
-Incorrect: `User::whereIn('id', $users->pluck('id'))->update([...]);`
+错误：`User::whereIn('id', $users->pluck('id'))->update([...]);`
 
-Correct: `$users->toQuery()->update([...]);`
+正确：`$users->toQuery()->update([...]);`
 
-## Use `#[CollectedBy]` for Custom Collection Classes
+## 对自定义集合类使用 `#[CollectedBy]`
 
-More declarative than overriding `newCollection()`.
+比覆盖 `newCollection()` 更具声明性。
 
 ```php
 #[CollectedBy(UserCollection::class)]

@@ -4,9 +4,9 @@
   "capabilities": {
     "network": {
       "decision": "approved",
-      "reviewer": "GEOFlow maintainer, user-authorized merge review",
-      "scope": "Task-scoped read-only preflight and capability inventory against the operator-selected GEOFlow instance or channel target declared in security/network_policy.json.",
-      "reason": "Running-system and channel work needs current capability evidence before mutation; host, protocol, response-size, timeout, credential, and output boundaries are explicitly constrained.",
+      "reviewer": "GEOFlow 维护者、用户授权的合并审查",
+      "scope": "针对在 security/network_policy.json 中声明的操作员所选 GEOFlow 实例或渠道目标，执行任务范围内的只读预检与能力清点。",
+      "reason": "运行系统与渠道工作需要在变更前具备当前的能力证据；主机、协议、响应大小、超时、凭据和输出边界均被明确约束。",
       "expires_at": "2027-07-19",
       "evidence": [
         "security/network_policy.json",
@@ -14,18 +14,18 @@
         "references/channel-frontend-contract.md"
       ],
       "target_enforcement": {
-        "openai": "SKILL.md discovery-first guardrail plus security/network_policy.json",
-        "claude": "SKILL.md discovery-first guardrail plus security/network_policy.json",
-        "agent-skills": "SKILL.md discovery-first guardrail plus security/network_policy.json",
-        "generic": "SKILL.md discovery-first guardrail plus security/network_policy.json",
-        "vscode": "SKILL.md discovery-first guardrail plus security/network_policy.json"
+        "openai": "SKILL.md 发现优先护栏加上 security/network_policy.json",
+        "claude": "SKILL.md 发现优先护栏加上 security/network_policy.json",
+        "agent-skills": "SKILL.md 发现优先护栏加上 security/network_policy.json",
+        "generic": "SKILL.md 发现优先护栏加上 security/network_policy.json",
+        "vscode": "SKILL.md 发现优先护栏加上 security/network_policy.json"
       }
     },
     "file_write": {
       "decision": "approved",
-      "reviewer": "GEOFlow maintainer, user-authorized merge review",
-      "scope": "User-selected discovery report output; preview, publish-as-new, or confirmed replace operations inside a resolved GEOFlow theme workspace; Laravel backups under storage/app/private; legacy backups in a dedicated mode-0700 child of an explicitly selected persistent parent outside the web workspace; temporary preflight response files; and exact-contract Codex Skill staging with persistent backup of the current and retired Skill directories.",
-      "reason": "The unified skill needs bounded local writes for capability reports, theme edit sessions, redacted preflight processing, and clean installation; theme identifiers and filesystem entries are validated, replacements require confirmation and rollback-capable staging, and persistent backups precede live replacement or Skill switching.",
+      "reviewer": "GEOFlow 维护者、用户授权的合并审查",
+      "scope": "用户选择的发现报告输出；在已解析的 GEOFlow 主题工作区内进行预览、作为新内容发布或经确认的替换操作；storage/app/private 下的 Laravel 备份；位于 Web 工作区之外、显式选择的持久父目录下专用 mode-0700 子目录中的旧版备份；临时预检响应文件；以及精确契约的 Codex Skill 暂存，并对当前和已停用 Skill 目录进行持久备份。",
+      "reason": "统一技能需要有限的本地写入，用于能力报告、主题编辑会话、经脱敏的预检处理和干净安装；主题标识符和文件系统条目会被验证，替换需要确认和可回滚的暂存，持久备份先于实时替换或 Skill 切换。",
       "expires_at": "2027-07-19",
       "evidence": [
         "references/theme-edit-workflow.md",
@@ -36,18 +36,18 @@
         "scripts/finalize_theme_edit_session.py"
       ],
       "target_enforcement": {
-        "openai": "SKILL.md guardrails and explicit CLI confirmation contract",
-        "claude": "SKILL.md guardrails and explicit CLI confirmation contract",
-        "agent-skills": "SKILL.md guardrails and explicit CLI confirmation contract",
-        "generic": "SKILL.md guardrails and explicit CLI confirmation contract",
-        "vscode": "SKILL.md guardrails and explicit CLI confirmation contract"
+        "openai": "SKILL.md 护栏与显式 CLI 确认契约",
+        "claude": "SKILL.md 护栏与显式 CLI 确认契约",
+        "agent-skills": "SKILL.md 护栏与显式 CLI 确认契约",
+        "generic": "SKILL.md 护栏与显式 CLI 确认契约",
+        "vscode": "SKILL.md 护栏与显式 CLI 确认契约"
       }
     },
     "subprocess": {
       "decision": "approved",
-      "reviewer": "GEOFlow maintainer, user-authorized merge review",
-      "scope": "Argument-list invocation of local php artisan geoflow:frontend-experience for read-only channel capability and sync-preview reports.",
-      "reason": "Channel frontend comparison requires current application evidence; subprocess calls use fixed command arguments, capture JSON output, and do not use a shell.",
+      "reviewer": "GEOFlow 维护者、用户授权的合并审查",
+      "scope": "以参数列表方式调用本地 php artisan geoflow:frontend-experience，用于只读频道能力与同步预览报告。",
+      "reason": "渠道前端比较需要当前应用证据；子进程调用使用固定命令参数，捕获 JSON 输出，并且不使用 shell。",
       "expires_at": "2027-07-19",
       "evidence": [
         "references/channel-frontend-contract.md",
@@ -55,11 +55,11 @@
         "scripts/compare_default_vs_channel_frontend.py"
       ],
       "target_enforcement": {
-        "openai": "SKILL.md discovery-first contract and fixed argument-list subprocess",
-        "claude": "SKILL.md discovery-first contract and fixed argument-list subprocess",
-        "agent-skills": "SKILL.md discovery-first contract and fixed argument-list subprocess",
-        "generic": "SKILL.md discovery-first contract and fixed argument-list subprocess",
-        "vscode": "SKILL.md discovery-first contract and fixed argument-list subprocess"
+        "openai": "SKILL.md 发现优先契约与固定参数列表子进程",
+        "claude": "SKILL.md 发现优先契约与固定参数列表子进程",
+        "agent-skills": "SKILL.md 发现优先契约与固定参数列表子进程",
+        "generic": "SKILL.md 发现优先契约与固定参数列表子进程",
+        "vscode": "SKILL.md 发现优先契约与固定参数列表子进程"
       }
     }
   }

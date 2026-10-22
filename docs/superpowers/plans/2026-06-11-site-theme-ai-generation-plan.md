@@ -108,7 +108,7 @@ POST /admin/site-settings/theme-generations
 | 任务名称 | text | 必填，例如「GEO 行业站模板批量生成」 |
 | 主题标识前缀 | text | 必填，例如 `geo-pro`，系统生成 `geo-pro-01` 到 `geo-pro-10` |
 | 生成数量 | number / stepper | 1 到 10，默认 3 |
-| AI 模型 | select | 仅 active chat model |
+| AI 模型 | select | 仅活动聊天模型 |
 | 参考基准主题 | select | 可选，从现有主题库选择 |
 | 适用场景 | radio/card | 内容站、品牌官网、资讯媒体、B2B 服务、知识库门户、分发渠道站 |
 | 风格方向 | multi-select | 专业稳重、轻量现代、资讯密集、品牌感强、极简阅读、转化导向 |
@@ -590,7 +590,7 @@ php artisan test
 
 处理：
 
-- AI 只生成 JSON blueprint。
+- AI 只生成 JSON 蓝图。
 - Blade 和文件由白名单 writer 生成。
 - AI 失败回退到确定性模板生成。
 - 每版都保存版本，支持重新生成和归档。

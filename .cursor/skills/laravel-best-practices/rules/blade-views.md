@@ -1,8 +1,8 @@
-# Blade & Views Best Practices
+# Blade 与视图最佳实践
 
-## Use `$attributes->merge()` in Component Templates
+## 在组件模板中使用 `$attributes->merge()`
 
-Hardcoding classes prevents consumers from adding their own. `merge()` combines class attributes cleanly.
+硬编码类会阻止使用者添加自己的类。`merge()` 可以干净地合并类属性。
 
 ```blade
 <div {{ $attributes->merge(['class' => 'alert alert-'.$type]) }}>
@@ -10,27 +10,27 @@ Hardcoding classes prevents consumers from adding their own. `merge()` combines 
 </div>
 ```
 
-## Use `@pushOnce` for Per-Component Scripts
+## 为每个组件的脚本使用 `@pushOnce`
 
-If a component renders inside a `@foreach`, `@push` inserts the script N times. `@pushOnce` guarantees it's included exactly once.
+如果组件在 `@foreach` 内渲染，`@push` 会插入脚本 N 次。`@pushOnce` 保证它只被包含一次。
 
-## Prefer Blade Components Over `@include`
+## 优先使用 Blade 组件而非 `@include`
 
-`@include` shares all parent variables implicitly (hidden coupling). Components have explicit props, attribute bags, and slots.
+`@include` 隐式共享所有父级变量（隐藏耦合）。组件具有显式 props、属性包和插槽。
 
-## Use View Composers for Shared View Data
+## 使用视图 Composer 共享视图数据
 
-If every controller rendering a sidebar must pass `$categories`, that's duplicated code. A View Composer centralizes it.
+如果每个渲染侧边栏的控制器都必须传入 `$categories`，那就是重复代码。View Composer 可将其集中处理。
 
-## Use Blade Fragments for Partial Re-Renders (htmx/Turbo)
+## 使用 Blade 片段进行局部重新渲染（htmx/Turbo）
 
-A single view can return either the full page or just a fragment, keeping routing clean.
+单个视图可以返回完整页面或仅返回片段，从而保持路由清晰。
 
 ```php
 return view('dashboard', compact('users'))
     ->fragmentIf($request->hasHeader('HX-Request'), 'user-list');
 ```
 
-## Use `@aware` for Deeply Nested Component Props
+## 为深度嵌套的组件 Props 使用 `@aware`
 
-Avoids re-passing parent props through every level of nested components.
+避免在每一层嵌套组件中重复传递父级 props。

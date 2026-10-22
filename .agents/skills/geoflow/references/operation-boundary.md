@@ -1,104 +1,104 @@
 <!--
-Copyright © 2026 姚金刚. All rights reserved.
-Project: geoflow
-Created by: 姚金刚
-Date: 2026-07-05
+版权所有 © 2026 姚金刚。保留所有权利。
+项目：geoflow
+创建者：姚金刚
+日期：2026-07-05
 X: https://x.com/yaojingang
 -->
 
-# Operation Boundary
+# 操作边界
 
-The `operations` mode operates a running GEOFlow system. Product code changes require an explicit switch to `development`. When `bin/geoflow` exists, GEOFlow CLI 0.2.0 is the preferred API v1 client for catalog, task, job, material, and article operations. API v1 is the fallback when the CLI is absent. Blade admin routes handle management workflows such as Analytics, manual publication, distribution, enterprise knowledge, leads, AI source providers, article editor assistance, URL Import, System Updates, site settings, Theme Replication, homepage modules, API tokens, and frontend-capability sync.
+`operations` 模式运行正在运行的 GEOFlow 系统。产品代码更改需要显式切换到 `development`。当存在 `bin/geoflow` 时，GEOFlow CLI 0.2.0 是用于 catalog、task、job、material 和 article 操作的首选 API v1 客户端。缺少 CLI 时，API v1 是回退方案。Blade 管理路由处理管理工作流，例如 Analytics、手动发布、分发、企业知识、线索、AI 源提供商、文章编辑器辅助、URL Import、System Updates、站点设置、Theme Replication、主页模块、API tokens 和前端能力同步。
 
-## Allowed Actions
+## 允许的操作
 
-- Run `bin/geoflow --version` and `bin/geoflow --help`, then use a listed CLI command when it supports the action.
-- Use Laravel `/api/v1` fallback for exposed catalog/material/task/job/article operations.
-- Use authenticated admin web routes for capabilities not exposed through CLI or API v1.
-- Run local Artisan maintenance commands through `php artisan` or the deployed application container when the command exists in `routes/console.php`.
-- Read command output and route lists.
-- Build JSON payload files for task, material, article, or admin-form operations.
-- Submit admin forms with the current CSRF token and session cookies.
-- Download generated packages only when the user explicitly requests the target resource.
+- 运行 `bin/geoflow --version` 和 `bin/geoflow --help`，然后当列出的 CLI 命令支持该操作时使用它。
+- 为已暴露的 catalog/material/task/job/article 操作使用 Laravel `/api/v1` 回退。
+- 对于未通过 CLI 或 API v1 暴露的功能，使用已认证的管理后台 Web 路由。
+- 当命令存在于 `routes/console.php` 中时，通过 `php artisan` 或已部署的应用容器运行本地 Artisan 维护命令。
+- 读取命令输出和路由列表。
+- 为任务、素材、文章或管理表单操作构建 JSON 负载文件。
+- 使用当前 CSRF 令牌和会话 Cookie 提交管理表单。
+- 仅当用户明确请求目标资源时，才下载生成的包。
 
-## Disallowed Actions
+## 禁止的操作
 
-- Direct SQL against the project database.
-- Editing backend/frontend code to complete an operations request.
-- Replacing a supported CLI action with raw `curl`.
-- Claiming admin-only manual publication, distribution, enterprise knowledge, lead management, Analytics, AI source providers, article editor assistance/risk scan, URL Import, System Updates, Theme Replication, homepage editing, frontend-capability sync, API tokens, admin users, site settings, security settings, or async generation flows are available through API v1 unless route inspection proves it.
-- Claiming a live Theme Editor exists in the current repository. Current `routes/web.php` has Theme Replication routes and no live Theme Editor route.
-- Bypassing admin authentication, CSRF validation, super-admin checks, current-password checks, or configured update-center gates.
-- Printing distribution secrets, WordPress Application Passwords, generic API secrets, full API tokens, package secrets, or lead personal data in final summaries.
+- 针对项目数据库的直接 SQL。
+- 编辑后端/前端代码以完成运维请求。
+- 用原始 `curl` 替换受支持的 CLI 操作。
+- 声称仅管理员可用的手动发布、分发、企业知识、线索管理、Analytics、AI 来源提供方、文章编辑器辅助/风险扫描、URL Import、System Updates、Theme Replication、首页编辑、前端能力同步、API 令牌、管理员用户、站点设置、安全设置或异步生成流程可通过 API v1 使用，除非路由检查证明其确实可用。
+- 声称当前仓库中存在可用的 Theme Editor。当前 `routes/web.php` 具有 Theme Replication 路由，且没有可用的 Theme Editor 路由。
+- 绕过管理员身份验证、CSRF 校验、超级管理员检查、当前密码检查或已配置的更新中心门禁。
+- 在最终摘要中打印分发密钥、WordPress 应用程序密码、通用 API 密钥、完整 API 令牌、包密钥或潜在客户个人数据。
 
-## Required Checks
+## 必需检查
 
-Before the first mutating action in a workspace:
+在工作区中执行第一个变更操作之前：
 
-1. Verify whether `bin/geoflow` exists. If it does, run `--version` and `--help`. If it does not, verify a Laravel GEOFlow app with `artisan` and `routes/api.php`.
-2. If CLI configuration is missing, run `geoflow login` first. If using API fallback, obtain a bearer token through `/api/v1/auth/login` or the provided token source.
-3. Interpret authenticated failures before changing credentials: `401` means invalid or expired authentication; `403` means missing permission or scope; `423` means a resource lock; `429` means rate limiting. Refresh login/token only for `401` or explicit token-invalid output.
-4. Verify an authenticated read such as `catalog` succeeds; public homepage checks alone are not sufficient.
-5. For material operations, use `GET /api/v1/materials` to verify `materials:read`. Confirm that the selected token was issued with `materials:write` before a mutation; the read endpoint cannot prove the write scope, and a missing write scope returns `403`.
-6. For admin web operations, verify the login page, authenticate to an admin session, read the target form/page, then post with CSRF.
-7. For super-admin operations, verify super-admin-only routes are accessible before attempting writes.
-8. For high-risk actions, ensure the user has explicitly identified the exact action and target resource.
-9. Resolve the admin prefix from the target configuration or `route:list`; the repository default is `geo_admin` and deployments may override it.
+1. 验证 `bin/geoflow` 是否存在。如果存在，运行 `--version` 和 `--help`。如果不存在，使用 `artisan` 和 `routes/api.php` 验证 Laravel GEOFlow 应用。
+2. 如果缺少 CLI 配置，请先运行`geoflow login`。如果使用 API 回退方案，请通过`/api/v1/auth/login`或提供的令牌来源获取 bearer token。
+3. 在更改凭据之前，先解释认证失败：`401` 表示认证无效或已过期；`403` 表示缺少权限或作用域；`423` 表示资源锁定；`429` 表示速率限制。仅在 `401` 或明确的 token 无效输出时刷新登录/token。
+4. 验证诸如 `catalog` 之类的已认证读取能够成功；仅靠公共首页检查并不足够。
+5. 对于素材操作，使用 `GET /api/v1/materials` 验证 `materials:read`。在变更前确认所选令牌是通过 `materials:write` 签发的；读取端点无法证明写入作用域，缺少写入作用域会返回 `403`。
+6. 对于管理 Web 操作，验证登录页，认证到管理员会话，读取目标表单/页面，然后使用 CSRF 提交。
+7. 对于超级管理员操作，在尝试写入之前，验证仅超级管理员可访问的路由可访问。
+8. 对于高风险操作，确保用户已明确指明确切的操作和目标资源。
+9. 从目标配置或 `route:list` 解析管理前缀；仓库默认值为 `geo_admin`，部署可以覆盖它。
 
-After any mutating action:
+在任何变更操作之后：
 
-1. Re-read the target resource.
-2. Report the final persisted state.
-3. Inspect background jobs separately when the action queues work.
-4. If publishing an article locally, report the persisted `/article/{slug}` route rather than an `article.php?id=...` compatibility link.
-5. If the action used admin web, verify by reading the redirected page, JSON status endpoint, listing page, detail page, or artifact metadata.
-6. If the action touched a remote channel, separate local GEOFlow success from remote target success.
+1. 重新阅读目标资源。
+2. 报告最终持久化状态。
+3. 当操作将工作加入队列时，请单独检查后台任务。
+4. 如果在本地发布文章，请报告持久化的 `/article/{slug}` 路由，而不是 `article.php?id=...` 兼容性链接。
+5. 如果该操作使用了管理 Web，请通过读取重定向后的页面、JSON 状态端点、列表页、详情页或制品元数据进行验证。
+6. 如果该操作触及远程渠道，请将本地 GEOFlow 成功与远程目标成功分开。
 
-## High-Risk Admin Web Actions
+## 高风险管理后台 Web 操作
 
-Proceed only when the user's request explicitly names the target action/resource:
+仅当用户请求明确指定目标操作/资源时才继续：
 
-- force-delete articles or empty trash
-- delete admin users, revoke API tokens, or change passwords
-- export manual-publication records or lead data
-- reveal or rotate distribution secrets
-- download target-site packages containing generated credentials
-- prepare and permanently delete a distribution channel after reviewing its current impact fingerprint
-- apply, retry, mark failed, or roll back system updates
-- publish theme replication output
-- delete generated theme replication drafts
-- export leads or expose lead personal data
-- batch settings sync to multiple distribution channels
+- 强制删除文章或清空回收站
+- 删除管理员用户、撤销 API 令牌或更改密码
+- 导出手动发布记录或线索数据
+- 显示或轮换分发密钥
+- 下载包含生成凭据的目标站点包
+- 在审查分发渠道当前的影响指纹后，准备并永久删除一个分发渠道
+- 应用、重试、标记失败或回滚系统更新
+- 发布主题复制输出
+- 删除生成的主题复制草稿
+- 导出线索或暴露线索个人数据
+- 批量设置同步到多个分发渠道
 
-For distribution-channel deletion, use the exact preview, prepare, optional cancel, and final DELETE sequence. The final request needs the channel name, current password, impact fingerprint, impact acknowledgements, and any required stale-operation force acknowledgement. Remote cleanup remains a separate result. For all high-risk operations, report the route, target ID, verification result, and any remaining manual step. Redact secrets and personal data.
+对于分发渠道删除，请使用精确的预览、准备、可选取消和最终 DELETE 序列。最终请求需要渠道名称、当前密码、影响指纹、影响确认，以及任何必需的过期操作强制确认。远程清理仍作为单独结果。对于所有高风险操作，报告路由、目标 ID、验证结果和任何剩余的手动步骤。脱敏机密和个人数据。
 
-## Current Admin And Local-Command Boundary
+## 当前管理端与本地命令边界
 
-Use admin web when CLI/API v1 has no matching capability. Current admin-only surfaces include the six Analytics pages, manual-publication workbench, AI source providers, article editor assistant and risk scan, staged distribution-channel deletion, and the GET homepage-module editor. Admin web login and API login are rate limited; API tokens can be revoked from the super-admin token page. Password or admin-status changes also revoke affected sessions and API tokens.
+当 CLI/API v1 没有匹配能力时，使用管理后台 Web。当前仅管理员的界面包括六个 Analytics 页面、手动发布工作台、AI 来源提供方、文章编辑器助手和风险扫描、分阶段分发渠道删除，以及 GET 首页模块编辑器。管理后台 Web 登录和 API 登录均有限流；API 令牌可从超级管理员令牌页面撤销。密码或管理员状态变更也会撤销受影响的会话和 API 令牌。
 
-Current local-only maintenance commands are:
+当前仅限本地的维护命令为：
 
 ```bash
 php artisan geoflow:recover-knowledge-syncs --stale=600 --limit=50
 php artisan geoflow:prune-expired-cache --limit=5000
 ```
 
-Do not translate these commands into API or GEOFlow CLI calls. In Docker, run them inside the application service.
+不要将这些命令转换为 API 或 GEOFlow CLI 调用。在 Docker 中，请在应用服务内部运行它们。
 
-## Error Interpretation
+## 错误解读
 
-Keep these failure classes separate:
+将这些故障类别分开：
 
-- CLI/runtime failure: command missing, config missing, permission problem, malformed args
-- API fallback setup failure: missing `GEOFLOW_BASE_URL`, missing bearer token, wrong `/api/v1` base path
-- API fallback routing failure: `/api/v1/catalog` returns HTML, proxy errors, login pages, or Laravel web pages instead of JSON
-- API failure: `401`, `403`, `404`, `409`, `422`, `423`, `429`, `500`
-- Admin web failure: missing login session, CSRF mismatch, validation redirect, super-admin denial, password-confirmation failure
-- Business-data failure: task inactive, missing titles, invalid category, review state conflict, missing active lead form slug
-- Remote target failure: WordPress authorization/capability error, generic API mapping failure, GEOFlow Agent health/sync failure
-- Frontend-capability mismatch: remote target package does not expose or support the local frontend capability being synced
-- System-update failure: preflight failure, missing backup, active run conflict, stale run, manual command not executed, disabled update/rollback config
-- Route-surface mismatch: requested capability exists in admin web but not API v1, or is absent from the target deployment
-- Transport-policy failure: authenticated remote HTTP, unsafe endpoint/credential source mixing, redirect, TLS, timeout, or response-size rejection
+- CLI/运行时失败：命令缺失、配置缺失、权限问题、参数格式错误
+- API 回退设置失败：缺少 `GEOFLOW_BASE_URL`、缺少 bearer token、`/api/v1` 基础路径错误
+- API 回退路由失败：`/api/v1/catalog` 返回 HTML、代理错误、登录页或 Laravel 网页而不是 JSON
+- API 失败：`401`、`403`、`404`、`409`、`422`、`423`、`429`、`500`
+- 管理端 Web 失败：缺少登录会话、CSRF 不匹配、验证重定向、超级管理员拒绝、密码确认失败
+- 业务数据失败：任务未激活、缺少标题、分类无效、审核状态冲突、缺少活跃线索表单 slug
+- 远程目标失败：WordPress 授权/能力错误、通用 API 映射失败、GEOFlow Agent 健康/同步失败
+- 前端能力不匹配：远程目标包未暴露或不支持正在同步的本地前端能力
+- 系统更新失败：预检失败、缺少备份、活动运行冲突、运行残留、手动命令未执行、更新/回滚配置已禁用
+- 路由表面不匹配：请求的能力存在于管理 Web 中，但不存在于 API v1 中，或在目标部署中缺失
+- 传输策略失败：经过身份验证的远程 HTTP、不安全的端点/凭据来源混用、重定向、TLS、超时或响应大小拒绝
 
-Do not conflate downstream job-data failures, remote target failures, or frontend-capability mismatches with CLI/API transport failures.
+不要将下游作业数据失败、远程目标失败或前端能力不匹配与 CLI/API 传输失败混为一谈。

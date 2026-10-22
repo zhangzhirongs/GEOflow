@@ -1,8 +1,8 @@
-# Architecture Best Practices
+# 架构最佳实践
 
-## Single-Purpose Action Classes
+## 单一用途的操作类
 
-Extract discrete business operations into invokable Action classes.
+将离散的业务操作提取为可调用的 Action 类。
 
 ```php
 class CreateOrderAction
@@ -19,11 +19,11 @@ class CreateOrderAction
 }
 ```
 
-## Use Dependency Injection
+## 使用依赖注入
 
-Always use constructor injection. Avoid `app()` or `resolve()` inside classes.
+始终使用构造函数注入。避免在类内使用 `app()` 或 `resolve()`。
 
-Incorrect:
+错误：
 ```php
 class OrderController extends Controller
 {
@@ -36,7 +36,7 @@ class OrderController extends Controller
 }
 ```
 
-Correct:
+正确：
 ```php
 class OrderController extends Controller
 {
@@ -49,11 +49,11 @@ class OrderController extends Controller
 }
 ```
 
-## Code to Interfaces
+## 面向接口编码
 
-Depend on contracts at system boundaries (payment gateways, notification channels, external APIs) for testability and swappability.
+在系统边界（支付网关、通知渠道、外部 API）依赖契约，以实现可测试性和可替换性。
 
-Incorrect (concrete dependency):
+错误（具体依赖）：
 ```php
 class OrderService
 {
@@ -61,7 +61,7 @@ class OrderService
 }
 ```
 
-Correct (interface dependency):
+正确（接口依赖）：
 ```php
 interface PaymentGateway
 {
@@ -74,92 +74,92 @@ class OrderService
 }
 ```
 
-Bind in a service provider:
+在服务提供者中绑定：
 
 ```php
 $this->app->bind(PaymentGateway::class, StripeGateway::class);
 ```
 
-## Default Sort by Descending
+## 默认按降序排序
 
-When no explicit order is specified, sort by `id` or `created_at` descending. Without an explicit `ORDER BY`, row order is undefined.
+未指定显式顺序时，按 `id` 或 `created_at` 降序排序。没有显式的 `ORDER BY` 时，行顺序未定义。
 
-Incorrect:
+错误：
 ```php
 $posts = Post::paginate();
 ```
 
-Correct:
+正确：
 ```php
 $posts = Post::latest()->paginate();
 ```
 
-## Use Atomic Locks for Race Conditions
+## 使用原子锁应对竞态条件
 
-Prevent race conditions with `Cache::lock()` or `lockForUpdate()`.
+防止与 `Cache::lock()` 或 `lockForUpdate()` 出现竞态条件。
 
 ```php
 Cache::lock('order-processing-'.$order->id, 10)->block(5, function () use ($order) {
     $order->process();
 });
 
-// Or at query level
+// 或在查询层面
 $product = Product::where('id', $id)->lockForUpdate()->first();
 ```
 
-## Use `mb_*` String Functions
+## 使用 `mb_*` 字符串函数
 
-When no Laravel helper exists, prefer `mb_strlen`, `mb_strtolower`, etc. for UTF-8 safety. Standard PHP string functions count bytes, not characters.
+当不存在 Laravel 辅助函数时，为 UTF-8 安全性优先使用 `mb_strlen`、`mb_strtolower` 等。标准 PHP 字符串函数计算的是字节数，而不是字符数。
 
-Incorrect:
+错误：
 ```php
 strlen('José');          // 5 (bytes, not characters)
 strtolower('MÜNCHEN');  // 'mÜnchen' — fails on multibyte
 ```
 
-Correct:
+正确：
 ```php
 mb_strlen('José');             // 4 (characters)
 mb_strtolower('MÜNCHEN');     // 'münchen'
 
-// Prefer Laravel's Str helpers when available
+// 可用时优先使用 Laravel 的 Str 辅助函数
 Str::length('José');          // 4
 Str::lower('MÜNCHEN');        // 'münchen'
 ```
 
-## Use `defer()` for Post-Response Work
+## 使用 `defer()` 执行响应后工作
 
-For lightweight tasks that don't need to survive a crash (logging, analytics, cleanup), use `defer()` instead of dispatching a job. The callback runs after the HTTP response is sent — no queue overhead.
+对于不需要在崩溃后继续存在的轻量任务（日志记录、分析、清理），请使用 `defer()`，而不是派发作业。回调会在 HTTP 响应发送后运行——没有队列开销。
 
-Incorrect (job overhead for trivial work):
+错误（琐碎工作带来作业开销）：
 ```php
 dispatch(new LogPageView($page));
 ```
 
-Correct (runs after response, same process):
+正确（在响应后运行，同一进程）：
 ```php
 defer(fn () => PageView::create(['page_id' => $page->id, 'user_id' => auth()->id()]));
 ```
 
-Use jobs when the work must survive process crashes or needs retry logic. Use `defer()` for fire-and-forget work.
+当工作必须在进程崩溃后仍能存续或需要重试逻辑时，使用任务。对于即发即忘的工作，使用 `defer()`。
 
-## Use `Context` for Request-Scoped Data
+## 使用 `Context` 存储请求作用域数据
 
-The `Context` facade passes data through the entire request lifecycle — middleware, controllers, jobs, logs — without passing arguments manually.
+`Context` facade 会在整个请求生命周期中透传数据——中间件、控制器、任务、日志——无需手动传递参数。
 
 ```php
-// In middleware
+// 在中间件中
 Context::add('tenant_id', $request->header('X-Tenant-ID'));
 
-// Anywhere later — controllers, jobs, log context
+// 之后在任何地方——控制器、作业、日志上下文
 $tenantId = Context::get('tenant_id');
 ```
 
-Context data automatically propagates to queued jobs and is included in log entries. Use `Context::addHidden()` for sensitive data that should be available in queued jobs but excluded from log context. If data must not leave the current process, do not store it in `Context`.
+上下文数据会自动传播到队列任务，并包含在日志条目中。对于应在队列任务中可用但要从日志上下文中排除的敏感数据，使用 `Context::addHidden()`。如果数据不得离开当前进程，请不要将其存储在 `Context` 中。
 
-## Use `Concurrency::run()` for Parallel Execution
+## 使用 `Concurrency::run()` 进行并行执行
 
-Run independent operations in parallel using child processes — no async libraries needed.
+使用子进程并行运行独立操作——无需异步库。
 
 ```php
 use Illuminate\Support\Facades\Concurrency;
@@ -170,13 +170,13 @@ use Illuminate\Support\Facades\Concurrency;
 ]);
 ```
 
-Each closure runs in a separate process with full Laravel access. Use for independent database queries, API calls, or computations that would otherwise run sequentially.
+每个闭包都在独立进程中运行，并拥有完整的 Laravel 访问权限。用于原本会顺序执行的独立数据库查询、API 调用或计算。
 
-## Convention Over Configuration
+## 约定优于配置
 
-Follow Laravel conventions. Don't override defaults unnecessarily.
+遵循 Laravel 约定。不要不必要地覆盖默认值。
 
-Incorrect:
+错误：
 ```php
 class Customer extends Model
 {
@@ -190,7 +190,7 @@ class Customer extends Model
 }
 ```
 
-Correct:
+正确：
 ```php
 class Customer extends Model
 {

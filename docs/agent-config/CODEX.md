@@ -1,15 +1,15 @@
-# GEOFlow Codex / GPT Instructions
+# GEOFlow Codex / GPT 指令
 
-Laravel Boost support is installed for this repository.
+此仓库已安装 Laravel Boost 支持。
 
-Before making Laravel, PHP, Tailwind, Horizon, or AI SDK changes, read:
+在进行 Laravel、PHP、Tailwind、Horizon 或 AI SDK 更改之前，请阅读：
 
 `../../.boost/guidelines.md`
 
-Codex MCP configuration is available at:
+Codex MCP 配置位于以下位置：
 
 `../../.codex/config.toml`
 
-Shared Laravel Boost MCP configuration is available at:
+共享的 Laravel Boost MCP 配置可在以下位置获取：
 
 `../../.mcp.json`

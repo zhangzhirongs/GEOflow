@@ -1,19 +1,19 @@
-# Runtime Conformance Matrix
+# 运行时符合性矩阵
 
-- Skill: `geoflow`
-- Targets: `5`
-- Passed: `5`
-- Failed: `0`
+- 技能：`geoflow`
+- 目标：`5`
+- 已通过：`5`
+- 失败：`0`
 
-| Target | Status | Failures | Warnings |
+| 目标 | 状态 | 失败数 | 警告数 |
 | --- | --- | --- | --- |
 | openai | pass | None | None |
 | claude | pass | None | None |
-| agent-skills | pass | None | agent-skills uses canonical Agent Skills metadata; provider-native execution transforms are not implemented in v0. |
-| vscode | pass | None | vscode uses canonical Agent Skills metadata; provider-native execution transforms are not implemented in v0. |
+| 智能体-技能 | 通过 | 无 | 智能体-技能使用规范的智能体技能元数据；提供商原生执行转换在 v0 中未实现。 |
+| vscode | pass | None | vscode 使用规范的智能体技能元数据；v0 中未实现提供商原生执行转换。 |
 | generic | pass | None | None |
 
-## Reviewer Notes
+## 审查者说明
 
-- Failed targets block release for that target.
-- Warnings identify lossy or not-yet-compiled behavior that must remain visible.
+- 失败的目标会阻止该目标的发布。
+- 警告用于标识有损或尚未编译的行为，这些行为必须保持可见。

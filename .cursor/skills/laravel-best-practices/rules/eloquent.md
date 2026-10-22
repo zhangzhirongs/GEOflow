@@ -1,8 +1,8 @@
-# Eloquent Best Practices
+# Eloquent 最佳实践
 
-## Use Correct Relationship Types
+## 使用正确的关系类型
 
-Use `hasMany`, `belongsTo`, `morphMany`, etc. with proper return type hints.
+使用 `hasMany`、`belongsTo`、`morphMany` 等，并提供正确的返回类型提示。
 
 ```php
 public function comments(): HasMany
@@ -16,11 +16,11 @@ public function author(): BelongsTo
 }
 ```
 
-## Use Local Scopes for Reusable Queries
+## 使用本地作用域实现可复用查询
 
-Extract reusable query constraints into local scopes to avoid duplication.
+将可复用的查询约束提取到本地作用域中，以避免重复。
 
-Incorrect:
+错误：
 ```php
 $active = User::where('verified', true)->whereNotNull('activated_at')->get();
 $articles = Article::whereHas('user', function ($q) {
@@ -28,23 +28,23 @@ $articles = Article::whereHas('user', function ($q) {
 })->get();
 ```
 
-Correct:
+正确：
 ```php
 public function scopeActive(Builder $query): Builder
 {
     return $query->where('verified', true)->whereNotNull('activated_at');
 }
 
-// Usage
+// 用量
 $active = User::active()->get();
 $articles = Article::whereHas('user', fn ($q) => $q->active())->get();
 ```
 
-## Apply Global Scopes Sparingly
+## 谨慎应用全局作用域
 
-Global scopes silently modify every query on the model, making debugging difficult. Prefer local scopes and reserve global scopes for truly universal constraints like soft deletes or multi-tenancy.
+全局作用域会静默修改该模型上的每个查询，从而使调试变得困难。优先使用局部作用域，仅将全局作用域保留给真正普遍适用的约束，如软删除或多租户。
 
-Incorrect (global scope for a conditional filter):
+错误（条件过滤器使用全局作用域）：
 ```php
 class PublishedScope implements Scope
 {
@@ -53,10 +53,10 @@ class PublishedScope implements Scope
         $builder->where('published', true);
     }
 }
-// Now admin panels, reports, and background jobs all silently skip drafts
+// 现在，管理面板、报表和后台作业都会静默跳过草稿
 ```
 
-Correct (local scope you opt into):
+正确（你选择启用的本地作用域）：
 ```php
 public function scopePublished(Builder $query): Builder
 {
@@ -67,9 +67,9 @@ Post::published()->paginate(); // Explicit
 Post::paginate(); // Admin sees all
 ```
 
-## Define Attribute Casts
+## 定义属性转换
 
-Use the `casts()` method (or `$casts` property following project convention) for automatic type conversion.
+使用 `casts()` 方法（或遵循项目约定的 `$casts` 属性）进行自动类型转换。
 
 ```php
 protected function casts(): array
@@ -82,16 +82,16 @@ protected function casts(): array
 }
 ```
 
-## Cast Date Columns Properly
+## 正确转换日期列
 
-Always cast date columns. Use Carbon instances in templates instead of formatting strings manually.
+始终转换日期列。在模板中使用 Carbon 实例，而不是手动格式化字符串。
 
-Incorrect:
+错误：
 ```blade
 {{ Carbon::createFromFormat('Y-d-m H-i', $order->ordered_at)->toDateString() }}
 ```
 
-Correct:
+正确：
 ```php
 protected function casts(): array
 {
@@ -106,26 +106,26 @@ protected function casts(): array
 {{ $order->ordered_at->format('m-d') }}
 ```
 
-## Use `whereBelongsTo()` for Relationship Queries
+## 使用 `whereBelongsTo()` 进行关联查询
 
-Cleaner than manually specifying foreign keys.
+比手动指定外键更简洁。
 
-Incorrect:
+错误：
 ```php
 Post::where('user_id', $user->id)->get();
 ```
 
-Correct:
+正确：
 ```php
 Post::whereBelongsTo($user)->get();
 Post::whereBelongsTo($user, 'author')->get();
 ```
 
-## Avoid Hardcoded Table Names in Queries
+## 避免在查询中硬编码表名
 
-Never use string literals for table names in raw queries, joins, or subqueries. Hardcoded table names make it impossible to find all places a model is used and break refactoring (e.g., renaming a table requires hunting through every raw string).
+绝不要在原始查询、连接或子查询中使用字符串字面量作为表名。硬编码表名会导致无法找到模型被使用的所有位置，并破坏重构（例如，重命名表需要在每一个原始字符串中逐一查找）。
 
-Incorrect:
+错误：
 ```php
 DB::table('users')->where('active', true)->get();
 
@@ -134,15 +134,15 @@ $query->join('companies', 'companies.id', '=', 'users.company_id');
 DB::select('SELECT * FROM orders WHERE status = ?', ['pending']);
 ```
 
-Correct — reference the model's table:
+正确——引用模型的表：
 ```php
 DB::table((new User)->getTable())->where('active', true)->get();
 
-// Even better — use Eloquent or the query builder instead of raw SQL
+// 更好的做法——使用 Eloquent 或查询构建器而不是原始 SQL
 User::where('active', true)->get();
 Order::where('status', 'pending')->get();
 ```
 
-Prefer Eloquent queries and relationships over `DB::table()` whenever possible — they already reference the model's table. When `DB::table()` or raw joins are unavoidable, always use `(new Model)->getTable()` to keep the reference traceable.
+尽可能优先使用 Eloquent 查询和关系，而不是 `DB::table()`——它们已经引用了模型的表。当 `DB::table()` 或原始连接不可避免时，始终使用 `(new Model)->getTable()` 以保持引用可追溯。
 
-**Exception — migrations:** In migrations, hardcoded table names via `DB::table('settings')` are acceptable and preferred. Models change over time but migrations are frozen snapshots — referencing a model that is later renamed or deleted would break the migration.
+**例外 — 迁移：** 在迁移中，通过 `DB::table('settings')` 硬编码表名是可接受且首选的做法。模型会随时间变化，但迁移是冻结的快照——引用后来被重命名或删除的模型会破坏迁移。

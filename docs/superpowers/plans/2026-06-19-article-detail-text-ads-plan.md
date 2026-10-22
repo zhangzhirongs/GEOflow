@@ -289,7 +289,7 @@ resources/views/site/partials/article-text-ads.blade.php
 
 两种模式都通过 `renderArticlePage()` 输出详情页，因此同一套渲染逻辑即可覆盖。
 
-### Generic HTTP API
+### 通用 HTTP API
 
 可以把 `article_text_ads` 透传到 `settings` payload 中，但是否展示由对方系统决定。后台文案需要说明“通用 API 只负责发送字段，不保证远端渲染”。
 

@@ -1,40 +1,40 @@
-# GEOFlow Output Quality Scorecard
+# GEOFlow 输出质量评分卡
 
-## Deterministic Cases
+## 确定性用例
 
-| Case | Required behavior | Result |
+| 场景 | 必需行为 | 结果 |
 |---|---|---|
-| Workspace discovery | Emit structured capability evidence without booting the application | pass |
-| Homepage design validation | Accept the bundled reviewed payload and report module/style coverage | pass |
-| Channel capability gap | Surface missing `lead_form`, require review, and recommend package upgrade or confirmed fallback | pass |
-| Theme edit lifecycle | Create an isolated preview and publish it under a new theme ID | pass |
-| Theme transaction failure | Restore the live theme after an injected commit failure and block concurrent finalizers | pass |
-| Preflight transport | Reject unsafe URL schemes and non-2xx JSON responses before capability use | pass |
-| Preflight redaction | Redact sensitive JSON keys before printing non-success response excerpts | pass |
-| Signed channel read | Require in-process HTTPS/loopback endpoint validation and disabled redirects before live access | pass |
-| Static preview boundary | Serve only six bundled files, disable directory listing, and render metadata through `textContent` | pass |
-| Clean Skill upgrade | Stage the exact artifact contract, remove stale files through directory replacement, and retain current plus retired Skills in persistent backup | pass |
-| Contract drift | Keep `lead_form`, trigger samples, runtime targets, network inventory, and expected package files synchronized | pass |
+| 工作区发现 | 在不启动应用程序的情况下输出结构化能力证据 | 通过 |
+| 主页设计验证 | 接受捆绑的已审核载荷并报告模块/样式覆盖情况 | 通过 |
+| 渠道能力缺口 | 展示缺失的 `lead_form`、要求复核，并建议升级软件包或经确认的回退方案 | pass |
+| 主题编辑生命周期 | 创建隔离预览，并在新主题 ID 下发布 | pass |
+| 主题事务失败 | 在注入的提交失败后恢复线上主题，并阻止并发终结器 | pass |
+| 预检传输 | 在使用能力前，拒绝不安全的 URL 方案和非 2xx 的 JSON 响应 | pass |
+| 预检脱敏 | 在打印非成功响应摘录前，对敏感 JSON 键进行脱敏 | pass |
+| 签名通道读取 | 在实时访问前，要求进行进程内 HTTPS/环回端点验证并禁用重定向 | pass |
+| 静态预览边界 | 仅提供六个捆绑文件，禁用目录列表，并通过 `textContent` 渲染元数据 | pass |
+| 干净技能升级 | 暂存精确的产物契约，通过目录替换移除过时文件，并在持久备份中保留当前及已停用的技能 | pass |
+| 契约漂移 | 保持 `lead_form`、触发示例、运行时目标、网络清单和预期包文件同步 | 通过 |
 
-Deterministic pass rate: `11 / 11`.
+确定性通过率：`11 / 11`。
 
-## Boundary Checks
+## 边界检查
 
-- Unsafe live actions remain explicit confirmation points.
-- Channel module support comes from target-package capability evidence.
-- Live channel reads fail closed on application versions missing request-time endpoint and redirect safeguards.
-- Secrets and personal lead data stay outside report output.
-- Non-success preflight response bodies pass through key-level or text fallback redaction before excerpts reach terminal output.
-- Bundled previews expose a fixed allowlist from a dedicated directory and do not load external metadata.
-- Global installation copies only declared artifacts and keeps recoverable timestamped backups of superseded Skill directories.
-- Theme finalization validates complete staged trees and retains a workspace-wide lock through commit or rollback.
-- Legacy templates require current Laravel contract validation.
+- 不安全的实时操作仍保留为显式确认点。
+- Channel 模块支持源自目标包的能力证据。
+- 对于缺少请求时端点与重定向防护的应用版本，实时渠道读取会按失败关闭处理。
+- 机密和个人潜在客户数据保留在报告输出之外。
+- 非成功预检响应体会在摘录到达终端输出之前，经过键级或文本回退脱敏处理。
+- 捆绑预览从专用目录暴露固定允许列表，且不加载外部元数据。
+- 全局安装仅复制已声明的产物，并为被取代的技能目录保留可恢复的带时间戳备份。
+- 主题最终化会验证完整的暂存树，并在提交或回滚期间保持工作区级锁。
+- 旧版模板需要当前 Laravel 契约验证。
 
-## Evidence Status
+## 证据状态
 
-- Deterministic script evidence: available (`30` regression tests)
-- Trigger evidence: available
-- Provider-backed output comparison: `missing evidence`
-- Human blind review: `missing evidence`
+- 确定性脚本证据：可用（`30` 回归测试）
+- 触发证据：可用
+- 由提供商支持的输出比较：`missing evidence`
+- 人工盲审：`missing evidence`
 
-This scorecard supports local installation and continued evaluation. Stable catalog promotion requires the missing external evidence or an explicit review decision.
+此评分卡支持本地安装和持续评估。稳定目录提升需要缺失的外部证据或明确的审查决定。

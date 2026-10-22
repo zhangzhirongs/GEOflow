@@ -1,10 +1,10 @@
-# Error Handling Best Practices
+# 错误处理最佳实践
 
-## Exception Reporting and Rendering
+## 异常报告与渲染
 
-There are two valid approaches — choose one and apply it consistently across the project.
+有两种可行方法——选择一种并在整个项目中一致应用。
 
-**Co-location on the exception class** — keeps behavior alongside the exception definition, easier to find:
+**与异常类放在一起** — 使行为与异常定义相伴，更容易找到：
 
 ```php
 class InvalidOrderException extends Exception
@@ -18,7 +18,7 @@ class InvalidOrderException extends Exception
 }
 ```
 
-**Centralized in `bootstrap/app.php`** — all exception handling in one place, easier to see the full picture:
+**集中在 `bootstrap/app.php` 中** — 所有异常处理都在一处，更容易看清全貌：
 
 ```php
 ->withExceptions(function (Exceptions $exceptions) {
@@ -29,27 +29,27 @@ class InvalidOrderException extends Exception
 })
 ```
 
-Check the existing codebase and follow whichever pattern is already established.
+检查现有代码库，并遵循其中已确立的模式。
 
-## Use `ShouldntReport` for Exceptions That Should Never Log
+## 为不应记录日志的异常使用 `ShouldntReport`
 
-More discoverable than listing classes in `dontReport()`.
+比在 `dontReport()` 中列出类更易发现。
 
 ```php
 class PodcastProcessingException extends Exception implements ShouldntReport {}
 ```
 
-## Throttle High-Volume Exceptions
+## 限制高并发异常
 
-A single failing integration can flood error tracking. Use `throttle()` to rate-limit per exception type.
+单个失败的集成可能淹没错误跟踪。请使用 `throttle()` 按异常类型进行限流。
 
-## Enable `dontReportDuplicates()`
+## 启用 `dontReportDuplicates()`
 
-Prevents the same exception instance from being logged multiple times when `report($e)` is called in multiple catch blocks.
+当在多个 catch 块中调用 `report($e)` 时，防止同一个异常实例被多次记录日志。
 
-## Force JSON Error Rendering for API Routes
+## 为 API 路由强制 JSON 错误渲染
 
-Laravel auto-detects `Accept: application/json` but API clients may not set it. Explicitly declare JSON rendering for API routes.
+Laravel 会自动检测 `Accept: application/json`，但 API 客户端可能不会设置它。请为 API 路由显式声明 JSON 渲染。
 
 ```php
 $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
@@ -57,9 +57,9 @@ $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
 });
 ```
 
-## Add Context to Exception Classes
+## 为异常类添加上下文
 
-Attach structured data to exceptions at the source via a `context()` method — Laravel includes it automatically in the log entry.
+通过`context()`方法在源头将结构化数据附加到异常——Laravel 会自动将其包含在日志条目中。
 
 ```php
 class InvalidOrderException extends Exception

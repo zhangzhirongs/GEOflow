@@ -724,8 +724,8 @@ GEOFLOW_UPDATE_DATABASE_BACKUP_ENABLED=true
 - 文件替换；
 - Composer install；
 - migrate；
-- optimize clear；
-- queue restart；
+- 优化清除；
+- 队列重启；
 - 退出维护模式；
 - 写日志；
 - 失败时提示回滚。

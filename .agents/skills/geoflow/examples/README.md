@@ -1,5 +1,5 @@
-# geoflow examples
+# geoflow 示例
 
-`qiaomu-editorial-20260418/` is a sanitized static preview retained from the earlier GEOFlow frontend skills. It demonstrates homepage, category, article, archive, assets, and template-mapping presentation. Validate the package against the current Laravel theme contract before using it in a live workspace.
+`qiaomu-editorial-20260418/` 是保留自早期 GEOFlow 前端技能的经过清理的静态预览。它演示首页、分类、文章、归档、资源和模板映射展示。在将其用于实时工作区之前，请根据当前 Laravel 主题契约验证该包。
 
-`channel-frontend-report.json` is a synthetic capability and sync-preview fixture. It exercises default-site, channel, target-package, remote-capability, missing-module, and review-before-sync behavior without containing credentials or real channel data.
+`channel-frontend-report.json` 是一个合成的能力与同步预览夹具。它演练默认站点、渠道、目标包、远程能力、缺失模块以及同步前审核行为，且不包含凭据或真实渠道数据。

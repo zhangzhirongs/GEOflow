@@ -1,58 +1,58 @@
 <!--
-Copyright © 2026 姚金刚. All rights reserved.
-Project: geoflow
-Created by: 姚金刚
-Date: 2026-05-16
+版权所有 © 2026 姚金刚。保留所有权利。
+项目：geoflow
+创建者：姚金刚
+日期：2026-05-16
 X: https://x.com/yaojingang
 -->
 
-# Design Optimization Playbook
+# 设计优化手册
 
-Use this reference when the request is to improve an existing GEOFlow theme rather than replace it wholesale.
+当请求是改进现有 GEOFlow 主题而不是整体替换时，使用此参考。
 
-## Optimization Modes
+## 优化模式
 
-- `polish`: tighten spacing, typography, chips, borders, shadows, and visual rhythm
-- `structural_cleanup`: simplify noisy sections, unify repeated cards, and reduce layout inconsistency
-- `page_specific_tuning`: improve one or two pages such as homepage or article detail without redesigning the full system
-- `homepage_enrichment`: turn the default homepage into a richer front page with hero/media, metrics/chart-lite, text/value blocks, visual CTAs, and article-derived resource/case sections
-- `homepage_builder_design`: produce importable `homepage-design.json` for `homepage_modules` and `homepage_style` when the current GEOFlow system exposes the builder/import contract
-- `hybrid_restyle`: use a reference site as direction while staying anchored to the current template
-- `target_theme_edit`: apply the changes inside a selected theme fork that can be previewed in the live GEOFlow system
+- `polish`：收紧间距、字体排版、标签块、边框、阴影和视觉节奏
+- `structural_cleanup`：简化杂乱区块、统一重复卡片并减少布局不一致
+- `page_specific_tuning`：改进一两个页面（例如首页或文章详情页），而无需重新设计整个系统
+- `homepage_enrichment`：将默认首页改造成更丰富的前台页面，包含主视觉/媒体、指标/轻量图表、文本/价值块、视觉 CTA，以及由文章衍生的资源/案例版块
+- `homepage_builder_design`：当当前 GEOFlow 系统暴露构建器/导入契约时，为 `homepage_modules` 和 `homepage_style` 生成可导入的 `homepage-design.json`
+- `hybrid_restyle`：以参考站点为方向，同时保持锚定当前模板
+- `target_theme_edit`：在选定的主题分叉中应用更改，可在实时 GEOFlow 系统中预览
 
-## Default Audit Checklist
+## 默认审计清单
 
-- header density and navigation clarity
-- hero hierarchy and section rhythm
-- card consistency across home/category/archive
-- article readability, metadata treatment, and related-content treatment
-- ad block tone and how aggressive it feels
-- mobile spacing, stacking, and overflow risk
-- repeated token drift across colors, radii, borders, and shadows
-- whether the requested new display modules can be built from existing GEOFlow data fields
-- whether default homepage modules stay out of search/category result states
-- whether charts and metrics are derived from current collections or clearly marked as static theme illustrations
-- whether homepage module/style requests fit the current `HomepageModuleBuilder` contract before editing Blade
+- 页眉密度和导航清晰度
+- 首屏层级和区块节奏
+- 首页/分类/归档中的卡片一致性
+- 文章可读性、元数据处理及相关内容处理
+- 广告区块的语调及其激进程度
+- 移动端间距、堆叠和溢出风险
+- 在颜色、圆角、边框和阴影中重复出现的 token 漂移
+- 请求的新展示模块是否可以基于现有 GEOFlow 数据字段构建
+- 默认首页模块是否会排除在搜索/分类结果状态之外
+- 图表和指标是来自当前集合，还是明确标记为静态主题插图
+- 在编辑 Blade 之前，首页模块/样式请求是否符合当前 `HomepageModuleBuilder` 契约
 
-## Preferred Outputs
+## 首选输出
 
-- `design-audit.md`: current-template issues, constraints, and opportunities
-- `tokens.delta.json`: only the token changes needed for the optimization pass
-- `mapping.delta.json`: touched modules and what changes inside each one
-- `homepage-composition-plan.md`: module order, data source, fallback behavior, and desktop/mobile preview notes when homepage enrichment is in scope
-- `homepage-design.json`: importable builder payload when the current system supports homepage modules and custom homepage styles
-- `change-plan.md`: priority order, rollout notes, and preview focus
-- preview pages or preview notes for every touched route
-- a preview theme id and preview URLs when the edit runs against an existing target theme
+- `design-audit.md`：当前模板的问题、约束和机会
+- `tokens.delta.json`：仅包含优化处理所需的 token 变更
+- `mapping.delta.json`：涉及的模块以及每个模块内部发生的变化
+- `homepage-composition-plan.md`：当首页增强在范围内时，模块顺序、数据源、回退行为以及桌面/移动端预览说明
+- `homepage-design.json`：当前系统支持首页模块和自定义首页样式时可导入的构建器负载
+- `change-plan.md`：优先级顺序、发布说明和预览重点
+- 为每个涉及的路由提供预览页面或预览说明
+- 当编辑针对现有目标主题运行时，提供预览主题 ID 和预览 URL
 
-## Guardrails
+## 安全约束
 
-- preserve GEOFlow routes, helpers, and data queries
-- optimize modules that already exist before inventing new ones
-- when inventing homepage modules, prefer safe composition from current variables over backend expansion
-- when the homepage builder exists, prefer builder module JSON for supported module/style changes before adding Blade-only sections
-- use CSS-only chart and metric treatments unless the current theme already has a safe script path
-- keep `custom_html` sanitized and reviewable; do not use it for scripts, forms, iframes, or unsupplied claims
-- prefer shared card and metadata patterns over one-off page styling
-- when the current template is acceptable structurally, bias toward token cleanup and hierarchy fixes instead of large rewrites
-- default to preview-fork editing instead of live-theme editing on the first pass
+- 保留 GEOFlow 路由、辅助函数和数据查询
+- 在创造新模块之前，先优化已有的模块
+- 发明首页模块时，优先使用当前变量进行安全组合，而不是扩展后端
+- 当首页构建器存在时，对于受支持的模块/样式更改，应优先使用构建器模块 JSON，再考虑添加仅限 Blade 的区块
+- 除非当前主题已有安全的脚本路径，否则仅使用 CSS 图表和指标处理
+- 保持 `custom_html` 已清理且可审查；不要将其用于脚本、表单、iframe 或未提供的声明
+- 优先使用共享的卡片和元数据模式，而不是一次性页面样式
+- 当当前模板在结构上可接受时，倾向于进行 token 清理和层级修复，而不是大规模重写
+- 首次处理时默认进行预览分支编辑，而不是实时主题编辑

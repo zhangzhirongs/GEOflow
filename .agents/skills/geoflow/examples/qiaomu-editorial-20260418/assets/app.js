@@ -1,7 +1,7 @@
 const PACKAGE_META = Object.freeze([
   { text: 'Qiaomu Editorial', accent: true },
-  { text: 'reference: sanitized local example', accent: false },
-  { text: 'MVP: homepage → article', accent: false }
+  { text: '参考：经过清理的本地示例', accent: false },
+  { text: 'MVP：首页 → 文章', accent: false }
 ]);
 
 function loadPackageMeta() {

@@ -1,84 +1,84 @@
 # GEOFlow
 
-> Languages: [简体中文](../../README.md) | [English](README_en.md) | [日本語](README_ja.md) | [Español](README_es.md) | [Русский](README_ru.md) | [Português (BR)](README_pt_BR.md)
+> 语言：[简体中文](../../README.md) | [英语](README_en.md) | [日语](README_ja.md) | [西班牙语](README_es.md) | [俄语](README_ru.md) | [葡萄牙语（巴西）](README_pt_BR.md)
 
-> GEOFlow は GEO（Generative Engine Optimization）向けのオープンソース・コンテンツエンジニアリング／マルチサイト配信システムです。ナレッジベース、素材ライブラリ、プロンプト、AI 生成タスク、レビューと公開、データ分析、GEOFlow Agent ターゲットサイトパッケージ、WordPress REST チャネル、汎用 HTTP API チャネル、リモート静的ページ配信を一つの運用フローに統合し、信頼できる資料を追跡可能で公開・配信しやすい GEO コンテンツ資産へ変換します。
+> GEOFlow 是一套面向 GEO（Generative Engine Optimization）的开源内容工程与多站点分发系统。它把知识库、素材库、提示词、AI 生成任务、审核与发布、数据分析、GEOFlow Agent 目标站点包、WordPress REST 渠道、通用 HTTP API 渠道和远端静态页面分发集成到一个运营流程中，将可信资料转化为可追踪、易于发布和分发的 GEO 内容资产。
 
 [![PHP](https://img.shields.io/badge/PHP-8.3%2B-blue)](https://www.php.net/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](../../LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
+[![GitHub 星标数](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
+[![GitHub 分叉数](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
+[![GitHub 议题数](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
 
-GEOFlow は [Apache License 2.0](../../LICENSE) の下で公開されています。著作権表示とライセンス表示を保持し、Apache-2.0 の特許、商標、保証免責に関する条件を遵守する限り、商用利用を含む利用、複製、変更、再配布が可能です。
+GEOFlow 依据 [Apache License 2.0](../../LICENSE) 发布。在保留版权声明和许可证声明、遵守 Apache-2.0 的专利、商标及免责条款的前提下，可以包括商业使用在内的使用、复制、修改和再分发。
 
 ---
 
-## ✨ GEOFlow でできること
+## ✨ GEOFlow 能做什么
 
 | 機能 | 説明 |
 |------|------|
-| 🤖 マルチモデル生成 | OpenAI 互換 API と Gemini ネイティブ API、chat / embedding、Provider URL 自動適配、スマートフェイルオーバー、リトライ、利用統計 |
-| 🧠 ナレッジ RAG | ルールベース分割、任意の LLM セマンティック計画、安定フォールバック、embedding 設定時のベクトル保存、生成時の関連文脈検索 |
-| 🗂 素材とプロンプト | タイトル、キーワード、画像、作者、ナレッジ、本文プロンプト、特殊プロンプト |
-| 📦 タスク自動化 | 生成数、下書きプール、レビュー設定、公開頻度、キュー、失敗リトライ、公開範囲、タスク別記事フィルタ |
-| 📋 レビューと記事管理 | 下書き、レビュー、公開、ゴミ箱、作者、カテゴリ、SEO、タスク由来を一元管理 |
-| 📡 マルチサイト配信 | GEOFlow Agent、WordPress REST、汎用 HTTP API チャネル、シークレット、ターゲットサイトパッケージ、静的モード、rewrite ルール、リモート編集/削除、キュー、ログ |
-| 🧾 ターゲットサイトパッケージ | チャネルごとの PHP Agent、ホーム、記事ページ、静的アセット、sitemap、`llms.txt` / TXT マップ、Schema |
-| 📊 データ分析 | システム概要、単一サイト運用、マルチサイト配信、アクセスログ、Top コンテンツ、AI クローラー識別、トレンド |
-| 🔍 SEO と LLM 向け出力 | SEO メタ、OG、Schema、GFM Markdown、独立 CSS、画像同期、sitemap、TXT マップ |
-| 🎨 フロントとテーマ | テーマ、プレビュー、管理画面でのテーマ切替、リモートサイトのタイトル・著作権・テーマ・カテゴリ同期 |
-| 🌍 管理画面 i18n | 中国語、英語、日本語、スペイン語、ロシア語、ポルトガル語（ブラジル）。GEOFlow 2.0 モジュールも対象 |
-| 🔔 バージョン通知 | GitHub `version.json` を確認し、新バージョンを管理画面で通知 |
-| 🐳 すぐデプロイ | **Docker Compose**：PostgreSQL（pgvector）、Redis、アプリ、キュー、スケジューラ、Reverb、本番 Nginx/php-fpm |
+| 🤖 多模型生成 | OpenAI 兼容 API 和 Gemini 原生 API、chat / embedding、Provider URL 自动适配、智能故障转移、重试、使用统计 |
+| 🧠 知识库 RAG | 基于规则的分割、可选的 LLM 语义规划、稳定回退、配置 embedding 时的向量存储、生成时的相关上下文检索 |
+| 🗂 素材与提示词 | 标题、关键词、图片、作者、知识库、正文提示词、特殊提示词 |
+| 📦 任务自动化 | 生成数量、草稿池、审核设置、发布频率、队列、失败重试、发布范围、按任务筛选文章 |
+| 📋 审核与文章管理 | 草稿、审核、发布、回收站、作者、分类、SEO、任务来源统一管理 |
+| 📡 多站点分发 | GEOFlow Agent、WordPress REST、通用 HTTP API 渠道、密钥、目标站点包、静态模式、rewrite 规则、远程编辑/删除、队列、日志 |
+| 🧾 目标站点包 | 每个渠道的 PHP 智能体、首页、文章页、静态资源、sitemap、`llms.txt` / TXT 地图、Schema |
+| 📊 数据分析 | 系统概览、单站点运营、多站点分发、访问日志、Top 内容、AI 爬虫识别、趋势 |
+| 🔍 SEO 与面向 LLM 的输出 | SEO 元信息、OG、Schema、GFM Markdown、独立 CSS、图片同步、sitemap、TXT 地图 |
+| 🎨 前端与主题 | 主题、预览、在管理界面中切换主题、远程站点标题・版权・主题・分类同步 |
+| 🌍 管理界面 i18n | 中文、英语、日语、西班牙语、俄语、葡萄牙语（巴西）。也涵盖 GEOFlow 2.0 模块 |
+| 🔔 版本通知 | 检查 GitHub `version.json`，并在管理界面中通知新版本 |
+| 🐳 可立即部署 | **Docker Compose**：PostgreSQL（pgvector）、Redis、应用、队列、调度器、Reverb、生产 Nginx/php-fpm |
 
 ---
 
 ## GEOFlow CLI 0.2.0
 
-リポジトリ同梱の `bin/geoflow` から、API v1 のカタログ、タスク、ジョブ、素材、記事を操作できます。macOS、Linux、WSL を正式にサポートしています。Windows ネイティブ環境では、設定ファイルの ACL を手動で確認してください。
+可以从仓库自带的 `bin/geoflow` 操作 API v1 的目录、任务、作业、素材和文章。正式支持 macOS、Linux、WSL。在 Windows 原生环境中，请手动检查配置文件的 ACL。
 
-[CLI ガイド（英語）](../GEOFLOW_CLI_en.md)
+[CLI 指南（英语）](../GEOFLOW_CLI_en.md)
 
 ---
 
-## 🖼 画面プレビュー
+## 🖼 界面预览
 
 <table>
   <tr>
-    <td width="34%" rowspan="3"><img src="../../docs/images/screenshots/analytics-en.png" alt="GEOFlow analytics preview" /><br /><sub>Analytics</sub></td>
-    <td width="33%" rowspan="2"><img src="../../docs/images/screenshots/site-settings-en.png" alt="GEOFlow site settings preview" /><br /><sub>Site Settings</sub></td>
-    <td width="33%"><img src="../../docs/images/screenshots/dashboard-en.png" alt="GEOFlow admin dashboard preview" /><br /><sub>Admin Dashboard</sub></td>
+    <td width="34%" rowspan="3"><img src="../../docs/images/screenshots/analytics-en.png" alt="GEOFlow 分析预览" /><br /><sub>分析</sub></td>
+    <td width="33%" rowspan="2"><img src="../../docs/images/screenshots/site-settings-en.png" alt="GEOFlow 站点设置预览" /><br /><sub>站点设置</sub></td>
+    <td width="33%"><img src="../../docs/images/screenshots/dashboard-en.png" alt="GEOFlow 管理后台预览" /><br /><sub>管理后台</sub></td>
   </tr>
   <tr>
-    <td width="33%"><img src="../../docs/images/screenshots/tasks-en.png" alt="GEOFlow task management preview" /><br /><sub>Task Management</sub></td>
+    <td width="33%"><img src="../../docs/images/screenshots/tasks-en.png" alt="GEOFlow 任务管理预览" /><br /><sub>任务管理</sub></td>
   </tr>
   <tr>
-    <td width="33%"><img src="../../docs/images/screenshots/ai-config-en.png" alt="GEOFlow AI model configuration preview" /><br /><sub>AI Model Configuration</sub></td>
-    <td width="33%"><img src="../../docs/images/screenshots/materials-en.png" alt="GEOFlow materials preview" /><br /><sub>Materials</sub></td>
+    <td width="33%"><img src="../../docs/images/screenshots/ai-config-en.png" alt="GEOFlow AI 模型配置预览" /><br /><sub>AI 模型配置</sub></td>
+    <td width="33%"><img src="../../docs/images/screenshots/materials-en.png" alt="GEOFlow 素材预览" /><br /><sub>素材</sub></td>
   </tr>
 </table>
 
-管理画面トップ、データ分析、タスク、素材、モデル設定、サイト設定の主要導線をカバーします。
+涵盖管理后台首页、数据分析、任务、素材、模型设置和站点设置的主要路径。
 
 ---
 
-## 🆕 新バージョンの主な更新点
+## 🆕 新版本的主要更新点
 
-GEOFlow 2.0 の主な変更点は次のとおりです。
+GEOFlow 2.0 的主要变更点如下。
 
-- **管理画面を運用ナビゲーション化**：3 ステップ導線を残し、単一サイト運用、マルチサイト配信、関連 skill リソースに整理。
-- **Gemini と OpenAI 互換 Provider を両方サポート**：モデル設定で OpenAI 互換ルートと Gemini ネイティブ chat / embedding を扱えます。
-- **ナレッジ分割にセマンティック計画を追加**：ルールベース、自動、任意の LLM セマンティック計画を選択できます。LLM は境界だけを計画し、最終 chunk は原文から安定的に再構築されます。
-- **データ分析ページを独立化**：システム概要、コンテンツ運用、タスク/素材の健全性、配信状況、アクセスログ、AI クローラートレンドを `/admin/analytics` に集約。
-- **配信管理が実運用可能に**：GEOFlow Agent、WordPress REST、汎用 HTTP API チャネル、シークレット、接続テスト、ターゲットサイトパッケージ、静的/rewrite モード、リモート設定同期、キュー、ログ、リモート編集/削除を提供。
-- **公開範囲を明確化**：本体サイト＋チャネル、チャネルのみ、本体サイトのみを選択可能。本体サイトのみではチャネル選択が無効になります。
-- **ターゲットサイトを静的運用可能に**：配信時にホーム、記事ページ、sitemap、TXT マップ、`llms.txt`、画像、独立 CSS を再生成。
-- **素材と RAG を強化**：ナレッジ分割、ベクトル化状態、タイトル、キーワード、画像、作者、プロンプトをタスク入力層として統合。
-- **デプロイと安全性を改善**：本番 Docker は Nginx + PHP-FPM、既存管理者を seed で上書きせず、Docker/Composer ミラーを設定可能。
-- **現在の管理画面キーを多言語でカバー**：2.0 新モジュールで裸の翻訳 key や英語フォールバックが出にくくなりました。
+- **将管理后台打造为运营导航**：保留 3 步引导流程，并整理为单站点运营、多站点分发、相关技能资源。
+- **同时支持 Gemini 和 OpenAI 兼容 Provider**：可在模型设置中处理 OpenAI 兼容路由与 Gemini 原生 chat / embedding。
+- **知识分割新增语义规划**：可选择基于规则、自动、可选的 LLM 语义规划。LLM 仅规划边界，最终 chunk 会从原文稳定重建。
+- **数据分析页面独立化**：将系统概览、内容运营、任务/素材健康度、分发状态、访问日志、AI 爬虫趋势集中到 `/admin/analytics`。
+- **分发管理可投入实际运行**：提供 GEOFlow Agent、WordPress REST、通用 HTTP API 渠道、密钥、连接测试、目标站点包、静态/rewrite 模式、远程设置同步、队列、日志、远程编辑/删除。
+- **明确公开范围**：可选择主站＋频道、仅频道、仅主站。仅选择主站时，频道选择将失效。
+- **目标站点可静态运行**：分发时会重新生成首页、文章页、sitemap、TXT 地图、`llms.txt`、图像、独立 CSS。
+- **强化素材与 RAG**：将知识切分、向量化状态、标题、关键词、图片、作者、提示词整合为任务输入层。
+- **改进部署与安全性**：生产 Docker 使用 Nginx + PHP-FPM，seed 不会覆盖现有管理员，并可配置 Docker/Composer 镜像。
+- **当前管理后台键已支持多语言**：2.0 新模块中更不容易出现裸露的翻译 key 或英语回退。
 
 ---
 
@@ -102,79 +102,79 @@ AI 設定 / 素材 / プロンプト / タスク設定
 
 ---
 
-## 🧱 システムアーキテクチャ
+## 🧱 系统架构
 
 | 層 | 説明 |
 |----|------|
-| Web / Admin | **Laravel** ルートとコントローラ。記事サイト、**Blade** 管理画面、分析、配信、素材、タスク |
-| API / Agent | ローカル API とターゲットサイト PHP Agent。ヘルスチェック、記事受信/更新/削除、リモート設定同期、静的ファイル生成 |
-| Scheduler / Queue / Reverb | **Scheduler**、**`queue:work` / Horizon** による生成・配信処理、必要に応じ **Reverb** |
-| ドメイン / Jobs | `app/Services`、`app/Jobs`、`app/Http/Controllers` などで AI 生成、RAG、公開、配信、ログ分析を処理 |
-| 永続化 | **PostgreSQL**（**pgvector** 推奨）+ **Redis** + ターゲットサイト JSON/静的ファイル |
+| Web / Admin | **Laravel** 路由与控制器。文章站点、**Blade** 管理界面、分析、分发、素材、任务 |
+| API / 智能体 | 本地 API 与目标站点 PHP 智能体。健康检查、文章接收/更新/删除、远程设置同步、静态文件生成 |
+| Scheduler / Queue / Reverb | **Scheduler**、**`queue:work` / Horizon** 用于生成・分发处理，根据需要 **Reverb** |
+| 域名 / Jobs | 通过 `app/Services`、`app/Jobs`、`app/Http/Controllers` 等处理 AI 生成、RAG、发布、分发、日志分析 |
+| 持久化 | **PostgreSQL**（推荐 **pgvector**）+ **Redis** + 目标站点 JSON/静态文件 |
 
-主な流れ：管理でモデル・プロンプトを設定 → ナレッジ、タイトル、キーワード、画像、作者を準備 → タスク作成とキュー投入 → Worker が生成 → 下書き〜公開 → ローカル SEO ページ出力 → 選択チャネルへ配信 → 分析で生産・配信・アクセス・AI クローラーを確認。
-
----
-
-## ⚡ 管理画面の最短導線
-
-1. **API を設定**：少なくとも 1 つの chat モデルを追加します。RAG を使う場合は embedding モデルを追加し、ナレッジ分割戦略を選びます。
-2. **素材を設定**：ナレッジ、タイトル、キーワード、画像、作者を準備します。まずは実在し検証できる資料を使ってください。
-3. **タスクを作成**：素材、モデル、生成数、公開頻度、公開範囲を選び、最初は下書きまたはレビューから検証します。
+主要流程：在管理中设置模型和提示词 → 准备知识、标题、关键词、图片和作者 → 创建任务并加入队列 → Worker 生成 → 草稿至发布 → 输出本地 SEO 页面 → 分发到选定渠道 → 在分析中查看生产、分发、访问和 AI 爬虫情况。
 
 ---
 
-## 🎯 想定シーンと得られる価値
+## ⚡ 管理后台的最短操作路径
 
-GEOFlow は次のような実務シーンに向いています。
-
-- **独立した GEO 公式サイト**
-  製品説明、FAQ、事例、ブランド知識を継続的に整理・公開するサイトとして運用できます。目的は AI 検索での可視性や信頼性を高めることであり、低品質ページを量産することではありません。
-- **既存公式サイト内の GEO サブチャンネル**
-  既存サイトの中に、ニュース、ナレッジ、解説などの専用チャンネルを追加できます。目的は情報を構造化し、検索や引用に強い状態にすることです。
-- **独立した GEO 信源サイト**
-  特定の業界やテーマに特化した記事、ガイド、ランキング、解説を継続的に蓄積できます。目的は信頼できる外部コンテンツ資産を作ることであり、情報汚染ではありません。
-- **社内向け GEO コンテンツ管理システム**
-  モデル、素材、ナレッジ、プロンプト、レビュー、公開フローをまとめて扱う内部バックエンドとして利用できます。目的は運用効率の向上です。
-- **マルチサイト / マルチチャンネル運用**
-  複数のテーマ、サイト、チャンネルを同じ運用設計で管理できます。目的は標準化と保守性の向上です。
-- **自動化された信源管理と配信**
-  ナレッジ、特集、更新、配信をエンジニアリングして運用できます。目的は価値ある情報をユーザーと AI にとって理解・引用・検索しやすくすることです。
-
-このシステムの価値は、**真実で質の高く維持されたナレッジベース**を前提にしてはじめて成立します。
-インターネットをノイズで汚すための仕組みではなく、信頼できる情報をより効率よく管理・配信するための基盤です。
+1. **配置 API**：至少添加 1 个 chat 模型。使用 RAG 时，添加 embedding 模型并选择知识分块策略。
+2. **设置素材**：准备知识、标题、关键词、图片和作者。请先使用真实存在且可验证的资料。
+3. **创建任务**：选择素材、模型、生成数量、发布频率和发布范围，最初通过草稿或审核进行验证。
 
 ---
 
-## 🧭 シーン別の導入・利用方法
+## 🎯 预期场景与可获得的价值
 
-- **独立 GEO サイトとして導入**
-  フロントエンドと管理画面をまとめて導入し、公式情報や解説コンテンツの拠点として運用します。
-- **公式サイトの GEO サブチャンネルとして導入**
-  既存サイトを大きく作り直さず、サブドメインやディレクトリ配下で専用チャンネルとして展開します。
-- **GEO 信源サイトとして導入**
-  まずナレッジベースの整備を優先し、その上でタスク機能を使って安定的に更新します。
-- **社内コンテンツ運用基盤として導入**
-  前台よりも后台、素材管理、API 連携を重視して、内部の制作・配信基盤として使います。
-- **マルチサイト運用基盤として導入**
-  複数テーマや複数ブランド向けに、同じワークフローを横展開します。
-- **自動化された信源管理システムとして導入**
-  タイトル庫、画像庫、プロンプト体系、ナレッジを長期的なインフラとして扱います。
+GEOFlow 适合以下实务场景。
 
-おすすめの順序は次の通りです。
+- **独立的 GEO 官方网站**
+  可作为持续整理和发布产品说明、FAQ、案例和品牌知识的网站运营。目的是提高在 AI 搜索中的可见性和可信度，而不是批量生产低质量页面。
+- **现有官方网站内的 GEO 子频道**
+  可以在现有网站中添加新闻、知识、解说等专用频道。目的是将信息结构化，使其更易于搜索和引用。
+- **独立的 GEO 信源站点**
+  可以持续积累面向特定行业或主题的文章、指南、排名和解说。目的是创建可信的外部内容资产，而不是信息污染。
+- **面向内部的 GEO 内容管理系统**
+  可作为统一处理模型、素材、知识、提示词、审核和发布流程的内部后端使用。目的是提高运营效率。
+- **多站点 / 多渠道运营**
+  可以使用相同的运营设计管理多个主题、站点和频道。目的是提高标准化和可维护性。
+- **自动化的信源管理与分发**
+  可以对知识、专题、更新和分发进行工程化运营。目的是让有价值的信息更易于用户和 AI 理解、引用和搜索。
 
-1. 先に実際の業務目的と読者を定義する
-2. 先にナレッジベースを整備する
-3. 内容の正確性と継続保守性を確保する
-4. その上で自動化によって効率を高める
-
-ナレッジベースが弱いまま自動化を強めると、ノイズだけが増えます。GEOFlow では **ナレッジベースの品質を最優先**にすべきです。
+该系统的价值只有在具备**真实、高质量且持续维护的知识库**的前提下才能成立。
+它不是用来污染互联网噪声的机制，而是为了更高效地管理和分发可信信息的基础设施。
 
 ---
 
-## 🚀 クイックスタート
+## 🧭 按场景的部署与使用方法
 
-### 方法 1：Docker（開発／デモ）
+- **作为独立 GEO 站点引入**
+  一并部署前台和管理后台，并将其作为官方信息和解说内容的基地来运营。
+- **作为官方网站的 GEO 子频道引入**
+  无需大幅重做现有网站，而是在子域名或目录下作为专用频道展开。
+- **作为 GEO 信源站点引入**
+  首先优先整备知识库，然后使用任务功能进行稳定更新。
+- **作为内部内容运营基座引入**
+  相比前台，更重视后台、素材管理和 API 集成，并将其作为内部制作和分发基础设施使用。
+- **作为多站点运营基础引入**
+  面向多个主题或多个品牌横向展开相同的工作流。
+- **作为自动化的信源管理系统引入**
+  将标题库、图片库、提示词体系和知识视为长期基础设施。
+
+推荐顺序如下。
+
+1. 先定义实际的业务目的和读者
+2. 先完善知识库
+3. 确保内容的准确性和持续可维护性
+4. 在此基础上通过自动化提高效率
+
+在知识库薄弱的情况下加强自动化，只会增加噪声。在 GEOFlow 中应**最优先考虑知识库的质量**。
+
+---
+
+## 🚀 快速开始
+
+### 方法 1：Docker（开发／演示）
 
 ```bash
 git clone https://github.com/zhangzhirongs/GEOflow.git
@@ -186,14 +186,14 @@ docker compose build
 docker compose up -d
 ```
 
-- サイト: `http://localhost:18080`（**`APP_PORT`**、既定 `18080`）
-- 管理ログイン: `http://localhost:18080/geo_admin/login`（**`ADMIN_BASE_PATH`**、既定 `geo_admin`）
+- 站点：`http://localhost:18080`（**`APP_PORT`**，默认 `18080`）
+- 管理登录：`http://localhost:18080/geo_admin/login`（**`ADMIN_BASE_PATH`**，默认 `geo_admin`）
 
-**`docker-compose.yml`** では **`init`** が DB 準備後にマイグレーションと `php artisan geoflow:install` を実行します。初期データは空の DB の場合だけ書き込まれます（既定管理者は下表参照）。
+在 **`docker-compose.yml`** 中，**`init`** 会在数据库准备完成后执行迁移和 `php artisan geoflow:install`。初始数据仅在数据库为空时写入（默认管理员见下表）。
 
 ### 補足：Docker（本番）
 
-本番は **`docker-compose.prod.yml`** で **Nginx + php-fpm**（`php artisan serve` ではない構成）を推奨します。
+生产环境推荐在 **`docker-compose.prod.yml`** 中使用 **Nginx + php-fpm**（非 `php artisan serve` 的架构）。
 
 ```bash
 cp .env.prod.example .env.prod
@@ -205,11 +205,11 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d init
 docker compose --env-file .env.prod -f docker-compose.prod.yml up -d app web queue scheduler reverb
 ```
 
-- フロント／管理は `web`（Nginx）経由、PHP は `app`（php-fpm）。
-- **初回インストール:** 本番の `init` サービスはマイグレーション後に `php artisan geoflow:install` を実行します。新規の空データベースでは、Enterprise Signature 21 テーマと 50 件の参考記事が導入されます。既存サイトは現在のテーマとコンテンツを保持し、`../../docs/deployment/DEPLOYMENT.md` 3.1 節の停止・ドレイン手順を実行してください。
-- 手順の詳細は **`../../docs/deployment/DEPLOYMENT.md`** を参照してください。
+- 前端／管理经由 `web`（Nginx），PHP 为 `app`（php-fpm）。
+- **首次安装：** 生产环境的 `init` 服务会在迁移后执行 `php artisan geoflow:install`。在全新的空数据库中，将导入 Enterprise Signature 21 主题和 50 篇参考文章。现有站点保留当前主题和内容，请执行 `../../docs/deployment/DEPLOYMENT.md` 第 3.1 节的停止/排空流程。
+- 步骤详情请参阅 **`../../docs/deployment/DEPLOYMENT.md`**。
 
-### 方法 2：ローカル PHP
+### 方法 2：本地 PHP
 
 **前提:** PHP **8.3+**（`pdo_pgsql`、`redis` 等）、**PostgreSQL**、**Redis**、**Composer 2.x**。
 
@@ -227,7 +227,7 @@ php artisan storage:link
 php artisan serve --host=127.0.0.1 --port=8080
 ```
 
-別ターミナル:
+另一个终端：
 
 ```bash
 php artisan queue:work redis --queue=geoflow,distribution,default --sleep=1 --tries=1 --timeout=300
@@ -235,36 +235,36 @@ php artisan schedule:work
 php artisan reverb:start
 ```
 
-管理: `http://127.0.0.1:8080/geo_admin/login`。**本番**は Nginx + PHP-FPM、ドキュメントルートは **`public/`**。
+管理：`http://127.0.0.1:8080/geo_admin/login`。**生产环境**使用 Nginx + PHP-FPM，文档根目录为 **`public/`**。
 
 ---
 
-## 環境チェックリスト
+## 环境检查清单
 
-| 項目 | メモ |
+| 项目 | 备注 |
 |------|------|
-| PHP | **8.3+**（Docker は 8.4 の場合あり） |
+| PHP | **8.3+**（Docker 中可能为 8.4） |
 | DB | **PostgreSQL**（**pgvector** 推奨） |
-| Redis | キュー用（ローカル検証のみ `QUEUE_CONNECTION=sync` 可） |
+| Redis | 用于队列（仅本地验证可 `QUEUE_CONNECTION=sync`） |
 
 ---
 
-## デフォルト管理者（`geoflow:install` 後）
+## 默认管理员（`geoflow:install` 之后）
 
 | 項目 | 値 |
 |------|-----|
-| ユーザー名 | `GEOFLOW_ADMIN_USERNAME`、既定は `admin` |
-| パスワード | ローカル開発では既定 `password`。本番では `GEOFLOW_ADMIN_PASSWORD` を設定してください。未設定でアカウントがまだ存在しない場合、インストーラは一回限りのランダムパスワードを init / `geoflow:install` ログに出力します。 |
+| 用户名 | `GEOFLOW_ADMIN_USERNAME`，默认为 `admin` |
+| 密码 | 本地开发默认 `password`。生产环境请设置 `GEOFLOW_ADMIN_PASSWORD`。如果未设置且账户尚不存在，安装程序会将一次性随机密码输出到 init / `geoflow:install` 日志中。 |
 
-`geoflow:install` は新規の空データベースで管理者、Enterprise Signature 21 テーマ、50 件の参考記事を追加します。最小構成には `--without-demo` を使用できます。既存の業務データを検出した場合はマーカーのみを書き込み、現在のテーマ、設定、カテゴリ、著者、記事を保持します。Admin seeder も冪等です。
+`geoflow:install` 会在全新的空数据库中新增管理员、Enterprise Signature 21 主题和 50 篇参考文章。最小配置可使用 `--without-demo`。如果检测到现有业务数据，则只写入标记，并保留当前主题、设置、分类、作者和文章。Admin seeder 也是幂等的。
 
-参考パックを手動導入する場合は、`GEOFLOW_SEED_FRONTEND_DEMO=true` を設定して `php artisan db:seed --force` を実行します。既定で不足した著者、カテゴリ、記事だけを追加します。`GEOFLOW_SEED_FRONTEND_DEMO_OVERWRITE=true` はリセット可能なデモデータベースに限定してください。
+手动导入参考包时，请设置 `GEOFLOW_SEED_FRONTEND_DEMO=true` 并执行 `php artisan db:seed --force`。默认只添加缺失的作者、分类和文章。请将 `GEOFLOW_SEED_FRONTEND_DEMO_OVERWRITE=true` 限制在可重置的演示数据库中。
 
-### ログイン失敗時のロックと手動解除
+### 登录失败时的锁定与手动解除
 
-- 管理者アカウントは、連続 **5** 回ログインに失敗すると自動的にロックされます（`status=locked`）。
-- ロックされたアカウントは、管理者による手動解除までログインできません。
-- 解除コマンド:
+- 管理员账号在连续 **5** 次登录失败后会被自动锁定（`status=locked`）。
+- 被锁定的账号在管理员手动解除之前无法登录。
+- 解除命令：
 
 ```bash
 php artisan geoflow:admin-unlock <username>
@@ -280,13 +280,13 @@ php artisan geoflow:admin-unlock admin
 
 ## Docker 補足
 
-**開発**（`docker-compose.yml`）: `postgres` / `redis` / `init` / `app`（`${APP_PORT:-18080}:8080`）/ `queue` / `scheduler` / `reverb`（`${REVERB_EXPOSE_PORT:-18081}:8080`）。`docker/entrypoint.sh` の変数は [README_en.md](README_en.md) と同趣旨です。
+**开发**（`docker-compose.yml`）：`postgres` / `redis` / `init` / `app`（`${APP_PORT:-18080}:8080`）/ `queue` / `scheduler` / `reverb`（`${REVERB_EXPOSE_PORT:-18081}:8080`）。`docker/entrypoint.sh` 的变量与 [GEOFlow](README_en.md) 含义相同。
 
-**本番**（`docker-compose.prod.yml`）: `docker compose --env-file .env.prod -f docker-compose.prod.yml …` で起動（上記「補足：Docker（本番）」および **`../../docs/deployment/DEPLOYMENT.md`**）。
+**生产**（`docker-compose.prod.yml`）：通过 `docker compose --env-file .env.prod -f docker-compose.prod.yml …` 启动（参见上方“补充：Docker（生产）”以及 **`../../docs/deployment/DEPLOYMENT.md`**）。
 
 ---
 
-## 開発とテスト
+## 开发与测试
 
 ```bash
 composer test
@@ -298,18 +298,18 @@ composer test
 ## 🌍 他言語 README
 
 - [简体中文](../../README.md)
-- [English](README_en.md)
-- [Español](README_es.md)
-- [Русский](README_ru.md)
+- [英文](README_en.md)
+- [西班牙语](README_es.md)
+- [俄语](README_ru.md)
 
 ---
 
-## 📄 ライセンス
+## 📄 许可证
 
-GEOFlow は [Apache License 2.0](../../LICENSE) の下で提供されます。このライセンスは、ライセンス表示、著作権表示、変更通知、特許条項、保証免責を遵守する限り、個人利用、商用利用、変更、再配布、非公開デプロイを許可します。
+GEOFlow 依据 [Apache License 2.0](../../LICENSE) 提供。该许可证允许个人使用、商业使用、修改、再分发和私有部署，前提是遵守许可证声明、版权声明、变更通知、专利条款和免责声明。
 
 ---
 
-## ⭐ スター推移
+## ⭐ 星标趋势
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)
+[![Star 历史图表](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)

@@ -1,40 +1,40 @@
-# Testing Best Practices
+# 测试最佳实践
 
-## Use `LazilyRefreshDatabase` Over `RefreshDatabase`
+## 优先使用 `LazilyRefreshDatabase` 而非 `RefreshDatabase`
 
-`RefreshDatabase` migrates once per process and wraps each test in a rolled-back transaction. `LazilyRefreshDatabase` skips even that first migration if the schema is already up to date.
+`RefreshDatabase` 每个进程迁移一次，并将每个测试包裹在回滚事务中。如果架构已是最新，`LazilyRefreshDatabase` 甚至会跳过第一次迁移。
 
-## Use Model Assertions Over Raw Database Assertions
+## 使用模型断言而非原始数据库断言
 
-Incorrect: `$this->assertDatabaseHas('users', ['id' => $user->id]);`
+错误：`$this->assertDatabaseHas('users', ['id' => $user->id]);`
 
-Correct: `$this->assertModelExists($user);`
+正确：`$this->assertModelExists($user);`
 
-More expressive, type-safe, and fails with clearer messages.
+更具表现力、类型安全，且失败时提供更清晰的消息。
 
-## Use Factory States and Sequences
+## 使用工厂状态与序列
 
-Named states make tests self-documenting. Sequences eliminate repetitive setup.
+命名状态让测试具有自文档性。序列消除重复的设置。
 
-Incorrect: `User::factory()->create(['email_verified_at' => null]);`
+错误：`User::factory()->create(['email_verified_at' => null]);`
 
-Correct: `User::factory()->unverified()->create();`
+正确：`User::factory()->unverified()->create();`
 
-## Use `Exceptions::fake()` to Assert Exception Reporting
+## 使用 `Exceptions::fake()` 断言异常上报
 
-Instead of `withoutExceptionHandling()`, use `Exceptions::fake()` to assert the correct exception was reported while the request completes normally.
+不要使用 `withoutExceptionHandling()`，而应使用 `Exceptions::fake()` 来断言在请求正常完成的同时报告了正确的异常。
 
-## Call `Event::fake()` After Factory Setup
+## 在工厂设置后调用 `Event::fake()`
 
-Model factories rely on model events (e.g., `creating` to generate UUIDs). Calling `Event::fake()` before factory calls silences those events, producing broken models.
+模型工厂依赖模型事件（例如 `creating` 生成 UUID）。在工厂调用之前调用 `Event::fake()` 会使这些事件静默，从而产生损坏的模型。
 
-Incorrect: `Event::fake(); $user = User::factory()->create();`
+错误：`Event::fake(); $user = User::factory()->create();`
 
-Correct: `$user = User::factory()->create(); Event::fake();`
+正确：`$user = User::factory()->create(); Event::fake();`
 
-## Use `recycle()` to Share Relationship Instances Across Factories
+## 使用 `recycle()` 在多个工厂之间共享关联实例
 
-Without `recycle()`, nested factories create separate instances of the same conceptual entity.
+如果没有 `recycle()`，嵌套工厂会为同一概念实体创建单独的实例。
 
 ```php
 Ticket::factory()

@@ -1,37 +1,38 @@
 ---
 name: configuring-horizon
-description: "Use this skill whenever the user mentions Horizon by name in a Laravel context. Covers the full Horizon lifecycle: installing Horizon (horizon:install, Sail setup), configuring config/horizon.php (supervisor blocks, queue assignments, balancing strategies, minProcesses/maxProcesses), fixing the dashboard (authorization via Gate::define viewHorizon, blank metrics, horizon:snapshot scheduling), and troubleshooting production issues (worker crashes, timeout chain ordering, LongWaitDetected notifications, waits config). Also covers job tagging and silencing. Do not use for generic Laravel queues without Horizon, SQS or database drivers, standalone Redis setup, Linux supervisord, Telescope, or job batching."
+description: 每当用户在 Laravel 上下文中按名称提及 Horizon 时，使用此技能。涵盖完整的 Horizon 生命周期：安装 Horizon（horizon:install、Sail 设置）、配置 config/horizon.php（supervisor 块、队列分配、平衡策略、minProcesses/maxProcesses）、修复仪表板（通过 Gate::define viewHorizon 授权、空白指标、horizon:snapshot 调度），以及排查生产问题（worker 崩溃、超时链顺序、LongWaitDetected 通知、waits 配置）。还涵盖作业标记和静默。不要用于没有 Horizon 的通用 Laravel 队列、SQS 或数据库驱动、独立 Redis 设置、Linux supervisord、Telescope 或作业批处理。
 license: MIT
 metadata:
   author: laravel
+  display_name: Horizon 队列配置
 ---
 
-# Horizon Configuration
+# Horizon 队列配置
 
-## Documentation
+## 文档
 
-Use `search-docs` for detailed Horizon patterns and documentation covering configuration, supervisors, balancing, dashboard authorization, tags, notifications, metrics, and deployment.
+使用 `search-docs` 获取详细的 Horizon 模式和文档，涵盖配置、监督进程、负载均衡、仪表盘授权、标签、通知、指标和部署。
 
-For deeper guidance on specific topics, read the relevant reference file before implementing:
+如需针对特定主题的深入指导，请在实施前阅读相关参考文件：
 
-- `references/supervisors.md` covers supervisor blocks, balancing strategies, multi-queue setups, and auto-scaling
-- `references/notifications.md` covers LongWaitDetected alerts, notification routing, and the `waits` config
-- `references/tags.md` covers job tagging, dashboard filtering, and silencing noisy jobs
-- `references/metrics.md` covers the blank metrics dashboard, snapshot scheduling, and retention config
+- `references/supervisors.md` 涵盖 supervisor 块、负载均衡策略、多队列设置和自动扩缩容
+- `references/notifications.md` 涵盖 LongWaitDetected 警报、通知路由和 `waits` 配置
+- `references/tags.md` 涵盖任务标记、仪表盘过滤以及静默嘈杂任务
+- `references/metrics.md` 涵盖空白指标仪表盘、快照调度和保留配置
 
-## Basic Usage
+## 基本用法
 
-### Installation
+### 安装
 
 ```bash
 php artisan horizon:install
 ```
 
-### Supervisor Configuration
+### Supervisor 配置
 
-Define supervisors in `config/horizon.php`. The `environments` array merges into `defaults` and does not replace the whole supervisor block:
+在 `config/horizon.php` 中定义 supervisor。`environments` 数组会合并到 `defaults` 中，而不会替换整个 supervisor 块：
 
-<!-- Supervisor Config -->
+<!-- Supervisor 配置 -->
 ```php
 'defaults' => [
     'supervisor-1' => [
@@ -54,11 +55,11 @@ Define supervisors in `config/horizon.php`. The `environments` array merges into
 ],
 ```
 
-### Dashboard Authorization
+### 仪表板授权
 
-Restrict access in `App\Providers\HorizonServiceProvider`:
+在 `App\Providers\HorizonServiceProvider` 中限制访问：
 
-<!-- Dashboard Gate -->
+<!-- 仪表盘门控 -->
 ```php
 protected function gate(): void
 {
@@ -68,18 +69,18 @@ protected function gate(): void
 }
 ```
 
-## Verification
+## 验证
 
-1. Run `php artisan horizon` and visit `/horizon`
-2. Confirm dashboard access is restricted as expected
-3. Check that metrics populate after scheduling `horizon:snapshot`
+1. 运行 `php artisan horizon` 并访问 `/horizon`
+2. 确认仪表盘访问权限已按预期受限
+3. 检查调度`horizon:snapshot`后指标是否正常填充
 
-## Common Pitfalls
+## 常见陷阱
 
-- Horizon only works with the Redis queue driver. Other drivers such as database and SQS are not supported.
-- Redis Cluster is not supported. Horizon requires a standalone Redis connection.
-- Always check `config/horizon.php` before making changes to understand the current supervisor and environment configuration.
-- The `environments` array overrides only the keys you specify. It merges into `defaults` and does not replace it.
-- The timeout chain must be ordered: job `timeout` less than supervisor `timeout` less than `retry_after`. The wrong order can cause jobs to be retried before Horizon finishes timing them out.
-- The metrics dashboard stays blank until `horizon:snapshot` is scheduled. Running `php artisan horizon` alone does not populate metrics.
-- Always use `search-docs` for the latest Horizon documentation rather than relying on this skill alone.
+- Horizon 仅适用于 Redis 队列驱动。不支持 database 和 SQS 等其他驱动。
+- 不支持 Redis Cluster。Horizon 需要独立的 Redis 连接。
+- 在进行更改之前，始终检查 `config/horizon.php`，以了解当前的 supervisor 和环境配置。
+- `environments` 数组仅覆盖你指定的键。它会合并到 `defaults` 中，而不会替换它。
+- 超时链必须按顺序设置：作业 `timeout` 小于 supervisor `timeout` 小于 `retry_after`。顺序错误可能导致作业在 Horizon 完成超时处理之前被重试。
+- 在调度 `horizon:snapshot` 之前，指标仪表板会一直空白。仅运行 `php artisan horizon` 不会填充指标。
+- 要获取最新的 Horizon 文档，始终使用 `search-docs`，而不是仅依赖此技能。

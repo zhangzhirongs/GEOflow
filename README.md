@@ -1,6 +1,6 @@
 # GEOFlow
 
-> Languages: [简体中文](README.md) | [English](docs/readme/README_en.md) | [日本語](docs/readme/README_ja.md) | [Español](docs/readme/README_es.md) | [Русский](docs/readme/README_ru.md) | [Português (BR)](docs/readme/README_pt_BR.md)
+> 语言：[简体中文](README.md) | [英语](docs/readme/README_en.md) | [日语](docs/readme/README_ja.md) | [西班牙语](docs/readme/README_es.md) | [俄语](docs/readme/README_ru.md) | [葡萄牙语（巴西）](docs/readme/README_pt_BR.md)
 
 > GEOFlow 是一套专门面向 GEO（生成式引擎优化）的开源智能内容工程与多站点分发系统。它把知识库、素材库、提示词、AI 生成任务、审核发布、数据分析、GEOFlow Agent 目标站点包、WordPress REST 渠道、通用 HTTP API 渠道和远端静态页面分发串联为一条可持续运营的工作链路，目标是帮助团队把可信资料沉淀为可管理、可发布、可追踪、可同步到多端的 GEO 内容资产。
 
@@ -8,9 +8,9 @@
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
+[![GitHub 星标数](https://img.shields.io/github/stars/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/stargazers)
+[![GitHub 分叉数](https://img.shields.io/github/forks/zhangzhirongs/GEOflow?style=social)](https://github.com/zhangzhirongs/GEOflow/network/members)
+[![GitHub 议题数](https://img.shields.io/github/issues/zhangzhirongs/GEOflow)](https://github.com/zhangzhirongs/GEOflow/issues)
 
 GEOFlow 以 [Apache License 2.0](LICENSE) 开源发布。你可以自由使用、复制、修改和分发本项目，包括商业使用；请保留版权声明和许可证文本，并遵守 Apache-2.0 的专利授权、商标与免责声明条款。
 
@@ -38,21 +38,21 @@ GEOFLOW_TELEMETRY_ENABLED=false
 | 📦 任务自动化 | 支持任务创建、生成数量、草稿池、审核开关、发布节奏、队列执行、失败重试、发布范围控制和任务文章筛选 |
 | 📋 审核与文章管理 | 草稿、审核、发布、回收站、作者、分类、SEO 字段和任务来源统一管理 |
 | ✍️ 人工发布工作台 | 将已审核文章或评论文案编排为人工发布工单，支持身份、账号、执行人、计划时间、风险提示、重复提醒、发布回执和 CSV 导出 |
-| 📡 多站点分发管理 | 支持 GEOFlow Agent、WordPress REST 与通用 HTTP API 渠道、密钥管理、目标站点包、静态模式、伪静态规则、远端文章编辑/删除和队列日志 |
-| 🧾 目标站点包 | 为每个渠道生成预配置 PHP Agent 包，内置首页、详情页、静态资源、sitemap、`llms.txt` / TXT 地图和 Schema |
+| 📡 多站点分发管理 | 支持 GEOFlow Agent、WordPress REST 与通用 HTTP API 渠道、密钥管理、目标站点包、静态模式、伪静态规则、远程文章编辑/删除和队列日志 |
+| 🧾 目标站点包 | 为每个渠道生成预配置 PHP 智能体包，内置首页、详情页、静态资源、sitemap、`llms.txt` / TXT 地图和 Schema |
 | 📊 数据分析 | 集中展示系统总览、单站内容运营、多站分发、访问日志、Top 内容、AI 爬虫识别和趋势图 |
 | 🔍 SEO 与 LLM 抓取友好输出 | 文章 SEO 元信息、Open Graph、Schema、GFM Markdown、独立 CSS、图片同步、sitemap 和 TXT 地图 |
 | 🎨 前台与主题 | 默认主题、主题包、预览路径、后台主题切换；GEOFlow Agent 渠道可同步站点标题、版权、主题和分类设置 |
 | 🌍 后台多语言 | 后台支持中文、英文、日语、西班牙语、俄语、葡萄牙语（巴西）切换，并覆盖 2.0 新模块 |
 | 🔔 版本提醒 | 后台可按 `version.json` 检查 GitHub 新版本，并在有新版本时提醒管理员 |
 | 🐳 可直接部署 | **Docker Compose** 一键拉起 PostgreSQL（pgvector）、Redis、应用、队列、调度、Reverb 和生产 Nginx/php-fpm |
-| 🧭 GEOFlow Agent Skill | 仓库内置统一的 `$geoflow` Skill，覆盖产品开发、后台运营、网站前台、主题模板、渠道站点和旧版迁移 |
+| 🧭 GEOFlow Agent 技能 | 仓库内置统一的 `$geoflow` 技能，覆盖产品开发、后台运营、网站前台、主题模板、渠道站点和旧版迁移 |
 
 ---
 
-## 🧭 GEOFlow Agent Skill
+## 🧭 GEOFlow Agent 技能
 
-仓库在 [`.agents/skills/geoflow`](.agents/skills/geoflow/) 内提供统一的 GEOFlow Skill。支持 Agent Skills 的工具打开本项目后可以直接发现它；在 Codex 中可通过 `$geoflow` 调用。
+仓库在 [`.agents/skills/geoflow`](.agents/skills/geoflow/) 内提供统一的 GEOFlow 技能。支持智能体技能的工具打开本项目后可以直接发现它；在 Codex 中可通过 `$geoflow` 调用。
 
 这个统一入口覆盖五种工作模式：
 
@@ -62,15 +62,15 @@ GEOFLOW_TELEMETRY_ENABLED=false
 | `operations` | 通过受支持的 CLI、API v1 或登录后的管理界面执行系统操作 |
 | `public_frontend` | 默认网站、Blade 主题、首页模块、线索表单和前台页面 |
 | `channel_frontend` | GEOFlow Agent 目标站点包、渠道能力检查、同步预览和渠道前台设置 |
-| `legacy_migration` | 旧版根目录 PHP 模板、历史包体和旧 Skill 标识迁移 |
+| `legacy_migration` | 旧版根目录 PHP 模板、历史包体和旧技能标识迁移 |
 
-它统一替代 `yao-geoflow-cli`、`yao-geoflow-design` 和 `yao-geoflow-template`。如需安装或升级为 Codex 全局 Skill，可在克隆仓库后执行：
+它统一替代 `yao-geoflow-cli`、`yao-geoflow-design` 和 `yao-geoflow-template`。如需安装或升级为 Codex 全局技能，可在克隆仓库后执行：
 
 ```bash
 bash .agents/skills/geoflow/scripts/install_codex_skill.sh
 ```
 
-安装器只复制公开清单中的文件，校验暂存包，将当前 `geoflow` 和三个旧 Skill 移到唯一的 `~/.codex/skill-backups/geoflow-<时间戳>.<后缀>/`，随后在同一文件系统内切换新版本。完成后重启 Codex。依赖矩阵、回滚命令和平台边界见 [Skill 安装说明](.agents/skills/geoflow/README.md#installation)。
+安装器只复制公开清单中的文件，校验暂存包，将当前 `geoflow` 和三个旧技能移到唯一的 `~/.codex/skill-backups/geoflow-<时间戳>.<后缀>/`，随后在同一文件系统内切换新版本。完成后重启 Codex。依赖矩阵、回滚命令和平台边界见 [技能安装说明](.agents/skills/geoflow/README.md#安装)。
 
 ---
 
@@ -78,7 +78,7 @@ bash .agents/skills/geoflow/scripts/install_codex_skill.sh
 
 仓库内置 `bin/geoflow`，用于通过 API v1 管理目录、任务、执行记录、素材和文章。CLI 支持安全配置、登录、JSON 文件或 stdin、删除确认和结构化错误提示。正式支持 macOS、Linux 和 WSL；原生 Windows 的配置文件 ACL 需要手动确认。
 
-[CLI 中文完整文档](docs/GEOFLOW_CLI.md) | [CLI English guide](docs/GEOFLOW_CLI_en.md)
+[CLI 中文完整文档](docs/GEOFLOW_CLI.md) | [CLI 英文指南](docs/GEOFLOW_CLI_en.md)
 
 ---
 
@@ -107,7 +107,7 @@ bash .agents/skills/geoflow/scripts/install_codex_skill.sh
 
 GEOFlow 2.0 重点变化包括：
 
-- **后台首页改为运营导航**：保留三步上手引导，并按单站点运营、多站点分发和配套 skill 资源组织入口。
+- **后台首页改为运营导航**：保留三步上手引导，并按单站点运营、多站点分发和配套技能资源组织入口。
 - **Gemini 与 OpenAI-compatible 接入更完整**：AI 模型配置同时覆盖 OpenAI 风格 Provider 与 Gemini 原生 chat / embedding 路径。
 - **知识库支持语义切片规划**：提供结构化规则切片、自动策略和可选 LLM 语义规划，LLM 只规划边界，最终切片仍从原文稳定重建。
 - **数据分析独立成页**：系统总览、内容运营、任务健康、素材健康、分发状态、访问日志和 AI 爬虫趋势集中到 `/admin/analytics`。
@@ -145,8 +145,8 @@ AI 配置 / 素材库 / 提示词 / 任务配置
 | 层级 | 说明 |
 |------|------|
 | Web / Admin | **Laravel** 路由与控制器；前台文章站点、**Blade** 后台、数据分析、分发管理、素材与任务入口 |
-| API / Agent | 本地 API 与目标站点 PHP Agent；负责分发健康检查、文章接收、远端设置同步和静态文件生成 |
-| Scheduler / Queue / Reverb | **Laravel Scheduler** 扫描与入队；**`queue:work` / Horizon** 消费生成与分发任务；**Reverb** 按需启用 |
+| API / 智能体 | 本地 API 与目标站点 PHP 智能体；负责分发健康检查、文章接收、远端设置同步和静态文件生成 |
+| Scheduler / 队列 / Reverb | **Laravel Scheduler** 扫描与入队；**`queue:work` / Horizon** 消费生成与分发任务；**Reverb** 按需启用 |
 | Domain & Jobs | `app/Services`、`app/Jobs`、`app/Http/Controllers` 等承载 AI 生成、RAG、发布、分发和日志分析规则 |
 | Persistence | **PostgreSQL**（推荐 **pgvector** 镜像与线上实例一致）+ **Redis**（队列/缓存等）+ 目标站点本地 JSON/静态文件 |
 
@@ -430,10 +430,10 @@ composer test
 
 ## 🌍 多语言文档
 
-- [English README](docs/readme/README_en.md)
+- [英文 README](docs/readme/README_en.md)
 - [日本語 README](docs/readme/README_ja.md)
-- [Español README](docs/readme/README_es.md)
-- [Русский README](docs/readme/README_ru.md)
+- [西班牙语 README](docs/readme/README_es.md)
+- [俄语 README](docs/readme/README_ru.md)
 
 ---
 
@@ -445,4 +445,4 @@ composer test
 
 ## ⭐ Star 趋势
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)
+[![Star 历史图表](https://api.star-history.com/svg?repos=zhangzhirongs/GEOflow&type=Date)](https://star-history.com/#zhangzhirongs/GEOflow&Date)

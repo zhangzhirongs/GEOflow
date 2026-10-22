@@ -20,8 +20,8 @@
 - `system-update-queue`: 系统更新与回滚任务
 - `scheduler`: `php artisan schedule:work`
 - `reverb`: `php artisan reverb:start`
-- `postgres`: PostgreSQL 16 + pgvector
-- `redis`: Redis 7
+- `postgres`：PostgreSQL 16 + pgvector
+- `redis`：Redis 7
 
 这套方案与当前开发用 `docker-compose.yml` 分离：
 
@@ -236,7 +236,7 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 
 该命令仅用于没有代码、镜像或数据库迁移变化的配置重建。已有部署的代码更新统一执行 3.1 节的停机排空协议。
 
-- 全新空库需要手动跑迁移时，可把 fresh-install intent 限定在该一次性容器：
+- 全新空库需要手动跑迁移时，可将全新安装意图限定在该一次性容器：
 
 ```bash
 docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm \

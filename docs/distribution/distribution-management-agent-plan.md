@@ -17,7 +17,7 @@ GEOFlow 中控系统
 -> 目标网站内容存储与发布系统
 ```
 
-JS 文件包可以作为前台嵌入、展示组件或安装辅助存在，但不应该持有写权限，也不应该承担文章增删改查能力。真正的创建、更新、删除、下架、图片同步、分类同步等动作，应通过目标站服务端 Agent 完成。
+JS 文件包可以作为前台嵌入、展示组件或安装辅助存在，但不应该持有写权限，也不应该承担文章增删改查能力。真正的创建、更新、删除、下架、图片同步、分类同步等动作，应通过目标站服务端智能体完成。
 
 ## 2. 核心目标
 
@@ -26,7 +26,7 @@ JS 文件包可以作为前台嵌入、展示组件或安装辅助存在，但�
 - 创建任务时可选择一个或多个分发渠道。
 - 文章仍由 GEOFlow 生成、审核、入库和管理。
 - 发布时通过队列把内容同步到目标站点。
-- 每个目标站点通过服务端 Agent 接收 GEOFlow 的签名请求。
+- 每个目标站点通过服务端智能体接收 GEOFlow 的签名请求。
 - 支持每个渠道的模板、分类、作者、发布状态、日志和失败重试。
 - 不影响现有 GEOFlow 站内文章生成、审核、发布和前台展示逻辑。
 
@@ -46,7 +46,7 @@ JS 文件包可以作为前台嵌入、展示组件或安装辅助存在，但�
 - 分发渠道管理。
 - 任务绑定分发渠道。
 - 分发队列。
-- 服务端 Agent 协议。
+- 服务端智能体协议。
 - HMAC 签名通信。
 - 分发状态、日志、重试和审计。
 
@@ -94,16 +94,16 @@ flowchart LR
 | 名称 | 后台显示名称，例如“移山科技官网 GEO 频道” |
 | 域名 | 目标站点域名，例如 `https://example.com` |
 | 渠道类型 | `geoflow_agent`、`wordpress_agent`、`laravel_agent`、`static_agent`、`webhook` |
-| Agent 地址 | 目标站 Agent API 地址 |
+| 智能体地址 | 目标站智能体 API 地址 |
 | 模板 | 该渠道默认使用的前台模板 |
 | 状态 | 未验证、正常、异常、禁用 |
-| 最近心跳 | Agent 最近一次健康检查时间 |
+| 最近心跳 | 智能体最近一次健康检查时间 |
 | 最近错误 | 最近一次分发或心跳失败原因 |
 | 创建人 | 创建该渠道的管理员 |
 
-### 5.2 服务端 Agent
+### 5.2 服务端智能体
 
-服务端 Agent 是安装在目标网站服务器上的轻量接收器，不是 AI 终端，也不是大模型服务。
+服务端智能体是安装在目标网站服务器上的轻量接收器，不是 AI 终端，也不是大模型服务。
 
 它负责：
 
@@ -131,7 +131,7 @@ flowchart LR
 渠道模板用于控制目标站的页面样式和结构。第一阶段建议复用 GEOFlow 当前已有 themes 机制。后续可扩展为：
 
 - GEOFlow 托管模板。
-- Agent 安装包模板。
+- 智能体安装包模板。
 - 静态站模板。
 - JS 嵌入组件模板。
 
@@ -197,7 +197,7 @@ flowchart LR
 | 渠道名称 | 文本框 | 必填，2-80 字 |
 | 目标域名 | URL 输入框 | 必填，自动补全协议 |
 | 渠道类型 | 下拉选择 | 默认 `GEOFlow Agent` |
-| Agent API 地址 | URL 输入框 | 可自动根据域名生成 |
+| 智能体 API 地址 | URL 输入框 | 可自动根据域名生成 |
 | 前台模板 | 下拉选择 | 读取现有 themes |
 | 默认发布方式 | 单选 | 草稿、直接发布、跟随 GEOFlow |
 | 图片策略 | 单选 | 使用远程 URL、同步到目标站、不分发图片 |
@@ -225,8 +225,8 @@ flowchart LR
 - 基本信息：名称、域名、类型、模板、状态。
 - 安装状态：未安装、已检测、版本过低、异常。
 - 密钥信息：Channel ID、Secret 只允许重置，不再次明文展示。
-- Agent 安装说明：根据渠道类型展示安装步骤。
-- 健康检查：最近心跳、Agent 版本、目标站时间、目标站环境。
+- 智能体安装说明：根据渠道类型展示安装步骤。
+- 健康检查：最近心跳、智能体版本、目标站时间、目标站环境。
 - 分发统计：成功数、失败数、待重试数、最近成功时间。
 - 最近日志：请求摘要、响应摘要、错误原因。
 
@@ -239,7 +239,7 @@ flowchart LR
 - 禁用渠道
 - 查看全部日志
 
-### 6.5 Agent 安装包页面
+### 6.5 智能体安装包页面
 
 路径建议：
 
@@ -257,19 +257,19 @@ flowchart LR
 
 | 类型 | 输出 |
 | --- | --- |
-| PHP Agent | `geoflow-agent.php`、配置文件、Nginx/Apache 示例 |
-| Laravel Agent | route/controller/config 中间件包 |
-| WordPress Agent | 插件 zip |
-| Static Agent | Node/PHP 接收器与构建脚本 |
-| JS Embed | 只读展示 snippet |
+| PHP 智能体 | `geoflow-agent.php`、配置文件、Nginx/Apache 示例 |
+| Laravel 智能体 | route/controller/config 中间件包 |
+| WordPress 智能体 | 插件 zip |
+| Static 智能体 | Node/PHP 接收器与构建脚本 |
+| JS Embed | 只读展示代码片段 |
 
 页面展示：
 
-- 下载 Agent 包。
+- 下载智能体包。
 - 复制安装命令。
 - 复制环境变量。
 - 复制 Nginx 规则。
-- 安装后点击“检测 Agent”。
+- 安装后点击“检测智能体”。
 
 ### 6.6 分发队列页面
 
@@ -509,7 +509,7 @@ Schema::create('distribution_domain_verifications', function (Blueprint $table) 
 - 重置密钥。
 - 禁用渠道。
 - 验证域名。
-- 测试 Agent 健康状态。
+- 测试智能体健康状态。
 
 ### 8.2 `DistributionOrchestrator`
 
@@ -525,9 +525,9 @@ Schema::create('distribution_domain_verifications', function (Blueprint $table) 
 
 职责：
 
-- 把本地 `Article` 转成远程 Agent 统一 payload。
+- 把本地 `Article` 转成远程智能体统一 payload。
 - 处理标题、摘要、正文、分类、作者、图片、SEO 字段。
-- 生成 payload checksum。
+- 生成 payload 校验和。
 - 生成幂等 key。
 
 ### 8.4 `DistributionHttpClient`
@@ -535,7 +535,7 @@ Schema::create('distribution_domain_verifications', function (Blueprint $table) 
 职责：
 
 - 发送签名请求。
-- 添加 HMAC headers。
+- 添加 HMAC 请求头。
 - 处理超时。
 - 处理 HTTP 错误。
 - 对敏感响应脱敏。
@@ -555,12 +555,12 @@ Schema::create('distribution_domain_verifications', function (Blueprint $table) 
 
 - 从队列读取分发任务。
 - 构建 payload。
-- 调用目标 Agent。
+- 调用目标智能体。
 - 更新状态。
 - 写入日志。
 - 失败时按策略释放回队列。
 
-## 9. 目标站 Agent API 协议
+## 9. 目标站智能体 API 协议
 
 ### 9.1 健康检查
 
@@ -644,7 +644,7 @@ DELETE /geoflow-agent/v1/articles/{remote_id}
 
 ## 10. 签名机制
 
-GEOFlow 请求目标 Agent 时必须带这些 header：
+GEOFlow 请求目标智能体时必须带这些 header：
 
 ```text
 X-GEOFlow-Key-Id: gfch_xxx
@@ -670,12 +670,12 @@ SHA256(BODY)
 HMAC_SHA256(channel_secret, signing_string)
 ```
 
-Agent 校验规则：
+智能体校验规则：
 
 - 时间戳超过 5 分钟拒绝。
 - nonce 已使用拒绝。
-- body hash 不一致拒绝。
-- key id 不存在拒绝。
+- body hash 不一致时拒绝。
+- key id 不存在则拒绝。
 - secret 已禁用拒绝。
 - scope 不包含当前动作拒绝。
 
@@ -724,7 +724,7 @@ synced -> delete_queued -> sending -> deleted
 
 ### 12.3 请求防重放
 
-- Agent 记录 nonce，至少保留 10 分钟。
+- 智能体记录 nonce，至少保留 10 分钟。
 - 同一个 idempotency key 多次请求返回同一结果。
 - 时间戳超过窗口拒绝。
 
@@ -757,7 +757,7 @@ health:read
 
 - 一个渠道失败不影响其他渠道。
 - 外部分发失败不影响本地文章状态。
-- Agent 异常不应阻塞文章生成任务。
+- 智能体异常不应阻塞文章生成任务。
 - 分发队列应设置最大并发和速率限制。
 
 ## 13. 和现有 GEOFlow 模块的关系
@@ -776,7 +776,7 @@ health:read
 
 ### 13.4 API Token
 
-现有 API Token 机制可继续服务 GEOFlow 自身 API。目标站 Agent 使用独立的 channel secret，不建议复用管理员 API Token。
+现有 API Token 机制可继续服务 GEOFlow 自身 API。目标站智能体使用独立的 channel secret，不建议复用管理员 API Token。
 
 ### 13.5 队列系统
 
@@ -811,9 +811,9 @@ distribution
 - 可以在创建任务时选择渠道。
 - 不影响原有任务生成与发布。
 
-### 阶段二：分发队列与 Agent 协议
+### 阶段二：分发队列与智能体协议
 
-目标：让文章可以通过签名 API 推送到目标 Agent。
+目标：让文章可以通过签名 API 推送到目标智能体。
 
 包含：
 
@@ -823,34 +823,34 @@ distribution
 - 新增 `ProcessArticleDistributionJob`。
 - 新增 `article_distributions` 状态流转。
 - 新增分发日志页面。
-- 新增 Laravel/PHP Agent 示例。
+- 新增 Laravel/PHP 智能体示例。
 
 验收标准：
 
 - 本地文章发布后能创建分发任务。
 - 分发任务能发送签名请求。
-- 目标 Agent 能校验签名。
+- 目标智能体能校验签名。
 - 成功后写入 remote_id 和 remote_url。
 - 失败后写入日志并可重试。
 
 ### 阶段三：安装包与多目标适配
 
-目标：让用户可以更容易安装目标站 Agent。
+目标：让用户可以更容易安装目标站智能体。
 
 包含：
 
-- 生成 PHP Agent 安装包。
-- 生成 Laravel Agent 安装包。
+- 生成 PHP 智能体安装包。
+- 生成 Laravel 智能体安装包。
 - 生成 WordPress 插件草案。
-- Agent 安装说明页。
-- Agent 版本检测。
-- Agent 能力检测。
+- 智能体安装说明页。
+- 智能体版本检测。
+- 智能体能力检测。
 
 验收标准：
 
 - 后台可下载当前渠道专属安装包。
 - 安装后可以通过健康检查。
-- Agent 版本低时后台有提示。
+- 智能体版本低时后台有提示。
 
 ### 阶段四：高级分发能力
 
@@ -881,8 +881,8 @@ distribution
 
 - HMAC 签名生成。
 - HMAC 签名校验。
-- payload checksum。
-- idempotency key 生成。
+- 载荷校验和。
+- 幂等键生成。
 - 失败重试策略。
 - 状态流转。
 
@@ -900,7 +900,7 @@ distribution
 
 ### 15.3 集成测试
 
-准备一个本地 Fake Agent：
+准备一个本地 Fake 智能体：
 
 ```text
 /fake-agent/v1/health
@@ -929,13 +929,13 @@ distribution
 
 | 风险 | 影响 | 应对 |
 | --- | --- | --- |
-| 目标站 Agent 安装复杂 | 用户接入成本高 | 第一阶段先支持 GEOFlow 托管和 PHP/Laravel Agent |
+| 目标站智能体安装复杂 | 用户接入成本高 | 第一阶段先支持 GEOFlow 托管和 PHP/Laravel 智能体 |
 | 远程站点 API 不稳定 | 分发失败 | 队列重试、失败隔离、人工重发 |
 | Token 泄露 | 远程站点被写入垃圾内容 | 独立 secret、可吊销、scope、域名验证 |
 | 分类/作者不一致 | 内容落库失败 | 渠道级映射和默认兜底 |
 | 图片同步失败 | 文章展示不完整 | 支持引用远程 URL、跳过图片、重试上传 |
 | 删除误操作 | 远程内容丢失 | 默认下架，不物理删除 |
-| SEO 受 JS 影响 | 页面不被抓取 | 核心分发走服务端 Agent，不依赖 JS 渲染 |
+| SEO 受 JS 影响 | 页面不被抓取 | 核心分发走服务端智能体，不依赖 JS 渲染 |
 
 ## 17. 推荐第一版范围
 
@@ -947,7 +947,7 @@ distribution
 - 任务创建页选择分发渠道。
 - 文章分发记录表。
 - 分发队列与日志。
-- Laravel/PHP Agent 协议样板。
+- Laravel/PHP 智能体协议样板。
 - 健康检查和测试连接。
 - 文章创建/更新/下架三个动作。
 
@@ -963,10 +963,10 @@ distribution
 
 本方案已按以下维度自检：
 
-- 功能完整性：覆盖渠道管理、任务绑定、文章分发、Agent 通信、日志、重试和安全。
+- 功能完整性：覆盖渠道管理、任务绑定、文章分发、智能体通信、日志、重试和安全。
 - 安全边界：避免前端 JS 持有写权限，采用服务端签名 API。
 - 架构兼容：不破坏现有任务、文章、模板和 API Token 机制。
-- 可迭代性：支持先做 GEOFlow 内部底座，再扩展 Agent 和第三方平台。
+- 可迭代性：支持先做 GEOFlow 内部底座，再扩展智能体和第三方平台。
 - 风险控制：明确远程失败不影响本地发布，删除默认下架。
 
 建议进入开发前，先确认两个产品决策：

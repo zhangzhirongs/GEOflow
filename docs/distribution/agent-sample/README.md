@@ -1,6 +1,6 @@
 # GEOFlow Agent 示例包
 
-这个目录提供一个最小 PHP Agent 示例，用于目标站接收 GEOFlow 后台分发的文章。
+该目录提供一个最小 PHP 智能体示例，用于目标站接收 GEOFlow 后台分发的文章。
 
 ## 文件
 
@@ -9,11 +9,11 @@
 
 ## 后台流程
 
-1. 在 GEOFlow 后台创建分发渠道，填写目标站的 Agent 基础地址，例如 `https://www.example.com`。
+1. 在 GEOFlow 后台创建分发渠道，填写目标站的智能体基础地址，例如 `https://www.example.com`。
 2. 保存后复制 `密钥 ID` 和 `密钥明文`。如果之后忘记密钥，超级管理员可以在渠道详情页输入当前管理员密码，临时重新显示一次。
-3. 在目标站部署 Agent 文件，并配置 `GEOFLOW_KEY_ID`、`GEOFLOW_SECRET`、`GEOFLOW_STORAGE_DIR`。
+3. 在目标站部署智能体文件，并配置 `GEOFLOW_KEY_ID`、`GEOFLOW_SECRET`、`GEOFLOW_STORAGE_DIR`。
 4. 回到渠道详情页点击“测试连接”，健康检查通过后，在任务创建或编辑页绑定该分发渠道。
-5. 本地文章发布后，GEOFlow 会自动请求 `POST /geoflow-agent/v1/articles`，目标站 Agent 校验签名后保存或写入站点文章系统。
+5. 本地文章发布后，GEOFlow 会自动请求 `POST /geoflow-agent/v1/articles`，目标站智能体校验签名后保存或写入站点文章系统。
 
 ## 本地试运行
 
@@ -23,7 +23,7 @@ cp config.example.php config.php
 php -S 127.0.0.1:8787 geoflow-agent.php
 ```
 
-然后在 GEOFlow 渠道中把 Agent 基础地址填成：
+然后在 GEOFlow 渠道中把智能体基础地址填成：
 
 ```text
 http://127.0.0.1:8787

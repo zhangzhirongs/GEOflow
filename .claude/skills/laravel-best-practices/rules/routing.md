@@ -1,10 +1,10 @@
-# Routing & Controllers Best Practices
+# 路由与控制器最佳实践
 
-## Use Implicit Route Model Binding
+## 使用隐式路由模型绑定
 
-Let Laravel resolve models automatically from route parameters.
+让 Laravel 自动从路由参数解析模型。
 
-Incorrect:
+错误：
 ```php
 public function show(int $id)
 {
@@ -12,7 +12,7 @@ public function show(int $id)
 }
 ```
 
-Correct:
+正确：
 ```php
 public function show(Post $post)
 {
@@ -20,31 +20,31 @@ public function show(Post $post)
 }
 ```
 
-## Use Scoped Bindings for Nested Resources
+## 对嵌套资源使用作用域绑定
 
-Enforce parent-child relationships automatically.
+自动强制实施父子关系。
 
 ```php
 Route::get('/users/{user}/posts/{post}', function (User $user, Post $post) {
-    // $post is automatically scoped to $user
+    // $post 自动限定在 $user 的作用域内
 })->scopeBindings();
 ```
 
-## Use Resource Controllers
+## 使用资源控制器
 
-Use `Route::resource()` or `apiResource()` for RESTful endpoints.
+对 RESTful 端点使用 `Route::resource()` 或 `apiResource()`。
 
 ```php
 Route::resource('posts', PostController::class);
-// In routes/api.php — the /api prefix is applied automatically
+// 在 routes/api.php 中——/api 前缀会自动应用
 Route::apiResource('posts', Api\PostController::class);
 ```
 
-## Keep Controllers Thin
+## 保持控制器精简
 
-Aim for under 10 lines per method. Extract business logic to action or service classes.
+每个方法尽量控制在 10 行以内。将业务逻辑提取到 action 或 service 类中。
 
-Incorrect:
+错误：
 ```php
 public function store(Request $request)
 {
@@ -59,7 +59,7 @@ public function store(Request $request)
 }
 ```
 
-Correct:
+正确：
 ```php
 public function store(StorePostRequest $request, CreatePostAction $create)
 {
@@ -69,11 +69,11 @@ public function store(StorePostRequest $request, CreatePostAction $create)
 }
 ```
 
-## Type-Hint Form Requests
+## 类型提示表单请求
 
-Type-hinting Form Requests triggers automatic validation and authorization before the method executes.
+对 Form Request 进行类型提示会在方法执行前触发自动验证和授权。
 
-Incorrect:
+错误：
 ```php
 public function store(Request $request): RedirectResponse
 {
@@ -88,7 +88,7 @@ public function store(Request $request): RedirectResponse
 }
 ```
 
-Correct:
+正确：
 ```php
 public function store(StorePostRequest $request): RedirectResponse
 {

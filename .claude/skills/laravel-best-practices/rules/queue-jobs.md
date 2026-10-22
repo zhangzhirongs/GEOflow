@@ -1,43 +1,43 @@
-# Queue & Job Best Practices
+# 队列与任务最佳实践
 
-## Set `retry_after` Greater Than `timeout`
+## 将 `retry_after` 设置为大于 `timeout`
 
-If `retry_after` is shorter than the job's `timeout`, the queue worker re-dispatches the job while it's still running, causing duplicate execution.
+如果 `retry_after` 短于任务的 `timeout`，队列 worker 会在任务仍在运行时重新派发该任务，从而导致重复执行。
 
-Incorrect (`retry_after` ≤ `timeout`):
+不正确（`retry_after` ≤ `timeout`）：
 ```php
 class ProcessReport implements ShouldQueue
 {
     public $timeout = 120;
 }
 
-// config/queue.php — retry_after: 90 ← job retried while still running!
+// config/queue.php — retry_after: 90 ← 作业仍在运行时就被重试！
 ```
 
-Correct (`retry_after` > `timeout`):
+正确（`retry_after` > `timeout`）：
 ```php
 class ProcessReport implements ShouldQueue
 {
     public $timeout = 120;
 }
 
-// config/queue.php — retry_after: 180 ← safely longer than any job timeout
+// config/queue.php — retry_after: 180 ← 安全地长于任何作业超时
 ```
 
-## Use Exponential Backoff
+## 使用指数退避
 
-Use progressively longer delays between retries to avoid hammering failing services.
+在重试之间使用逐步延长的延迟，以避免反复冲击故障服务。
 
-Incorrect (fixed retry interval):
+错误（固定重试间隔）：
 ```php
 class SyncWithStripe implements ShouldQueue
 {
     public $tries = 3;
-    // Default: retries immediately, overwhelming the API
+    // 默认：立即重试，使 API 不堪重负
 }
 ```
 
-Correct (exponential backoff):
+正确（指数退避）：
 ```php
 class SyncWithStripe implements ShouldQueue
 {
@@ -46,9 +46,9 @@ class SyncWithStripe implements ShouldQueue
 }
 ```
 
-## Implement `ShouldBeUnique`
+## 实现 `ShouldBeUnique`
 
-Prevent duplicate job processing.
+防止重复处理作业。
 
 ```php
 class GenerateInvoice implements ShouldQueue, ShouldBeUnique
@@ -62,9 +62,9 @@ class GenerateInvoice implements ShouldQueue, ShouldBeUnique
 }
 ```
 
-## Always Implement `failed()`
+## 始终实现 `failed()`
 
-Handle errors explicitly — don't rely on silent failure.
+显式处理错误，不要依赖静默失败。
 
 ```php
 public function failed(?Throwable $exception): void
@@ -74,9 +74,9 @@ public function failed(?Throwable $exception): void
 }
 ```
 
-## Rate Limit External API Calls in Jobs
+## 在作业中对外部 API 调用进行限流
 
-Use `RateLimited` middleware to throttle jobs calling third-party APIs.
+使用 `RateLimited` 中间件对调用第三方 API 的作业进行限流。
 
 ```php
 public function middleware(): array
@@ -85,9 +85,9 @@ public function middleware(): array
 }
 ```
 
-## Batch Related Jobs
+## 批量处理相关作业
 
-Use `Bus::batch()` when jobs should succeed or fail together.
+当作业应一起成功或一起失败时，使用 `Bus::batch()`。
 
 ```php
 Bus::batch([
@@ -99,9 +99,9 @@ Bus::batch([
 ->dispatch();
 ```
 
-## `retryUntil()` Needs `$tries = 0`
+## `retryUntil()` 需要 `$tries = 0`
 
-When using time-based retry limits, set `$tries = 0` to avoid premature failure.
+使用基于时间的重试限制时，设置 `$tries = 0` 以避免过早失败。
 
 ```php
 public $tries = 0;
@@ -112,20 +112,20 @@ public function retryUntil(): \DateTimeInterface
 }
 ```
 
-## Use `ShouldBeUniqueUntilProcessing` for Early Lock Release
+## 使用 `ShouldBeUniqueUntilProcessing` 提前释放锁
 
-`ShouldBeUnique` holds the lock until the job completes. `ShouldBeUniqueUntilProcessing` releases it when processing starts, allowing new instances to queue.
+`ShouldBeUnique` 持有锁直到任务完成。`ShouldBeUniqueUntilProcessing` 在处理开始时释放锁，允许新实例排队。
 
 ```php
 class UpdateSearchIndex implements ShouldQueue, ShouldBeUniqueUntilProcessing
 {
-    // Lock releases when processing begins, not when it finishes
+    // 锁在处理开始时释放，而不是在完成时释放
 }
 ```
 
-## Use Horizon for Complex Queue Scenarios
+## 对复杂队列场景使用 Horizon
 
-Use Laravel Horizon when you need monitoring, auto-scaling, failure tracking, or multiple queues with different priorities.
+当你需要监控、自动扩缩容、失败跟踪或具有不同优先级的多个队列时，使用 Laravel Horizon。
 
 ```php
 // config/horizon.php
