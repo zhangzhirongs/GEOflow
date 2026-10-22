@@ -12,6 +12,7 @@ use App\Models\ManualPublicationAccount;
 use App\Models\ManualPublicationPersona;
 use App\Models\SocialPublication;
 use App\Services\GeoFlow\ExecutorJobService;
+use App\Services\GeoFlow\GeoRankRecipeCatalog;
 use App\Services\GeoFlow\SocialPublicationOrchestrator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -155,6 +156,120 @@ class GeoRankExecutorControlPlaneTest extends TestCase
         ]);
         $this->assertSame('synced', $publication->fresh()->status);
         $this->assertSame('https://www.xiaohongshu.com/explore/abc', $publication->fresh()->remote_url);
+    }
+
+    public function test_expired_login_releases_slot_and_late_report_cannot_overwrite_timeout(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        $first = $jobs->enqueueLogin($account);
+        $first->forceFill(['recipe' => ['login' => ['timeoutMs' => 300000]]])->save();
+        $claimed = $jobs->claim($node);
+        $this->assertNotEmpty($claimed->recipe['login']['successCookieNames']);
+        $retry = $jobs->enqueueLogin($account);
+        $this->travel(359)->seconds();
+        $this->assertNull($jobs->claim($node));
+        $this->assertSame('running', $first->fresh()->status);
+        $this->travel(2)->seconds();
+        $this->assertSame($retry->id, $jobs->claim($node)->id);
+        $this->assertSame('failed', $first->fresh()->status);
+        $this->assertNotNull($first->fresh()->finished_at);
+        $this->assertNotEmpty($first->fresh()->error);
+        $jobs->report($node, (int) $first->id, ['status' => 'succeeded', 'sessionStatus' => 'ready']);
+        $this->assertSame('failed', $first->fresh()->status);
+        $this->assertSame('login_in_progress', $account->fresh()->session_status);
+        $this->assertSame(1, $node->fresh()->fail);
+        $this->assertSame(0, $jobs->expireSessionJobs($node));
+    }
+
+    public function test_session_check_timeout_is_recovered_by_heartbeat(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        $job = $jobs->enqueueCheck($account);
+        $jobs->claim($node);
+        $this->travel(89)->seconds();
+        $this->assertSame(0, $jobs->expireSessionJobs($node));
+        $this->travel(2)->seconds();
+        $jobs->heartbeat($node, ['load' => 0]);
+        $this->assertSame('failed', $job->fresh()->status);
+        $this->assertSame('unknown', $account->fresh()->session_status);
+        $this->assertSame(1, $node->fresh()->fail);
+    }
+
+    public function test_successful_report_is_idempotent_and_not_recovered_as_expired(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        $job = $jobs->enqueueLogin($account);
+        $jobs->claim($node);
+        $report = ['status' => 'succeeded', 'sessionStatus' => 'ready'];
+        $jobs->report($node, (int) $job->id, $report);
+        $jobs->report($node, (int) $job->id, $report);
+        $this->travel(10)->minutes();
+        $this->assertSame(0, $jobs->expireSessionJobs());
+        $this->assertSame('succeeded', $job->fresh()->status);
+        $this->assertSame(1, $node->fresh()->done);
+        $this->assertSame('ready', $account->fresh()->session_status);
+    }
+
+    public function test_session_recovery_does_not_expire_publish_jobs(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        $job = $jobs->enqueueLogin($account);
+        $jobs->claim($node);
+        $job->forceFill(['type' => 'publish'])->save();
+        $this->travel(1)->hours();
+        $this->assertSame(0, $jobs->expireSessionJobs());
+        $this->assertSame('running', $job->fresh()->status);
+    }
+
+    public function test_every_platform_has_login_detection_and_check_credentials(): void
+    {
+        $catalog = app(GeoRankRecipeCatalog::class);
+        foreach (ManualPublicationAccount::PLATFORMS as $platform) {
+            $recipe = $catalog->forPlatform($platform);
+            $this->assertNotEmpty($recipe['login']['successCookieNames'], $platform);
+            $this->assertSame($recipe['login']['successCookieNames'], $recipe['check']['loggedInCookieNames'], $platform);
+            $this->assertLessThanOrEqual(300000, $recipe['login']['timeoutMs'], $platform);
+            $this->assertLessThanOrEqual(30000, $recipe['check']['timeoutMs'], $platform);
+        }
+        $this->assertSame(['SESSDATA'], $catalog->forPlatform('bilibili')['check']['loggedInCookieNames']);
+        $this->assertArrayNotHasKey('successUrlIncludes', $catalog->forPlatform('csdn')['login']);
+    }
+
+    public function test_all_real_platforms_release_timed_out_login_and_check_slots(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        foreach (ManualPublicationAccount::PLATFORMS as $platform) {
+            if ($platform === 'local_demo') {
+                continue;
+            }
+            $account->forceFill(['platform' => $platform])->save();
+            foreach (['login', 'check'] as $type) {
+                $job = $type === 'login' ? $jobs->enqueueLogin($account) : $jobs->enqueueCheck($account);
+                $this->assertSame($job->id, $jobs->claim($node)->id, $platform.' '.$type);
+                $this->travel($type === 'login' ? 361 : 91)->seconds();
+                $this->assertSame(1, $jobs->expireSessionJobs($node), $platform.' '.$type);
+                $this->assertSame('failed', $job->fresh()->status);
+                $this->assertNotNull($job->fresh()->finished_at);
+            }
+        }
+    }
+
+    private function sessionTaskContext(): array
+    {
+        $admin = $this->admin();
+        $persona = $this->persona($admin);
+        $jobs = app(ExecutorJobService::class);
+        $node = $jobs->createNode(['name' => 'timeout-test'])['node'];
+        $account = ManualPublicationAccount::query()->create([
+            'persona_id' => $persona->id,
+            'platform' => 'toutiao',
+            'account_name' => 'Toutiao',
+            'executor_node_id' => $node->id,
+            'is_active' => true,
+            'created_by_admin_id' => $admin->id,
+        ]);
+
+        return [$jobs, $node, $account];
     }
 
     private function admin(): Admin

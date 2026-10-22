@@ -50,7 +50,7 @@
 
     @if($articles->hasPages())
         <div class="mt-3">
-            {{ $articles->onEachSide(1)->links() }}
+            {{ $articles->onEachSide(1)->links('pagination.admin') }}
         </div>
     @endif
 

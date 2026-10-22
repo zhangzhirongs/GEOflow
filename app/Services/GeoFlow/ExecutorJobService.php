@@ -4,8 +4,9 @@ namespace App\Services\GeoFlow;
 
 use App\Models\ExecutorJob;
 use App\Models\ExecutorNode;
-use App\Models\ManualPublicationAccount;
 use App\Models\ManualPublication;
+use App\Models\ManualPublicationAccount;
+use App\Models\ManualPublicationTransition;
 use App\Models\SocialPublication;
 use App\Support\GeoRank\WireGuard;
 use Illuminate\Support\Facades\DB;
@@ -79,6 +80,7 @@ class ExecutorJobService
             'last_heartbeat_at' => now(),
         ])->save();
 
+        $this->expireSessionJobs($node);
         $this->reconcileManualPublications($node);
 
         foreach (($payload['sessions'] ?? []) as $session) {
@@ -148,8 +150,50 @@ class ExecutorJobService
             });
     }
 
+    public function expireSessionJobs(?ExecutorNode $node = null): int
+    {
+        $expired = 0;
+        ExecutorJob::query()
+            ->where('status', 'running')
+            ->whereIn('type', ['login', 'check'])
+            ->when($node, fn ($query) => $query->where('executor_node_id', $node->id))
+            ->where('claimed_at', '<=', now()->subSeconds(60))
+            ->with('node')
+            ->chunkById(100, function ($jobs) use (&$expired): void {
+                foreach ($jobs as $job) {
+                    $maximum = $job->type === 'login' ? 300000 : 30000;
+                    $timeoutMs = max(1, min($maximum, (int) data_get($job->recipe, $job->type.'.timeoutMs', $maximum)));
+                    $deadline = $job->claimed_at->copy()->addMilliseconds($timeoutMs)->addSeconds(60);
+                    if ($deadline->isFuture() || ! $job->node) {
+                        continue;
+                    }
+                    $didExpire = DB::transaction(function () use ($job): bool {
+                        $locked = ExecutorJob::query()->whereKey($job->id)->lockForUpdate()->first();
+                        if (! $locked || $locked->status !== 'running') {
+                            return false;
+                        }
+                        $this->report($job->node, (int) $job->id, [
+                            'status' => 'failed',
+                            'sessionStatus' => 'unknown',
+                            'error' => '登录或登录态验证超时，任务已结束并释放队列，请重新登录或验证。',
+                            'logs' => array_merge($job->logs ?? [], ['Session task deadline exceeded; queue slot released.']),
+                        ]);
+
+                        return true;
+                    });
+                    if ($didExpire) {
+                        $expired++;
+                    }
+                }
+            });
+
+        return $expired;
+    }
+
     public function claim(ExecutorNode $node): ?ExecutorJob
     {
+        $this->expireSessionJobs($node);
+
         return DB::transaction(function () use ($node): ?ExecutorJob {
             $running = ExecutorJob::query()
                 ->where('executor_node_id', $node->id)
@@ -171,6 +215,10 @@ class ExecutorJobService
                 ->first();
             if (! $job) {
                 return null;
+            }
+
+            if (in_array($job->type, ['login', 'check'], true)) {
+                $job->recipe = $this->recipes->forPlatform((string) $job->platform);
             }
 
             $job->forceFill([
@@ -200,6 +248,10 @@ class ExecutorJobService
             $job = ExecutorJob::query()->whereKey($jobId)->lockForUpdate()->first();
             if (! $job || (int) $job->executor_node_id !== (int) $node->id) {
                 throw new RuntimeException('job not found');
+            }
+
+            if (! in_array($job->status, ['queued', 'running'], true)) {
+                return $job;
             }
 
             $status = (string) ($report['status'] ?? 'failed');
@@ -264,7 +316,7 @@ class ExecutorJobService
                             : mb_substr((string) ($report['error'] ?? ''), 0, 1000),
                     ])->save();
                     if ($previousStatus !== $nextStatus) {
-                        \App\Models\ManualPublicationTransition::query()->create([
+                        ManualPublicationTransition::query()->create([
                             'manual_publication_id' => $manual->getKey(),
                             'from_status' => $previousStatus,
                             'to_status' => $nextStatus,

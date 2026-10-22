@@ -20,7 +20,7 @@ class LeadFormController extends Controller
         $forms = LeadForm::query()
             ->withCount('submissions')
             ->orderByDesc('created_at')
-            ->paginate(20);
+            ->paginate(10);
 
         return view('admin.lead-forms.index', [
             'pageTitle' => __('admin.lead_forms.page_title'),

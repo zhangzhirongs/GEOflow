@@ -571,7 +571,7 @@ class ArticleController extends Controller
             'date_from' => trim((string) $request->query('date_from', '')),
             'date_to' => trim((string) $request->query('date_to', '')),
             'search' => trim((string) $request->query('search', '')),
-            'per_page' => min(100, max(10, (int) $request->query('per_page', 20) ?: 20)),
+            'per_page' => 10,
             'trashed' => $request->boolean('trashed'),
         ];
     }

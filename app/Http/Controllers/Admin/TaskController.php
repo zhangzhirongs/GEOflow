@@ -53,7 +53,7 @@ class TaskController extends Controller
         try {
             $overview = $this->taskMonitoringQueryService->buildAdminOverview(
                 max(1, $request->integer('page', 1)),
-                50,
+                10,
             );
             $tasks = $overview['tasks'];
             $workers = $overview['worker_overview'];
@@ -67,7 +67,7 @@ class TaskController extends Controller
             $workers = [];
             $queueStats = ['pending' => 0, 'running' => 0, 'failed' => 0, 'completed' => 0];
             $recentJobs = [];
-            $pagination = ['page' => 1, 'per_page' => 50, 'total' => 0, 'total_pages' => 1];
+            $pagination = ['page' => 1, 'per_page' => 10, 'total' => 0, 'total_pages' => 1];
             $taskSummary = ['total_tasks' => 0, 'enabled_tasks' => 0, 'total_articles' => 0, 'published_articles' => 0];
             $error = __('admin.tasks.message.query_failed', ['message' => $e->getMessage()]);
         }
@@ -322,7 +322,7 @@ class TaskController extends Controller
         try {
             $overview = $this->taskMonitoringQueryService->buildAdminOverview(
                 max(1, $request->integer('page', 1)),
-                50,
+                10,
             );
 
             return response()->json([

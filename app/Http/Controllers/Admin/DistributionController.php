@@ -466,7 +466,7 @@ class DistributionController extends Controller
             $query->where('distribution_channel_id', $filters['channel_id']);
         }
 
-        $jobs = $query->orderByDesc('id')->paginate(20)->withQueryString();
+        $jobs = $query->orderByDesc('id')->paginate(10)->withQueryString();
         $channels = DistributionChannel::query()
             ->select(['id', 'name', 'domain'])
             ->orderBy('name')

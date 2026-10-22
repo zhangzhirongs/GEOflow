@@ -178,7 +178,7 @@
                                 {{ __('admin.image_detail.pagination_summary', ['from' => $images->firstItem(), 'to' => $images->lastItem(), 'total' => $images->total()]) }}
                             </div>
                             <div>
-                                {{ $images->links() }}
+                                {{ $images->links('pagination.admin') }}
                             </div>
                         </div>
                     </div>

@@ -73,7 +73,7 @@
     </div>
     @if (method_exists($jobs, 'links') && ($jobs->lastPage() ?? 1) > 1)
         <div class="border-t border-gray-200 px-6 py-4">
-            {{ $jobs->links() }}
+            {{ $jobs->links('pagination.admin') }}
         </div>
     @endif
 @endif

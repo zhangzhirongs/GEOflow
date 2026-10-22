@@ -234,21 +234,18 @@
                         </tbody>
                     </table>
                 </div>
-                @if ((int) ($pagination['total_pages'] ?? 1) > 1)
-                    <div class="flex items-center justify-between border-t border-gray-200 px-5 py-4">
-                        <span class="text-sm text-gray-500">
-                            {{ (int) ($pagination['total'] ?? 0) }} · {{ (int) ($pagination['page'] ?? 1) }} / {{ (int) ($pagination['total_pages'] ?? 1) }}
-                        </span>
-                        <div class="flex items-center gap-2">
-                            @if ((int) ($pagination['page'] ?? 1) > 1)
-                                <a href="{{ route('admin.tasks.index', ['page' => (int) $pagination['page'] - 1]) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ __('pagination.previous') }}</a>
-                            @endif
-                            @if ((int) ($pagination['page'] ?? 1) < (int) ($pagination['total_pages'] ?? 1))
-                                <a href="{{ route('admin.tasks.index', ['page' => (int) $pagination['page'] + 1]) }}" class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ __('pagination.next') }}</a>
-                            @endif
-                        </div>
-                    </div>
-                @endif
+                @php
+                    $taskPaginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                        $tasks,
+                        (int) ($pagination['total'] ?? 0),
+                        (int) ($pagination['per_page'] ?? 10),
+                        (int) ($pagination['page'] ?? 1),
+                        ['path' => route('admin.tasks.index'), 'query' => request()->query()],
+                    );
+                @endphp
+                <div class="border-t border-gray-200 px-5 py-4">
+                    {{ $taskPaginator->onEachSide(1)->links('pagination.admin') }}
+                </div>
             @endif
         </div>
 

@@ -4,6 +4,7 @@
  * Artisan 自定义命令注册（闭包命令或后续类命令）。
  */
 
+use App\Services\GeoFlow\ExecutorJobService;
 use App\Services\GeoFlow\KnowledgeChunkSyncCoordinator;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -87,3 +88,9 @@ Schedule::command('geoflow:telemetry:heartbeat')
     ->dailyAt('03:17')
     ->onOneServer()
     ->withoutOverlapping(10);
+
+Schedule::call(fn () => app(ExecutorJobService::class)->expireSessionJobs())
+    ->name('geoflow:expire-executor-session-jobs')
+    ->everyMinute()
+    ->onOneServer()
+    ->withoutOverlapping(2);

@@ -35,50 +35,16 @@
 
 @section('content')
     <div class="px-4 sm:px-0" data-task-create-page>
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-4">
                 <a href="{{ route('admin.tasks.index') }}" class="text-gray-400 hover:text-gray-600">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">{{ $isEdit ? $t('task_edit.page_heading') : $t('task_create.page_heading') }}</h1>
-                    @unless ($isEdit)
-                        <p class="mt-1 text-sm text-gray-600">{{ $t('task_create.page_subtitle') }}</p>
-                    @endunless
                 </div>
             </div>
         </div> 
-
-        @unless ($isEdit)
-        <section class="mb-6 rounded-lg border border-blue-100 bg-white p-5 shadow-sm">
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-900">{{ $t('task_create.engineering.title') }}</h2>
-                    <p class="mt-1 max-w-4xl text-sm leading-6 text-gray-600">{{ $t('task_create.engineering.desc') }}</p>
-                </div>
-                <span class="inline-flex w-fit items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                    <i data-lucide="workflow" class="mr-1.5 h-3.5 w-3.5"></i>
-                    {{ $t('task_create.engineering.badge') }}
-                </span>
-            </div>
-            <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                @foreach ([
-                    ['icon' => 'map', 'title' => $t('task_create.engineering.prompt_title'), 'desc' => $t('task_create.engineering.prompt_desc')],
-                    ['icon' => 'database', 'title' => $t('task_create.engineering.evidence_title'), 'desc' => $t('task_create.engineering.evidence_desc')],
-                    ['icon' => 'shield-check', 'title' => $t('task_create.engineering.gate_title'), 'desc' => $t('task_create.engineering.gate_desc')],
-                    ['icon' => 'radio-tower', 'title' => $t('task_create.engineering.distribution_title'), 'desc' => $t('task_create.engineering.distribution_desc')],
-                ] as $item)
-                    <article class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                        <div class="flex h-10 w-10 items-center justify-center rounded-md bg-white text-blue-600 ring-1 ring-blue-100">
-                            <i data-lucide="{{ $item['icon'] }}" class="h-5 w-5"></i>
-                        </div>
-                        <h3 class="mt-4 text-sm font-semibold text-gray-900">{{ $item['title'] }}</h3>
-                        <p class="mt-1 text-xs leading-5 text-gray-500">{{ $item['desc'] }}</p>
-                    </article>
-                @endforeach
-            </div>
-        </section>
-        @endunless
 
         <div data-task-form-shell class="w-full">
             @if (! $hasCategories)
@@ -93,7 +59,7 @@
                     </div>
                 </div>
             @else
-            <form method="POST" action="{{ $isEdit ? route('admin.tasks.update', ['taskId' => $taskId]) : route('admin.tasks.store') }}" class="grid grid-cols-1 gap-6 xl:grid-cols-12">
+            <form method="POST" action="{{ $isEdit ? route('admin.tasks.update', ['taskId' => $taskId]) : route('admin.tasks.store') }}" class="grid grid-cols-1 gap-4 xl:grid-cols-12">
                 @csrf
                 @if ($isEdit)
                     @method('PUT')
@@ -101,12 +67,11 @@
                 @endif
 
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.basic_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.basic_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
-                        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
                             <div class="lg:col-span-3">
                                 <label for="task_name" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.task_name') }} *</label>
                                 <input type="text" name="task_name" id="task_name" required value="{{ old('task_name', (string) ($taskForm['task_name'] ?? '')) }}"
@@ -136,12 +101,11 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.content_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.content_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
-                        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
                             <div>
                                 <label for="prompt_id" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.content_prompt') }}</label>
                                 <select name="prompt_id" id="prompt_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -242,9 +206,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-6">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.image_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.image_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         @php($imageCountValue = (string) old('image_count', (string) ($taskForm['image_count'] ?? '1')))
@@ -277,9 +240,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-6">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.publish_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.publish_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -302,9 +264,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.distribution_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.distribution_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <fieldset class="mb-5">
@@ -440,9 +401,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-12">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.seo_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.seo_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -467,9 +427,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-8">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.category_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.category_desc') }}</p>@endunless
                     </div>
                     @php($categoryMode = (string) old('category_mode', (string) ($taskForm['category_mode'] ?? 'smart')))
                     <div class="px-6 py-4 space-y-4">
@@ -535,9 +494,8 @@
                 </div>
 
                 <div class="bg-white shadow rounded-lg xl:col-span-4">
-                    <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="px-6 py-3 border-b border-gray-200">
                         <h3 class="text-lg font-medium text-gray-900">{{ $t('task_create.section.advanced_title') }}</h3>
-                        @unless ($isEdit)<p class="mt-1 text-sm text-gray-600">{{ $t('task_create.section.advanced_desc') }}</p>@endunless
                     </div>
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

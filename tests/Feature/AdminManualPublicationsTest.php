@@ -115,7 +115,7 @@ class AdminManualPublicationsTest extends TestCase
             ->assertOk()
             ->assertSee($currentArticle->title)
             ->assertSee('value="'.$currentArticle->getKey().'" selected', false)
-            ->assertViewHas('articles', fn ($articles): bool => $articles->perPage() === 50
+            ->assertViewHas('articles', fn ($articles): bool => $articles->perPage() === 10
                 && $articles->getCollection()->contains('id', $currentArticle->getKey()));
     }
 

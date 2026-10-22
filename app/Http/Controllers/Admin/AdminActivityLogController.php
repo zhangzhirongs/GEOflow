@@ -91,7 +91,7 @@ class AdminActivityLogController extends Controller
             });
         }
 
-        return $query->paginate(50)->withQueryString();
+        return $query->paginate(10)->withQueryString();
     }
 
     /**

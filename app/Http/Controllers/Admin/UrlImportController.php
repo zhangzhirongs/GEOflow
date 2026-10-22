@@ -178,7 +178,7 @@ class UrlImportController extends Controller
         return view('admin.url-import.history', [
             'pageTitle' => __('admin.url_import_history.page_title'),
             'activeMenu' => 'materials',
-            'jobs' => UrlImportJob::query()->latest()->paginate(20),
+            'jobs' => UrlImportJob::query()->latest()->paginate(10),
             'stats' => [
                 'total' => UrlImportJob::query()->count(),
                 'completed' => UrlImportJob::query()->where('status', 'completed')->count(),

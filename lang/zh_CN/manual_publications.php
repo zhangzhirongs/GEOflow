@@ -85,6 +85,9 @@ return [
         'unexpected' => '工单暂时无法保存，请检查输入后重试。',
     ],
     'settings' => [
+        'account_list' => '平台账号列表',
+        'accounts_empty' => '暂无平台账号',
+        'connection_settings' => '连接设置',
         'identity_auto_managed' => '发布身份已与当前登录账号关联，新增发布时会自动使用当前登录人。',
         'account_deleted' => '平台账号已删除。',
         'account_delete_blocked' => '该账号仍有待执行或执行中的发布任务，完成或取消任务后才能删除。',

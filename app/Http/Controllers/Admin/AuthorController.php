@@ -16,7 +16,7 @@ use Illuminate\View\View;
  */
 class AuthorController extends Controller
 {
-    private const INDEX_PER_PAGE = 20;
+    private const INDEX_PER_PAGE = 10;
 
     /**
      * 作者列表页。

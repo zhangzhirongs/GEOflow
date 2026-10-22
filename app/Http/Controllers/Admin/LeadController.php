@@ -23,7 +23,7 @@ class LeadController extends Controller
         $submissions = (clone $query)
             ->with(['form:id,name,slug', 'handler:id,username'])
             ->orderByDesc('created_at')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.leads.index', [

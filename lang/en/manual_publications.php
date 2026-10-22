@@ -92,6 +92,9 @@ return [
         'unexpected' => 'The work order could not be saved. Review the inputs and try again.',
     ],
     'settings' => [
+        'account_list' => 'Platform accounts',
+        'accounts_empty' => 'No platform accounts yet.',
+        'connection_settings' => 'Publishing connection and credentials',
         'title' => 'Publishing identities and accounts', 'subtitle' => 'Manage reusable personas and account references. Credentials are never stored here.',
         'new_persona' => 'New persona', 'new_account' => 'New platform account', 'name' => 'Persona name', 'tone' => 'Tone',
         'domain' => 'Expertise', 'bio' => 'Bio', 'disclosure' => 'Disclosure text', 'profile_url' => 'Profile URL',

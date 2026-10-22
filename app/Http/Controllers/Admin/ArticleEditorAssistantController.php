@@ -58,7 +58,7 @@ final class ArticleEditorAssistantController extends Controller
             }))
             ->orderByRaw('COALESCE(used_count, 0) ASC')
             ->orderByDesc('id')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         return response()->json([

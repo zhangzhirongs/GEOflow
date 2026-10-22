@@ -53,6 +53,9 @@ return array_replace_recursive($base, [
         'ready_requires_assignee' => '実行待ちの作業には担当者が必要です。', 'revision_conflict' => '別のセッションで更新されました。再読み込みして再試行してください。',
     ],
     'settings' => [
+        'account_list' => 'Platform accounts',
+        'accounts_empty' => 'No platform accounts yet.',
+        'connection_settings' => 'Publishing connection and credentials',
         'title' => '公開ペルソナとアカウント', 'subtitle' => '再利用するペルソナとアカウント参照を管理します。認証情報は保存しません。',
         'new_persona' => '新しいペルソナ', 'new_account' => '新しいプラットフォームアカウント', 'name' => 'ペルソナ名', 'tone' => '文体',
         'domain' => '専門領域', 'bio' => '紹介', 'disclosure' => '開示文', 'profile_url' => 'プロフィール URL', 'notes' => 'メモ', 'active' => '有効',

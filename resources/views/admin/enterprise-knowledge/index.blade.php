@@ -96,7 +96,7 @@
                 </div>
 
                 <div class="border-t border-gray-200 px-6 py-4">
-                    {{ $projects->links() }}
+                    {{ $projects->links('pagination.admin') }}
                 </div>
             @else
                 <div class="px-6 py-16 text-center">

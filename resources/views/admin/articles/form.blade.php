@@ -192,51 +192,25 @@
             </a>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">{{ __($i18nRoot.'.page_heading') }}</h1>
-                <p class="mt-1 text-sm text-gray-600">
-                    @if($isEdit)
-                        {{ $formData['title'] }}
-                    @else
-                        {{ __($i18nRoot.'.page_subtitle') }}
-                    @endif
-                </p>
+                @if($isEdit)
+                    <p class="mt-1 text-sm text-gray-600">{{ $formData['title'] }}</p>
+                @endif
             </div>
         </div>
 
-        <form method="POST" action="{{ $formAction }}" class="space-y-8">
+        <form method="POST" action="{{ $formAction }}" class="space-y-5">
             @csrf
             @if($isEdit)
                 @method('PUT')
             @endif
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div class="lg:col-span-3 space-y-6">
-                    <section class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-5">
-                        <div class="flex items-start gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-emerald-600 ring-1 ring-emerald-100">
-                                <i data-lucide="shield-check" class="h-5 w-5"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-base font-semibold text-gray-900">{{ __('admin.articles.quality_gate.form_title') }}</h2>
-                                <p class="mt-1 text-sm leading-6 text-gray-600">{{ __('admin.articles.quality_gate.form_desc') }}</p>
-                                <div class="mt-3 flex flex-wrap gap-2">
-                                    @foreach ([
-                                        __('admin.articles.quality_gate.form_structure'),
-                                        __('admin.articles.quality_gate.form_evidence'),
-                                        __('admin.articles.quality_gate.form_risk'),
-                                        __('admin.articles.quality_gate.form_publish'),
-                                    ] as $item)
-                                        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">{{ $item }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div class="lg:col-span-3 space-y-4">
                     <div class="bg-white shadow rounded-lg">
                         <div class="px-6 py-4 border-b border-gray-200">
                             <h3 class="text-lg font-medium text-gray-900">{{ __($i18nRoot.'.section.basic_title') }}</h3>
                         </div>
-                        <div class="px-6 py-4 space-y-6">
+                        <div class="px-6 py-4 space-y-4">
                             <div>
                                 <div class="flex items-center justify-between gap-3">
                                     <label for="title" class="block text-sm font-medium text-gray-700">{{ __($i18nRoot.'.field.title') }} *</label>
@@ -312,8 +286,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="mt-2 text-sm text-gray-600">{{ __('admin.article_editor.editor_desc') }}</p>
-                            <p class="mt-1 text-xs text-gray-500">{{ __('admin.article_editor.platform_copy.hint') }}</p>
                         </div>
                         <div class="px-6 py-4">
                             <textarea id="content-textarea" name="content" class="hidden">{{ $formData['content'] }}</textarea>
@@ -446,11 +418,6 @@
                                     </button>
                                 @endforeach
                             </div>
-                            <div class="mt-3 grid gap-2 text-xs text-gray-500 sm:grid-cols-3">
-                                <div class="rounded-md bg-gray-50 px-3 py-2">{{ __('admin.article_editor.help.markdown') }}</div>
-                                <div class="rounded-md bg-gray-50 px-3 py-2">{{ __('admin.article_editor.help.image') }}</div>
-                                <div class="rounded-md bg-gray-50 px-3 py-2">{{ __('admin.article_editor.help.crop') }}</div>
-                            </div>
                         </div>
                     </div>
 
@@ -465,14 +432,12 @@
                                         <h3 class="text-lg font-medium text-gray-900">{{ __('admin.articles.quality_scorecard.title') }}</h3>
                                         <span class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 ring-1 ring-gray-200">{{ __('admin.articles.quality_scorecard.manual_label') }}</span>
                                     </div>
-                                    <p class="mt-1 text-sm leading-6 text-gray-500">{{ __('admin.articles.quality_scorecard.desc') }}</p>
                                 </div>
                             </div>
                         </div>
                         <div class="border-b border-gray-100 bg-gray-50 px-6 py-4">
                             <div class="mb-3 flex items-center justify-between gap-3">
                                 <h4 class="text-sm font-semibold text-gray-900">{{ __('admin.articles.quality_scorecard.dynamic_title') }}</h4>
-                                <span class="text-xs font-medium text-gray-500">{{ __('admin.articles.quality_scorecard.dynamic_desc') }}</span>
                             </div>
                             <div class="grid grid-cols-1 gap-2 md:grid-cols-5">
                                 @foreach ($qualityFieldChecks as $fieldCheck)
@@ -499,7 +464,6 @@
                                         </div>
                                         <div class="min-w-0">
                                             <h4 class="text-sm font-semibold text-gray-900">{{ $scorecardItem['title'] }}</h4>
-                                            <p class="mt-1 text-xs leading-5 text-gray-500">{{ $scorecardItem['desc'] }}</p>
                                         </div>
                                         <span class="mt-auto inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 {{ $scoreStatusClass }}">
                                             <i data-lucide="{{ $scoreStatusIcon }}" class="mr-1.5 h-3.5 w-3.5"></i>

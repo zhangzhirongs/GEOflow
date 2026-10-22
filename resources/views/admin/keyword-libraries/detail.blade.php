@@ -143,7 +143,7 @@
                                 {{ __('admin.keyword_detail.pagination', ['start' => $keywords->firstItem(), 'end' => $keywords->lastItem(), 'total' => $keywords->total()]) }}
                             </div>
                             <div>
-                                {{ $keywords->links() }}
+                                {{ $keywords->links('pagination.admin') }}
                             </div>
                         </div>
                     </div>

@@ -24,7 +24,7 @@ use Illuminate\View\View;
  */
 class TitleLibraryController extends Controller
 {
-    private const DETAIL_PER_PAGE = 20;
+    private const DETAIL_PER_PAGE = 10;
 
     public function __construct(
         private TitleAiGenerationService $titleAiGenerationService

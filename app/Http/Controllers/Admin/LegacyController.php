@@ -112,7 +112,7 @@ class LegacyController extends Controller
                 $query->where('status', $filters['status']);
             }
 
-            return $query->paginate(15)->withQueryString();
+            return $query->paginate(10)->withQueryString();
         } catch (QueryException) {
             return $this->emptyTasksPaginator();
         }
@@ -126,7 +126,7 @@ class LegacyController extends Controller
         return new LengthAwarePaginator(
             items: collect(),
             total: 0,
-            perPage: 15,
+            perPage: 10,
             currentPage: max(1, (int) request()->query('page', 1)),
             options: [
                 'path' => request()->url(),

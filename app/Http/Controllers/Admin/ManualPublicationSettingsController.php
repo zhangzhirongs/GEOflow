@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveManualPublicationAccountRequest;
 use App\Http\Requests\Admin\SaveManualPublicationPersonaRequest;
+use App\Models\ExecutorNode;
 use App\Models\ManualPublicationAccount;
 use App\Models\ManualPublicationPersona;
-use App\Models\ExecutorNode;
 use App\Services\GeoFlow\ExecutorJobService;
 use App\Services\GeoFlow\SocialGatewayClient;
 use App\Support\AdminWeb;
 use App\Support\GeoFlow\ApiKeyCrypto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Illuminate\Http\Request;
 use Throwable;
 
 class ManualPublicationSettingsController extends Controller
@@ -27,12 +26,14 @@ class ManualPublicationSettingsController extends Controller
 
     public function index(): View
     {
+        $this->executorJobs->expireSessionJobs();
+
         return view('admin.manual-publications.settings', [
             'pageTitle' => __('admin.manual_publications.settings.title'),
             'activeMenu' => 'articles',
             'adminSiteName' => AdminWeb::siteName(),
-            'personas' => ManualPublicationPersona::query()->withCount('accounts')->orderByDesc('is_active')->orderBy('name')->paginate(20, ['*'], 'persona_page')->withQueryString(),
-            'accounts' => ManualPublicationAccount::query()->with(['persona:id,name', 'executorNode:id,name,slug,online,last_heartbeat_at'])->orderByDesc('is_active')->orderBy('account_name')->paginate(20, ['*'], 'account_page')->withQueryString(),
+            'personas' => ManualPublicationPersona::query()->withCount('accounts')->orderByDesc('is_active')->orderBy('name')->paginate(10, ['*'], 'persona_page')->withQueryString(),
+            'accounts' => ManualPublicationAccount::query()->with(['persona:id,name', 'executorNode:id,name,slug,online,last_heartbeat_at'])->orderByDesc('is_active')->orderBy('account_name')->paginate(10, ['*'], 'account_page')->withQueryString(),
             'executorNodes' => ExecutorNode::query()->where('enabled', true)->orderBy('name')->get(),
             'platforms' => ManualPublicationAccount::PLATFORMS,
             'publishMethods' => ['POST', 'PUT', 'PATCH'],
@@ -145,7 +146,6 @@ class ManualPublicationSettingsController extends Controller
 
         return back()->with('message', '小红书登录态状态：'.$status);
     }
-
 
     public function startExecutorLogin(int $accountId): RedirectResponse
     {

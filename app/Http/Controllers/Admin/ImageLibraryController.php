@@ -23,7 +23,7 @@ use Illuminate\View\View;
  */
 class ImageLibraryController extends Controller
 {
-    private const DETAIL_PER_PAGE = 24;
+    private const DETAIL_PER_PAGE = 10;
 
     public function __construct(private readonly ManagedImageFileService $managedImages) {}
 

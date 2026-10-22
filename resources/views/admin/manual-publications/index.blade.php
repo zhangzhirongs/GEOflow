@@ -150,7 +150,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="border-t border-gray-200 px-5 py-4">{{ $publications->links() }}</div>
+        <div class="border-t border-gray-200 px-5 py-4">{{ $publications->links('pagination.admin') }}</div>
     </div>
 </div>
 @endsection

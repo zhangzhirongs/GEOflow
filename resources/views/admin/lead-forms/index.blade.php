@@ -107,7 +107,7 @@
                 </table>
             </div>
             @if ($forms->hasPages())
-                <div class="border-t border-gray-200 px-6 py-4">{{ $forms->links() }}</div>
+                <div class="border-t border-gray-200 px-6 py-4">{{ $forms->links('pagination.admin') }}</div>
             @endif
         </div>
     </div>

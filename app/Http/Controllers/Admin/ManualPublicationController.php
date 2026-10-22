@@ -38,7 +38,7 @@ class ManualPublicationController extends Controller
         $publications = (clone $query)
             ->with($this->relations())
             ->latest('id')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
         $statsQuery = ManualPublication::query()->visibleTo($admin);
 
@@ -241,7 +241,7 @@ class ManualPublicationController extends Controller
                 $query->where('title', 'like', '%'.$articleSearch.'%');
             })
             ->latest('id')
-            ->paginate(50, ['id', 'title', 'review_status'], 'article_page')
+            ->paginate(10, ['id', 'title', 'review_status'], 'article_page')
             ->withQueryString();
 
         if ($selectedArticle instanceof Article

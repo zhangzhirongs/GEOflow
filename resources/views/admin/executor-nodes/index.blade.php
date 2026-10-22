@@ -82,7 +82,7 @@
                 @endforelse
             </tbody>
         </table></div>
-        <div class="border-t border-gray-200 px-4 py-3">{{ $nodes->links() }}</div>
+        <div class="border-t border-gray-200 px-4 py-3">{{ $nodes->links('pagination.admin') }}</div>
     </div>
 
     <div class="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -111,7 +111,7 @@
                 @endforelse
             </tbody>
         </table></div>
-        <div class="border-t border-gray-200 px-4 py-3">{{ $jobs->links() }}</div>
+        <div class="border-t border-gray-200 px-4 py-3">{{ $jobs->links('pagination.admin') }}</div>
     </div>
 </div>
 @endsection

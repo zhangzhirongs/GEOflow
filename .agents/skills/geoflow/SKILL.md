@@ -5,6 +5,14 @@ description: Develop or operate GEOFlow across Laravel backend/admin/API/CLI, th
 
 # GEOFlow
 
+## Capability Description
+
+GEOFlow is a Laravel-based GEO content engineering and multi-site distribution platform. This skill routes work across AI model configuration, materials, prompts, knowledge bases and RAG, content tasks, article review and publication, analytics, leads, themes, homepage modules, enterprise knowledge, distribution channels, target-site packages, queues, and legacy migration.
+
+When exposing GEOFlow through an MCP server, preserve these capability boundaries. Prefer read-only discovery tools first, use CLI/API v1 for catalog, task, job, material, and article operations, and use authenticated admin routes for capabilities not exposed by API v1. Every mutation must identify the target, preserve authorization and idempotency, and read the resource back afterward. High-risk tools such as deletion, secret rotation, system update, rollback, lead export, channel deletion, and theme publication require explicit target and confirmation fields.
+
+MCP results should return a structured envelope containing `success`, `operation`, `resource`, final `state`, `verification`, and redacted `warnings` or `error` data. Separate local persistence success, queued-job success, and remote-channel success; do not report one as proof of the others.
+
 ## Route
 
 1. Run `scripts/discover_geoflow_workspace.py <workspace>` for source work or `scripts/geoflow_preflight.sh "<workspace>" [config] [checks]` before runtime mutations. Inspect current CLI help and routes when available.

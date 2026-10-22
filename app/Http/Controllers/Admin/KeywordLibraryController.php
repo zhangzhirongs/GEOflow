@@ -20,7 +20,7 @@ use Illuminate\View\View;
  */
 class KeywordLibraryController extends Controller
 {
-    private const DETAIL_PER_PAGE = 50;
+    private const DETAIL_PER_PAGE = 10;
 
     /**
      * 列表页。

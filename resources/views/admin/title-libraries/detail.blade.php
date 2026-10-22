@@ -116,7 +116,7 @@
                                 {{ __('admin.title_detail.pagination', ['start' => $titles->firstItem(), 'end' => $titles->lastItem(), 'total' => $titles->total()]) }}
                             </div>
                             <div>
-                                {{ $titles->links() }}
+                                {{ $titles->links('pagination.admin') }}
                             </div>
                         </div>
                     </div>

@@ -38,7 +38,7 @@ class EnterpriseKnowledgeController extends Controller
             ->with(['publishedKnowledgeBase'])
             ->withCount(['sources', 'revisions'])
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return view('admin.enterprise-knowledge.index', [
             'pageTitle' => __('admin.enterprise_knowledge.page_title'),

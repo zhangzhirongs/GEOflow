@@ -14,7 +14,6 @@
     $selectedDateFrom = (string) ($filters['date_from'] ?? '');
     $selectedDateTo = (string) ($filters['date_to'] ?? '');
     $selectedSearch = (string) ($filters['search'] ?? '');
-    $selectedPerPage = (int) ($filters['per_page'] ?? 20);
     $selectedTaskName = '';
     foreach ($tasks as $taskOption) {
         if ((int) ($taskOption['id'] ?? 0) === $selectedTaskId) {
@@ -648,36 +647,9 @@
                     </table>
                 </div>
 
-                <div class="admin-card__foot flex-col gap-3">
-                    <div class="flex w-full flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                        <div class="shrink-0 text-sm text-gray-700">
-                            {{ __('admin.articles.pagination.summary', ['from' => $articles->firstItem() ?? 0, 'to' => $articles->lastItem() ?? 0, 'total' => $articles->total()]) }}
-                            @if($articles->lastPage() > 1)
-                                <span class="ml-2 text-gray-500">{{ __('admin.articles.pagination.pages', ['page' => $articles->currentPage(), 'total_pages' => $articles->lastPage()]) }}</span>
-                            @endif
-                        </div>
-                        <div class="flex shrink-0 items-center gap-2">
-                            <form method="GET" class="flex items-center gap-2">
-                                @foreach(request()->except(['per_page', 'page']) as $key => $value)
-                                    @if(is_array($value))
-                                        @foreach($value as $arrayValue)
-                                            <input type="hidden" name="{{ $key }}[]" value="{{ $arrayValue }}">
-                                        @endforeach
-                                    @else
-                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                                    @endif
-                                @endforeach
-                                <input type="hidden" name="page" value="1">
-                                <label for="per-page-input" class="text-sm text-gray-600">{{ __('admin.articles.pagination.per_page') }}</label>
-                                <input id="per-page-input" type="number" name="per_page" min="10" max="100" step="1" value="{{ $selectedPerPage }}" class="w-20 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm">
-                                <button type="submit" class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('admin.button.apply') }}</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="w-full min-w-0 overflow-x-auto xl:flex xl:justify-end">
-                        <div class="min-w-max">
-                            {{ $articles->onEachSide(1)->links() }}
-                        </div>
+                <div class="admin-card__foot">
+                    <div class="w-full">
+                        {{ $articles->onEachSide(1)->links('pagination.admin') }}
                     </div>
                 </div>
             @endif
