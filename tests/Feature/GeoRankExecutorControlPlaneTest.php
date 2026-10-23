@@ -114,6 +114,20 @@ class GeoRankExecutorControlPlaneTest extends TestCase
         $this->assertSame('succeeded', ExecutorJob::query()->firstOrFail()->status);
     }
 
+    public function test_legacy_node_can_claim_queued_login_for_a_bound_new_platform(): void
+    {
+        [$jobs, $node, $account] = $this->sessionTaskContext();
+        $node->forceFill(['platforms' => ['xiaohongshu', 'zhihu', 'bilibili', 'weibo']])->save();
+        foreach (['toutiao', 'csdn', 'baijiahao', 'douyin', 'wechat_mp'] as $platform) {
+            $account->forceFill(['platform' => $platform])->save();
+            $queued = $jobs->enqueueLogin($account);
+            $claimed = $jobs->claim($node->fresh());
+            $this->assertNotNull($claimed, $platform);
+            $this->assertSame($queued->id, $claimed->id);
+            $this->assertContains($platform, $node->fresh()->platforms);
+            $jobs->report($node, (int) $claimed->id, ['status' => 'succeeded', 'sessionStatus' => 'ready']);
+        }
+    }
     public function test_article_publish_enqueues_executor_job_instead_of_http(): void
     {
         $admin = $this->admin();

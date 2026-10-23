@@ -203,7 +203,19 @@ class ExecutorJobService
                 return null;
             }
 
-            $platforms = is_array($node->platforms) ? $node->platforms : [];
+            // Explicitly bound accounts may use platforms added after node creation.
+            $platforms = array_values(array_unique(array_merge(
+                is_array($node->platforms) ? $node->platforms : [],
+                ManualPublicationAccount::query()
+                    ->where('executor_node_id', $node->id)
+                    ->whereIn('platform', ManualPublicationAccount::PLATFORMS)
+                    ->distinct()
+                    ->pluck('platform')
+                    ->all(),
+            )));
+            if ($platforms !== $node->platforms) {
+                $node->forceFill(['platforms' => $platforms])->save();
+            }
             $job = ExecutorJob::query()
                 ->where('status', 'queued')
                 ->where(function ($query) use ($node): void {

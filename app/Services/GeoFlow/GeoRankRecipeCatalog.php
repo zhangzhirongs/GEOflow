@@ -23,10 +23,12 @@ class GeoRankRecipeCatalog
     private function toutiao(): array
     {
         $recipe = $this->generic('toutiao');
-        $recipe['version'] = 3;
+        $recipe['version'] = 4;
         $recipe['login'] = [
-            'url' => 'https://mp.toutiao.com',
-            'successSelectors' => ['.auth-avator', '.user-info'],
+            'url' => 'https://mp.toutiao.com/auth/page/login?redirect_url=%2Fprofile_v4%2Findex',
+            'freshSession' => true,
+            'failureUrlIncludes' => ['mp.toutiao.com/auth/page/login'],
+            'successSelectors' => [],
             'failureSelectors' => ['button:has-text("登录")', 'a:has-text("登录")'],
             'successCookieNames' => ['sessionid', 'sessionid_ss', 'sid_tt'],
             'successUrlIncludes' => ['mp.toutiao.com/profile_v4/index', 'mp.toutiao.com/profile_v4/graphic/'],
@@ -36,7 +38,7 @@ class GeoRankRecipeCatalog
         ];
         $recipe['check'] = [
             'url' => 'https://mp.toutiao.com',
-            'loggedInSelectors' => ['.auth-avator', '.user-info'],
+            'loggedInSelectors' => [],
             'loggedOutSelectors' => ['button:has-text("登录")', 'a:has-text("登录")'],
             'loggedInCookieNames' => ['sessionid', 'sessionid_ss', 'sid_tt'],
             'loggedInUrlIncludes' => ['mp.toutiao.com/profile_v4/index', 'mp.toutiao.com/profile_v4/graphic/'],
@@ -54,9 +56,11 @@ class GeoRankRecipeCatalog
     {
         $sessions = [
             'baijiahao' => [
-                'version' => 3,
+                'version' => 4,
                 'login' => [
                     'url' => 'https://baijiahao.baidu.com',
+                    'freshSession' => true,
+                    'failureUrlIncludes' => ['passport.baidu.com', 'baijiahao.baidu.com/builder/theme/bjh/login'],
                     'successSelectors' => ['.user-name'],
                     'failureSelectors' => ['button:has-text("登录")', 'a:has-text("登录")'],
                     'successCookieNames' => ['BDUSS', 'STOKEN'],
@@ -69,13 +73,14 @@ class GeoRankRecipeCatalog
                     'loggedInSelectors' => ['.user-name'],
                     'loggedOutSelectors' => ['button:has-text("登录")', 'a:has-text("登录")'],
                     'loggedInCookieNames' => ['BDUSS', 'STOKEN'],
+                    'loggedOutUrlIncludes' => ['passport.baidu.com', 'baijiahao.baidu.com/builder/theme/bjh/login'],
                     'timeoutMs' => 30000,
                 ],
             ],
             'weibo' => [
-                'version' => 2,
+                'version' => 3,
                 'login' => [
-                    'url' => 'https://weibo.com/login.php',
+                    'url' => 'https://weibo.com/newlogin?openLoginLayer=1',
                     'successSelectors' => ['[class*="Ctrls_avatar"]'],
                     'failureSelectors' => ['a:has-text("登录")', 'button:has-text("登录")'],
                     'successCookieNames' => ['SUB'],
@@ -88,17 +93,19 @@ class GeoRankRecipeCatalog
                     'loggedInSelectors' => ['[class*="Ctrls_avatar"]'],
                     'loggedOutSelectors' => ['a:has-text("登录")', 'button:has-text("登录")'],
                     'loggedInCookieNames' => ['SUB'],
-                    'loggedOutUrlIncludes' => ['/login.php', '/login'],
+                    'loggedOutUrlIncludes' => ['/login.php', '/login', '/newlogin'],
                     'timeoutMs' => 30000,
                 ],
             ],
             'douyin' => [
-                'version' => 2,
+                'version' => 3,
                 'login' => [
                     'url' => 'https://creator.douyin.com/',
+                    'freshSession' => true,
+                    'failureUrlIncludes' => ['creator.douyin.com/creator-micro/login', 'creator.douyin.com/login'],
                     'successSelectors' => [],
                     'successCookieNames' => ['sessionid', 'sessionid_ss', 'sid_guard', 'sid_tt'],
-                    'successUrlIncludes' => ['/creator-micro/', '/creator-micro'],
+                    'successUrlIncludes' => ['creator.douyin.com/creator-micro/home', 'creator.douyin.com/creator-micro/content/', 'creator.douyin.com/creator-micro/data/'],
                     'timeoutMs' => 300000,
                     'keepOpenMs' => 3000,
                     'hint' => '请在抖音创作者中心扫码或登录。登录态仅保存在本机。',
@@ -108,15 +115,17 @@ class GeoRankRecipeCatalog
                     'loggedInSelectors' => [],
                     'loggedOutSelectors' => [],
                     'loggedInCookieNames' => ['sessionid', 'sessionid_ss', 'sid_guard', 'sid_tt'],
-                    'loggedInUrlIncludes' => ['/creator-micro/', '/creator-micro'],
+                    'loggedInUrlIncludes' => ['creator.douyin.com/creator-micro/home', 'creator.douyin.com/creator-micro/content/', 'creator.douyin.com/creator-micro/data/'],
                     'loggedOutUrlIncludes' => ['/login'],
                     'timeoutMs' => 30000,
                 ],
             ],
             'wechat_mp' => [
-                'version' => 2,
+                'version' => 3,
                 'login' => [
                     'url' => 'https://mp.weixin.qq.com/',
+                    'freshSession' => true,
+                    'failureUrlIncludes' => ['mp.weixin.qq.com/cgi-bin/login'],
                     'successSelectors' => [],
                     'successCookieNames' => ['slave_sid'],
                     'successUrlIncludes' => ['/cgi-bin/home', '/cgi-bin/appmsg'],
@@ -135,9 +144,11 @@ class GeoRankRecipeCatalog
                 ],
             ],
             'csdn' => [
-                'version' => 2,
+                'version' => 3,
                 'login' => [
-                    'url' => 'https://editor.csdn.net/md/',
+                    'url' => 'https://passport.csdn.net/login?code=public&u=https%3A%2F%2Feditor.csdn.net%2Fmd%2F',
+                    'freshSession' => true,
+                    'failureUrlIncludes' => ['passport.csdn.net/login'],
                     'successSelectors' => [],
                     'successCookieNames' => ['UserToken', 'userToken'],
                     'timeoutMs' => 300000,
