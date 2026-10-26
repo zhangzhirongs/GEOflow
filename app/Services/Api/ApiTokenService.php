@@ -174,6 +174,7 @@ class ApiTokenService
     public function getAvailableScopes(): array
     {
         return [
+            'mcp:use',
             'catalog:read',
             'tasks:read',
             'tasks:write',
@@ -183,6 +184,8 @@ class ApiTokenService
             'articles:publish',
             'materials:read',
             'materials:write',
+            'social:read',
+            'social:publish',
         ];
     }
 

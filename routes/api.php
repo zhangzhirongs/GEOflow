@@ -12,6 +12,7 @@
 use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\SocialPublicationController;
 use App\Http\Controllers\Api\V1\JobController;
 use App\Http\Controllers\Api\V1\MaterialController;
 use App\Http\Controllers\Api\V1\TaskController;
@@ -29,6 +30,16 @@ Route::prefix('v1')
         Route::middleware(['api.auth'])->group(function (): void {
             // catalog:read — 下拉元数据（模型、提示词、库、作者、分类等）
             Route::get('catalog', [CatalogController::class, 'show'])->middleware('api.scope:catalog:read');
+
+            Route::get('social-publication/platforms', [SocialPublicationController::class, 'platforms'])
+                ->middleware('api.scope:social:read');
+            Route::get('social-publication/accounts', [SocialPublicationController::class, 'accounts'])
+                ->middleware('api.scope:social:read');
+            Route::post('social-publication/jobs', [SocialPublicationController::class, 'enqueue'])
+                ->middleware(['api.scope:social:publish', 'throttle:30,1']);
+            Route::get('social-publication/jobs/{job}', [SocialPublicationController::class, 'showJob'])
+                ->whereNumber('job')
+                ->middleware('api.scope:social:read');
 
             // tasks:* — 任务 CRUD、启停、入队、子 Job 列表
             Route::get('tasks', [TaskController::class, 'index'])->middleware('api.scope:tasks:read');

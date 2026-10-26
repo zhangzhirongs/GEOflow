@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "geoflow": {
+      "enabled": true,
+      "command": "python",
+      "args": ["scripts/geoflow_mcp.py"],
+      "env": {
+        "AGENT_GEOFLOW_BASE_URL": "${AGENT_GEOFLOW_BASE_URL}",
+        "AGENT_GEOFLOW_API_TOKEN": "${AGENT_GEOFLOW_API_TOKEN}"
+      }
+    }
+  }
+}

@@ -15,6 +15,14 @@ GEOFlow 是一个基于 Laravel 的 GEO 内容工程和多站点分发平台。�
 
 MCP 结果应返回结构化响应对象，其中包含 `success`、`operation`、`resource`、最终 `state`、`verification`，以及脱敏后的 `warnings` 或 `error` 数据。将本地持久化成功、排队任务成功和远程渠道成功区分开；不要将其中一项报告为其他项的证明。
 
+### 面向智能体的文章生成
+
+当用户提出文章生成需求时，使用逐步的一问一答收集必要输入，不要一次抛出整张配置表。先确认发布目标与内容用途，再逐项询问是否使用知识库、标题库、图片库以及分类/作者；每一步优先调用目录或素材只读工具展示可选项。用户明确不使用某项素材时继续，不要反复追问。收齐后先复述文章规格，请用户确认，再生成正文。
+
+生成完成后，使用 `geoflow_save_article_draft` 保存到 GEOFlow 内容文章，保持 `draft` 和 `pending` 状态；将文章 ID 和保存结果告知用户，并通过 `geoflow_get_article` 回读确认。修改现有文章前先读取目标文章并确认 ID，保存后再次回读。不要把草稿保存说成已审核、已发布或已分发；需要发布时单独走审核与发布授权流程。
+
+社媒发布时先用 `geoflow_list_social_platforms` 展示 GEOFlow 支持的平台，再用 `geoflow_list_social_accounts` 按用户选定的平台列出可用账号。逐步询问并让用户明确选择账号，不能替用户猜账号；只选择 `can_enqueue` 为 true 的账号。之后使用 `geoflow_enqueue_social_publication`，传入所选 `account_id`、标题、正文和可选图片，将发布任务放入该账号绑定的执行节点 job 队列。返回 queued 只表示任务已入队，不能声称平台已发布；可用 `geoflow_get_social_job` 按 job ID 回读状态。此社媒工作流不同于站点分发渠道，站点分发类型仍为 `geoflow_agent`、`wordpress_rest`、`generic_http_api`。
+
 ## 路由
 
 1. 进行源码工作时运行 `scripts/discover_geoflow_workspace.py <workspace>`，或在运行时变更前运行 `scripts/geoflow_preflight.sh "<workspace>" [config] [checks]`。可用时检查当前 CLI 帮助和路由。
