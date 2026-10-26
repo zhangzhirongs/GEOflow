@@ -25,7 +25,7 @@ class GeoRankRecipeCatalog
         $recipe = $this->generic('toutiao');
         $recipe['version'] = 4;
         $recipe['login'] = [
-            'url' => 'https://mp.toutiao.com/auth/page/login?redirect_url=%2Fprofile_v4%2Findex',
+            'url' => 'https://mp.toutiao.com/auth/page/login',
             'freshSession' => true,
             'failureUrlIncludes' => ['mp.toutiao.com/auth/page/login'],
             'successSelectors' => [],
