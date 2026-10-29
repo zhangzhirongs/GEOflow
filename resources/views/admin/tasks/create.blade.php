@@ -61,6 +61,9 @@
             @else
             <form method="POST" action="{{ $isEdit ? route('admin.tasks.update', ['taskId' => $taskId]) : route('admin.tasks.store') }}" class="grid grid-cols-1 gap-4 xl:grid-cols-12">
                 @csrf
+                @if (! $isEdit)
+                    @include('admin.partials.creation-wizard', ['kind' => 'task'])
+                @endif
                 @if ($isEdit)
                     @method('PUT')
                     <input type="hidden" name="task_revision" value="{{ (string) ($taskForm['task_revision'] ?? '') }}">
@@ -74,9 +77,13 @@
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
                             <div class="lg:col-span-3">
                                 <label for="task_name" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.task_name') }} *</label>
+                                @if (! $isEdit)
+                                    <textarea name="task_name" id="task_name" required rows="3" maxlength="200" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="{{ $t('task_create.placeholder.task_name') }}">{{ old('task_name', (string) ($taskForm['task_name'] ?? '')) }}</textarea>
+                                @else
                                 <input type="text" name="task_name" id="task_name" required value="{{ old('task_name', (string) ($taskForm['task_name'] ?? '')) }}"
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="{{ $t('task_create.placeholder.task_name') }}">
+                                @endif
                             </div>
                             <div class="lg:col-span-2">
                                 <label for="title_library_id" class="block text-sm font-medium text-gray-700">{{ $t('task_create.field.title_library') }} *</label>

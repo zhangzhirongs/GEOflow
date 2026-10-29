@@ -178,6 +178,8 @@ return [
     'api_login_rate_limit_decay_seconds' => (int) env('GEOFLOW_API_LOGIN_RATE_LIMIT_DECAY', 60),
     // API Token 默认有效期（天）
     'api_token_default_ttl_days' => (int) env('GEOFLOW_API_TOKEN_DEFAULT_TTL_DAYS', 30),
+    // Remote MCP is opt-in. When enabled, routes/ai.php exposes the MCP server over HTTPS.
+    'mcp_http_enabled' => filter_var(env('GEOFLOW_MCP_HTTP_ENABLED', false), FILTER_VALIDATE_BOOLEAN),
     // 会话空闲超时（秒）
     'session_timeout_seconds' => (int) env('GEOFLOW_SESSION_TIMEOUT', 2592000),
 

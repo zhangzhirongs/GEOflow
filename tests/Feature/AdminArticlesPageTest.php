@@ -146,6 +146,9 @@ class AdminArticlesPageTest extends TestCase
             ->get(route('admin.articles.create'))
             ->assertOk()
             ->assertSee(__('admin.article_create.page_heading'))
+            ->assertSee('data-creation-wizard data-kind="article"', false)
+            ->assertSee('data-wizard-manual', false)
+            ->assertSee('data-wizard-step="2"', false)
             ->assertSeeInOrder([
                 __('admin.article_create.section.content_title'),
                 __('admin.articles.quality_scorecard.title'),

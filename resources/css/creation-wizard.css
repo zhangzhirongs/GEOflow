@@ -1,0 +1,70 @@
+.creation-form { display: block !important; max-width: 960px; margin-inline: auto; }
+[data-creation-wizard] { overflow: hidden; border-radius: 22px; background: #fff; color: #183153; box-shadow: 0 6px 28px #20345809; }
+[data-creation-wizard] [hidden] { display: none !important; }
+.creation-brand { display: flex; align-items: center; gap: 9px; min-height: 65px; padding: 16px 26px; border-bottom: 1px solid #edf1f5; color: #10243c; }
+.creation-logo { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; background: #307afa; color: white; font-weight: 700; }
+.creation-kind { margin-left: auto; padding: 5px 12px; border-radius: 20px; background: #e8f5eb; color: #31965c; font-size: 12px; }
+.creation-steps { display: flex; align-items: center; gap: 14px; padding: 22px 26px; font-size: 14px; }
+.creation-steps > span { display: flex; align-items: center; gap: 8px; color: #94a3b8; white-space: nowrap; }
+.creation-steps > span:not(:last-child) { flex: 1; }
+.creation-steps > span:not(:last-child)::after { content: ''; height: 2px; background: #e6ebf1; flex: 1; margin-left: 6px; }
+[data-wizard-number] { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #eef1f5; font-weight: 700; }
+.creation-steps [data-state='active'] { color: #122942; font-weight: 600; }
+.creation-steps [data-state='active'] [data-wizard-number] { background: #307afa; color: #fff; }
+.creation-steps [data-state='complete'] { color: #365779; }
+.creation-steps [data-state='complete'] [data-wizard-number] { background: #e7f5eb; color: #2da36b; }
+.creation-body { padding: 0 26px 25px; }
+.creation-label { display: block; margin: 0 0 9px; color: #10243c; font-size: 14px; font-weight: 600; }
+[data-creation-wizard] .creation-topic { display: block; width: 100%; min-height: 100px; margin: 0; padding: 16px; border: 1px solid #d8e1ed; border-radius: 12px; box-shadow: none; font-size: 14px; }
+.creation-topic:focus { outline: 2px solid #307afa; outline-offset: 2px; }
+.creation-manual { margin-top: 14px; color: #307afa; font-size: 13px; }
+.creation-options { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid #edf1f5; font-size: 13px; }
+.creation-options > span { padding: 2px 8px; border-radius: 5px; background: #f3f5f8; color: #94a3b8; font-size: 12px; }
+.creation-options button { padding: 8px 15px; border: 1px dashed #d6e0ee; border-radius: 22px; color: #365779; }
+.creation-options button:hover { border-color: #307afa; background: #f4f8ff; }
+[data-creation-wizard] details { margin-top: 18px; font-size: 13px; }
+[data-creation-wizard] summary { cursor: pointer; color: #64748b; }
+.creation-settings { display: grid; gap: 16px; margin-top: 14px; }
+.creation-settings > * { grid-column: auto !important; min-width: 0; }
+.creation-settings > .bg-white { box-shadow: none; border: 1px solid #edf1f5; border-radius: 12px; }
+.creation-help { margin: 0; font-size: 13px; line-height: 1.6; color: #94a3b8; }
+.creation-platforms { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.creation-platforms button { padding: 9px 17px; border: 1px solid #d8e1ed; border-radius: 24px; font-size: 14px; }
+.creation-platforms [aria-pressed='true'], .creation-tones [aria-pressed='true'] { border-color: #307afa; background: #eaf4ff; color: #1260ed; }
+.creation-tone-heading { margin-top: 25px; }
+.creation-tones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; font-size: 13px; color: #94a3b8; }
+.creation-tones button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 105px; padding: 14px; border: 1px solid #d8e1ed; border-radius: 12px; text-align: center; }
+.creation-tones strong { color: #183153; font-size: 14px; overflow-wrap: anywhere; }
+.creation-tone-dot { width: 26px; height: 26px; border-radius: 50%; background: #fff7df; margin-bottom: 4px; }
+.creation-tones button:nth-child(3n + 2) .creation-tone-dot { background: #e9f3ff; }
+.creation-tones button:nth-child(3n) .creation-tone-dot { background: #fcebed; }
+.creation-preview { padding: 18px; border: 1px solid #eaf0f6; border-radius: 15px; background: #fcfdff; }
+.creation-check { display: inline-block; padding: 4px 11px; border-radius: 20px; background: #e8f5eb; color: #299660; font-size: 12px; }
+.creation-preview h2 { margin: 13px 0 10px; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+.creation-preview p { margin: 0; max-height: 280px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.9; color: #48658a; }
+.creation-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.creation-tags span { padding: 4px 10px; border-radius: 7px; background: #f0f3f7; font-size: 12px; }
+.creation-save { display: flex; gap: 9px; align-items: center; margin-top: 28px; font-size: 13px; }
+.creation-save input { border-radius: 5px; accent-color: #60b96e; }
+.creation-footer { padding: 18px 26px 22px; border-top: 1px solid #edf1f5; }
+.creation-actions { display: flex; gap: 12px; }
+.creation-actions button { min-height: 49px; border-radius: 12px; font-size: 16px; }
+[data-wizard-back] { flex: 0 0 92px; border: 1px solid #d8e1ed; color: #7b8da5; background: #fff; }
+[data-wizard-next], [data-wizard-submit] { flex: 1; background: #307afa; color: #fff; font-weight: 600; }
+[data-wizard-next]:hover, [data-wizard-submit]:hover { background: #2469e5; }
+.creation-actions button:disabled { opacity: .6; cursor: wait; }
+.creation-footer > .creation-help { margin-top: 21px; text-align: center; }
+[data-wizard-error] { margin: 0 0 12px; font-size: 13px; color: #b45309; }
+[data-creation-wizard] button:focus-visible, [data-creation-wizard] summary:focus-visible { outline: 2px solid #307afa; outline-offset: 3px; }
+@media (max-width: 600px) {
+    .creation-brand, .creation-steps { padding-inline: 16px; }
+    .creation-body { padding-inline: 16px; }
+    .creation-footer { padding-inline: 16px; }
+    .creation-steps { gap: 7px; font-size: 12px; }
+    .creation-steps > span { gap: 5px; }
+    .creation-steps > span:not(:last-child)::after { margin-left: 0; }
+    [data-wizard-number] { width: 24px; height: 24px; }
+    .creation-tones { grid-template-columns: 1fr; }
+    .creation-options { gap: 8px; }
+    .creation-options button { padding-inline: 11px; }
+}

@@ -114,6 +114,8 @@ class AdminTasksPageTest extends TestCase
             ->get(route('admin.tasks.create'))
             ->assertOk()
             ->assertSee('data-task-form-shell', false)
+            ->assertSee('data-creation-wizard data-kind="task"', false)
+            ->assertSee('data-wizard-step="2"', false)
             ->assertSee('xl:grid-cols-12', false)
             ->assertSee('lg:grid-cols-3', false)
             ->assertSee('id="target_platform"', false)
@@ -123,6 +125,7 @@ class AdminTasksPageTest extends TestCase
         $this->actingAs($admin, 'admin')
             ->get(route('admin.tasks.edit', ['taskId' => (int) $task->id]))
             ->assertOk()
+            ->assertDontSee('data-creation-wizard', false)
             ->assertSee('data-task-form-shell', false)
             ->assertSee('xl:grid-cols-12', false)
             ->assertDontSee('max-w-4xl mx-auto', false);

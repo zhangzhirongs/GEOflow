@@ -200,6 +200,9 @@
 
         <form method="POST" action="{{ $formAction }}" class="space-y-5">
             @csrf
+            @if (! $isEdit)
+                @include('admin.partials.creation-wizard', ['kind' => 'article'])
+            @endif
             @if($isEdit)
                 @method('PUT')
             @endif
@@ -225,7 +228,11 @@
                                         </button>
                                     @endif
                                 </div>
-                                <input id="title" type="text" name="title" maxlength="500" required value="{{ $formData['title'] }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="{{ __($i18nRoot.'.placeholder.title') }}">
+                                @if (! $isEdit)
+                                    <textarea id="title" name="title" maxlength="500" required rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="{{ __($i18nRoot.'.placeholder.title') }}">{{ $formData['title'] }}</textarea>
+                                @else
+                                    <input id="title" type="text" name="title" maxlength="500" required value="{{ $formData['title'] }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="{{ __($i18nRoot.'.placeholder.title') }}">
+                                @endif
                                 @if(! $isEdit)
                                     <input id="article-source-title-id" type="hidden" name="source_title_id" value="{{ $formData['source_title_id'] }}">
                                     <input id="article-is-ai-generated" type="hidden" name="is_ai_generated" value="{{ $formData['is_ai_generated'] }}">

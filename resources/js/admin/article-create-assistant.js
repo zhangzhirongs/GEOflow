@@ -586,6 +586,7 @@ if (assistantRoot) {
             }
             setEditorValue(generationContent);
             setGenerationStatus('success', messages.completed, generationContent.length);
+            return true;
         } catch (error) {
             if (error.name === 'AbortError') {
                 if (editorFrame !== null) {
@@ -606,7 +607,10 @@ if (assistantRoot) {
             generationController = null;
             setGenerating(false);
         }
+        return false;
     };
+
+    window.geoArticleCreationAssistant = { generate: startGeneration };
 
     knowledgeBaseSelect?.addEventListener('change', saveAssistantPreference);
     promptSelect?.addEventListener('change', saveAssistantPreference);
