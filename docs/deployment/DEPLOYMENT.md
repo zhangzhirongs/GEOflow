@@ -182,6 +182,20 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 - 前台与后台统一从 `web`（Nginx）进入
 - 站点：`http://服务器IP:${WEB_PORT}` 或你的反向代理域名
 - 后台：`/geo_admin/login`（或你的 `ADMIN_BASE_PATH`）
+
+### AI 工作台 Agent Framework
+
+AI 工作台通过同源 `/agent/` 路径嵌入已发布的 Agent Framework。生产 Compose 的 `web` 容器使用 `AGENT_FRAMEWORK_UPSTREAM` 作为上游地址，默认值为 `https://192.168.169.205:18788`；运行 Compose 前需先准备 `.env.prod`。该 HTTPS 服务当前使用自签名证书，部署前将 Agent Framework 的服务证书复制到 `docker/nginx/agent-framework-ca.crt`，并按实际证书 SAN 设置 `AGENT_FRAMEWORK_TLS_NAME`。Nginx 会校验上游 TLS 证书；不要通过关闭 TLS 校验绕过证书错误。
+
+Agent Framework 前端默认使用相对资源路径构建，可同时用于独立入口和 `/agent/` 嵌入入口。统一登录需要同步更新 GEOFlow、Nginx 配置和 Agent Framework 后端及前端，旧版已发布智能体不支持此协议。
+
+在 GEOFlow 的忽略文件 `.env`（生产为 `.env.prod`）中设置 `GEOFLOW_AGENT_SSO_SECRET`，在 Agent Framework 的忽略文件 `.env` 中设置相同的 `AGENT_SSO_SECRET`，使用至少 32 位随机字符；Agent Framework 的 `AGENT_SSO_PREFIX` 保持 `/agent`。不要把密钥写入源码或版本库。清除 Laravel 配置缓存，重启 Agent Framework，并检查及重新加载 Nginx；生产环境需重新构建对应镜像。两端系统时钟需同步。
+
+Nginx 对每个 `/agent/` 请求通过内部子请求检查 GEOFlow 的管理员会话。身份声明签名绑定当前请求方法和 URI，15 秒过期，且只通过代理内部请求头传递。外部不能访问 `/internal/` 签发接口；代理覆盖客户端传入的身份头。未登录返回 401，密钥未配置或会话检查失败时拒绝访问，不回退到智能体独立账号。自定义代理必须保留这些约束，并通过防火墙限制智能体服务的直接访问范围。
+
+用户按 GEOFlow 稳定账号 ID 自动映射到独立智能体身份，聊天与文件继续按用户隔离。只有 GEOFlow 超级管理员获得智能体管理权限，角色变化在下一次请求生效。原有智能体独立账号及历史不会自动合并。嵌入工作台不提供独立密码修改；退出按钮通过携带 GEOFlow CSRF 令牌的表单退出 GEOFlow，后续智能体请求随之失效。已经开始的后台任务不会因此自动取消。独立入口继续支持原有账号登录。
+
+本地 Docker 使用 `default.dev.conf`，上游为宿主机 `8787`；生产使用 `default.conf` 的 HTTPS 上游。只配置同源代理不能让旧版远端智能体自动支持统一登录，需部署两端代码和匹配的密钥。
 - Reverb：默认映射 `${REVERB_EXPOSE_PORT}:8080`
 
 ### 默认管理员（首次安装）

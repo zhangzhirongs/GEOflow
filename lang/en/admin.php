@@ -610,6 +610,7 @@ return [
             'invalid_request' => 'Invalid request',
             'empty_credentials' => 'Please enter both username and password',
             'invalid_credentials' => 'Invalid username or password, or the account is disabled',
+            'session_expired' => 'This login page has expired. Please enter your username and password again.',
             'account_locked' => 'This account has been locked. Please contact an administrator to unlock it.',
             'too_many_attempts' => 'Too many failed login attempts. Try again in :seconds seconds.',
         ],
@@ -2466,6 +2467,10 @@ return [
         'url_import_task_started' => 'Job started',
     ],
     'ai_configurator' => [
+        'content_title' => 'Content workspace',
+        'agent_frame_title' => 'AI agent',
+        'back_to_admin' => 'Back to admin',
+        'workspace_navigation' => 'Workspace navigation',
         'page_title' => 'AI Workbench',
         'heading' => 'AI Workbench',
         'subtitle' => 'Type what you want to build, or open the grouped skills below to configure content, assets, AI, site, and system workflows from one place.',

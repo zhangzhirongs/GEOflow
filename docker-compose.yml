@@ -82,8 +82,8 @@ services:
       AUTO_FIX_STORAGE_PERMISSIONS: "false"
       COMPOSER_ON_START: "${COMPOSER_ON_START:-true}"
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
-    ports:
-      - "0.0.0.0:${APP_PORT:-18080}:8080"
+    expose:
+      - "8080"
     volumes:
       - ./:/var/www/html
     depends_on:
@@ -91,6 +91,20 @@ services:
         condition: service_completed_successfully
       init:
         condition: service_completed_successfully
+    restart: unless-stopped
+
+  web:
+    image: ${NGINX_IMAGE:-nginx:1.27-alpine}
+    container_name: geoflow-web
+    ports:
+      - "0.0.0.0:${APP_PORT:-18080}:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./docker/nginx/default.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_started
     restart: unless-stopped
 
   queue:

@@ -21,7 +21,7 @@ class AdminAiConfiguratorWorkbenchTest extends TestCase
         $this->seedWorkbenchCatalog();
 
         $response = $this->actingAs($this->createAdmin(), 'admin')
-            ->get(route('admin.ai.configurator'));
+            ->get(route('admin.ai.configurator.content'));
 
         $response
             ->assertOk()
@@ -45,7 +45,7 @@ class AdminAiConfiguratorWorkbenchTest extends TestCase
         $this->seedWorkbenchCatalog();
 
         $response = $this->actingAs($this->createAdmin(), 'admin')
-            ->get(route('admin.ai.configurator'));
+            ->get(route('admin.ai.configurator.content'));
 
         $response->assertOk();
 
@@ -61,6 +61,22 @@ class AdminAiConfiguratorWorkbenchTest extends TestCase
         $this->assertStringNotContainsString(route('admin.materials.index'), $desktopNav);
         $this->assertStringNotContainsString(route('admin.site-settings.index'), $desktopNav);
         $this->assertStringNotContainsString(route('admin.admin-users.index'), $desktopNav);
+    }
+
+    public function test_agent_framework_is_embedded_for_authenticated_admins(): void
+    {
+        $this->actingAs($this->createAdmin(), 'admin')
+            ->get(route('admin.ai.configurator'))
+            ->assertOk()
+            ->assertSee('id="agent-config-frame"', false)
+            ->assertSee('src="/agent/"', false)
+            ->assertSee('title="'.__('admin.ai_configurator.agent_frame_title').'"', false);
+    }
+
+    public function test_agent_framework_embed_requires_admin_authentication(): void
+    {
+        $this->get(route('admin.ai.configurator'))
+            ->assertRedirect(route('admin.login'));
     }
 
     public function test_workbench_resolves_article_requests_to_prefilled_article_form(): void

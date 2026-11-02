@@ -21,7 +21,7 @@ class AuthenticateAdminWeb
     {
         $guard = Auth::guard('admin');
         if (! $guard->check()) {
-            return redirect()->guest(AdminWeb::routePath('admin.login'));
+            return $this->unauthenticated($request);
         }
 
         $adminId = (int) ($guard->id() ?? 0);
@@ -50,6 +50,15 @@ class AuthenticateAdminWeb
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        return $this->unauthenticated($request);
+    }
+
+    private function unauthenticated(Request $request): Response
+    {
+        if ($request->routeIs('agent.identity')) {
+            return response('', 401, ['Cache-Control' => 'no-store']);
+        }
 
         return redirect()->guest(AdminWeb::routePath('admin.login'));
     }

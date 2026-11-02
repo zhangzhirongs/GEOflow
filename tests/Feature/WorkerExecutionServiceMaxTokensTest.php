@@ -31,6 +31,14 @@ class WorkerExecutionServiceMaxTokensTest extends TestCase
         $this->assertSame(['maxOutputTokens' => 8192], $agent->providerOptions(Lab::Gemini));
     }
 
+    public function test_writer_agent_bounds_output_even_without_an_explicit_limit(): void
+    {
+        config(['geoflow.content_max_tokens' => 6000]);
+        $agent = new MarkdownContentWriterAgent();
+        $this->assertSame(['max_tokens' => 6000], $agent->providerOptions('deepseek'));
+        $this->assertSame(['max_output_tokens' => 6000], $agent->providerOptions('openai'));
+    }
+
     public function test_generate_content_sends_configured_model_max_tokens(): void
     {
         Http::fake([

@@ -260,6 +260,7 @@ docker compose up -d
 
 - 前台默认访问：`http://localhost:18080`（端口由环境变量 **`APP_PORT`** 控制，默认 `18080`）
 - 后台登录：`http://localhost:18080/geo_admin/login`（前缀由 **`ADMIN_BASE_PATH`** 控制，默认 `geo_admin`）
+- AI 工作台同源代理：`/agent/` 转发到本机 `host.docker.internal:8787` 上运行的 Agent Framework
 
 首次启动会运行 **`init`** 容器：在数据库就绪后执行首次迁移与种子（默认管理员见下文「默认管理员」）。
 
@@ -393,7 +394,8 @@ php artisan geoflow:admin-unlock admin
 | `postgres` | PostgreSQL 16 + pgvector |
 | `redis` | Redis 7 |
 | `init` | 一次性初始化（`restart: "no"`） |
-| `app` | `php artisan serve`，映射 **`${APP_PORT:-18080}:8080`** |
+| `app` | `php artisan serve`，仅供 Compose 网络内部的 Nginx 访问 |
+| `web` | Nginx 统一映射 **`${APP_PORT:-18080}:80`**；`/agent/` 反代到宿主机 Agent Framework 的 `8787` 端口 |
 | `queue` | 文章生成、分发、主题复刻与默认队列 |
 | `knowledge-queue` | 知识库解析与向量化队列，独立内存上限 |
 | `system-update-queue` | 系统更新与回滚队列，独立长超时 |

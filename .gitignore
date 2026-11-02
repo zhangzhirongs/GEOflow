@@ -8,6 +8,7 @@
 .env.prod
 .env.backup
 .env.production
+/docker/nginx/agent-framework-ca.crt
 .phpactor.json
 .phpunit.result.cache
 /.fleet

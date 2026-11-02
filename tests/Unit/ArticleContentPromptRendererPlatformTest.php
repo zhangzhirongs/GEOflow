@@ -47,6 +47,29 @@ class ArticleContentPromptRendererPlatformTest extends TestCase
         $this->assertStringNotContainsString('平台适配', $prompt);
     }
 
+    public function test_repeated_knowledge_placeholders_include_the_full_reference_only_once(): void
+    {
+        $knowledge = str_repeat('参考资料中的事实证据。', 100);
+        $prompt = $this->renderer->renderForWorker('标题', 'GEO', '{{knowledge}} / {{Knowledge}}', $knowledge);
+        $this->assertSame(1, substr_count($prompt, $knowledge));
+        $this->assertStringContainsString('知识库引用要求', $prompt);
+    }
+
+    public function test_inline_reference_is_not_appended_again_to_a_custom_prompt(): void
+    {
+        $knowledge = '客户确认的原始事实资料。';
+        $prompt = $this->renderer->renderForEditor('标题', 'GEO', '根据这些资料写文章：'.$knowledge, $knowledge);
+        $this->assertSame(1, substr_count($prompt, $knowledge));
+        $this->assertStringContainsString('文章标题：标题', $prompt);
+    }
+
+    public function test_inline_reference_is_not_appended_again_after_a_title_placeholder(): void
+    {
+        $knowledge = '客户确认的原始事实资料。';
+        $prompt = $this->renderer->renderForEditor('标题', 'GEO', '{{title}} '.$knowledge, $knowledge);
+        $this->assertSame(1, substr_count($prompt, $knowledge));
+    }
+
     public function test_unknown_platform_is_ignored(): void
     {
         $prompt = $this->renderer->renderForEditor('标题', 'GEO', '写文章。', '', 'nonexistent');

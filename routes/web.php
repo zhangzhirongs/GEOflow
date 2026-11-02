@@ -69,6 +69,9 @@ Route::middleware(['site.locale', 'site.view_log'])->group(function (): void {
         ->name('site.lead-forms.submit');
 });
 
+Route::get('/internal/agent-identity', \App\Http\Controllers\AgentIdentityController::class)
+    ->middleware('throttle:6000,1')->name('agent.identity');
+
 $adminPrefix = trim((string) config('geoflow.admin_base_path', '/geo_admin'), '/');
 
 Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group(function () {
@@ -354,7 +357,8 @@ Route::prefix($adminPrefix)->name('admin.')->middleware(['admin.locale'])->group
 
         // AI 配置模块（配置器 / 模型 / 提示词）
         Route::group([], function () {
-            Route::get('ai-configurator', [LegacyController::class, 'aiConfigurator'])->name('ai.configurator');
+            Route::get('ai-configurator', [LegacyController::class, 'aiConfiguratorAgent'])->name('ai.configurator');
+            Route::get('ai-configurator/content', [LegacyController::class, 'aiConfigurator'])->name('ai.configurator.content');
             Route::post('ai-configurator/resolve', [LegacyController::class, 'resolveAiConfiguratorIntent'])->name('ai.configurator.resolve');
             Route::post('ai-configurator/generate', [LegacyController::class, 'generateAiConfiguratorArticle'])
                 ->middleware('throttle:10,1')

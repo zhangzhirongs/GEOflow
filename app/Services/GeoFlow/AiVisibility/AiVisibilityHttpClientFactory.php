@@ -41,7 +41,7 @@ final class AiVisibilityHttpClientFactory
 
     private function retryAttempts(): int
     {
-        return max(1, (int) config('geoflow.ai_visibility.http_retry_attempts', 2));
+        return max(1, (int) config('geoflow.ai_visibility.http_retry_attempts', 1));
     }
 
     private function retrySleepMs(): int

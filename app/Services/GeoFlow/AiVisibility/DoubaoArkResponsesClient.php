@@ -34,7 +34,9 @@ final class DoubaoArkResponsesClient
         $apiKey = $this->apiKey($model);
 
         $payload = $this->buildPayload($modelId, $prompt, array_replace([
-            'max_output_tokens' => $model->max_tokens,
+            'max_output_tokens' => (int) ($model->max_tokens ?? 0) > 0
+                ? (int) $model->max_tokens
+                : max(512, (int) config('geoflow.ai_visibility.default_analysis_max_tokens', 4096)),
         ], $options));
         $startedAt = hrtime(true);
         $response = $this->httpClientFactory

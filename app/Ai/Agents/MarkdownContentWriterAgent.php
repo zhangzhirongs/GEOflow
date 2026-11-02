@@ -19,8 +19,8 @@ use Laravel\Ai\Promptable;
  * 通过 {@see HasProviderOptions} 在请求体注入最大输出 token 配置，覆盖各服务商较小的默认输出上限
  * （常见 4K），避免长文在生成阶段被截断。不同 provider 使用各自兼容的字段名：
  * 火山方舟 Ark / DeepSeek 等 Chat Completions 接口使用 `max_tokens`，OpenAI Responses
- * 使用 `max_output_tokens`，Gemini 使用 `maxOutputTokens`。未设置 maxTokens 时不附带该字段，
- * 不影响知识库切片、URL 导入等其他调用方的既有行为。
+ * 使用 `max_output_tokens`，Gemini 使用 `maxOutputTokens`。未设置 maxTokens 时使用 geoflow.content_max_tokens 的兜底值，
+ * 知识库切片、URL 导入等调用也必须具备明确的输出上限。
  */
 #[Timeout(240)]
 class MarkdownContentWriterAgent implements Agent, Conversational, HasProviderOptions, HasTools
@@ -69,16 +69,17 @@ class MarkdownContentWriterAgent implements Agent, Conversational, HasProviderOp
      */
     public function providerOptions(Lab|string $provider): array
     {
-        if (is_null($this->maxTokens) || $this->maxTokens <= 0) {
-            return [];
+        $maxTokens = $this->maxTokens;
+        if (is_null($maxTokens) || $maxTokens <= 0) {
+            $maxTokens = max(256, (int) config('geoflow.content_max_tokens', 8192));
         }
 
         $providerKey = $provider instanceof Lab ? $provider->value : $provider;
 
         return match ($providerKey) {
-            'gemini' => ['maxOutputTokens' => $this->maxTokens],
-            'openai' => ['max_output_tokens' => $this->maxTokens],
-            default => ['max_tokens' => $this->maxTokens],
+            'gemini' => ['maxOutputTokens' => $maxTokens],
+            'openai' => ['max_output_tokens' => $maxTokens],
+            default => ['max_tokens' => $maxTokens],
         };
     }
 }

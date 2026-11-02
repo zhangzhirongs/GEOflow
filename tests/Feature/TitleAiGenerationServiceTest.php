@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Ai\Agents\MarkdownContentWriterAgent;
 use App\Models\AiModel;
 use App\Services\GeoFlow\TitleAiGenerationService;
 use App\Support\GeoFlow\ApiKeyCrypto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Ai\AnonymousAgent;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class TitleAiGenerationServiceTest extends TestCase
@@ -15,7 +16,7 @@ class TitleAiGenerationServiceTest extends TestCase
 
     public function test_title_generation_uses_fallback_without_calling_a_model_after_daily_quota_is_used(): void
     {
-        AnonymousAgent::fake(['真实模型标题'])->preventStrayPrompts();
+        MarkdownContentWriterAgent::fake(['真实模型标题'])->preventStrayPrompts();
         $model = $this->createModel([
             'daily_limit' => 1,
             'used_today' => 1,
@@ -32,12 +33,12 @@ class TitleAiGenerationServiceTest extends TestCase
         $this->assertTrue($result['fallback_used']);
         $this->assertSame(1, (int) $model->fresh()->used_today);
         $this->assertSame(0, (int) $model->fresh()->total_used);
-        AnonymousAgent::assertNeverPrompted();
+        MarkdownContentWriterAgent::assertNeverPrompted();
     }
 
     public function test_successful_title_generation_records_daily_and_total_usage(): void
     {
-        AnonymousAgent::fake(["GEO 标题一\nGEO 标题二"])->preventStrayPrompts();
+        MarkdownContentWriterAgent::fake(["GEO 标题一\nGEO 标题二"])->preventStrayPrompts();
         $model = $this->createModel();
 
         $result = app(TitleAiGenerationService::class)->generateTitles(
@@ -56,7 +57,7 @@ class TitleAiGenerationServiceTest extends TestCase
 
     public function test_failed_title_generation_releases_the_reserved_daily_usage(): void
     {
-        AnonymousAgent::fake([''])->preventStrayPrompts();
+        MarkdownContentWriterAgent::fake([''])->preventStrayPrompts();
         $model = $this->createModel(['daily_limit' => 1]);
 
         $result = app(TitleAiGenerationService::class)->generateTitles(
@@ -69,6 +70,26 @@ class TitleAiGenerationServiceTest extends TestCase
         $this->assertTrue($result['fallback_used']);
         $this->assertSame(0, (int) $model->fresh()->used_today);
         $this->assertSame(0, (int) $model->fresh()->total_used);
+    }
+
+    public function test_title_request_has_a_task_sized_output_limit(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://ai.test/v1/chat/completions' => Http::response([
+                'id' => 'title-test',
+                'object' => 'chat.completion',
+                'created' => 1,
+                'model' => 'title-model',
+                'choices' => [['index' => 0, 'message' => ['role' => 'assistant', 'content' => 'GEO title'], 'finish_reason' => 'stop']],
+                'usage' => ['prompt_tokens' => 20, 'completion_tokens' => 5, 'total_tokens' => 25],
+            ]),
+        ]);
+        $model = $this->createModel(['max_tokens' => 512]);
+        $result = app(TitleAiGenerationService::class)->generateTitles($model, ['GEO'], 2, 'professional');
+        $this->assertFalse($result['fallback_used']);
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($request): bool => ($request['max_tokens'] ?? null) === 448);
     }
 
     private function createModel(array $overrides = []): AiModel

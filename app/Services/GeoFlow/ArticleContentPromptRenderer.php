@@ -91,9 +91,19 @@ final class ArticleContentPromptRenderer
             return trim($value) !== '' ? (string) ($matches[2] ?? '') : '';
         }, $prompt) ?? $prompt;
 
-        return preg_replace_callback('/\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/u', function (array $matches) use ($context): string {
+        $knowledgeInserted = false;
+        $knowledgeReference = $this->isLikelyEnglishPrompt($prompt)
+            ? '[Reference knowledge provided above.]' : '[参考知识同前]';
+
+        return preg_replace_callback('/\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/u', function (array $matches) use ($context, &$knowledgeInserted, $knowledgeReference): string {
             $name = (string) ($matches[1] ?? '');
             $value = $this->promptContextValue($name, $context);
+            if (mb_strtolower($name, 'UTF-8') === 'knowledge' && $value !== '') {
+                if ($knowledgeInserted) {
+                    return $knowledgeReference;
+                }
+                $knowledgeInserted = true;
+            }
 
             return $value !== '' || $this->isKnownPromptContextName($name) ? $value : (string) ($matches[0] ?? '');
         }, $renderedPrompt) ?? $renderedPrompt;
@@ -127,7 +137,7 @@ final class ArticleContentPromptRenderer
             if (trim($keyword) !== '') {
                 $lines[] = '- Core keyword: '.$keyword;
             }
-            if (trim($knowledgeContext) !== '') {
+            if (trim($knowledgeContext) !== '' && ! str_contains($prompt, $knowledgeContext)) {
                 $lines[] = '- Reference knowledge:';
                 $lines[] = $knowledgeContext;
             }
@@ -142,7 +152,7 @@ final class ArticleContentPromptRenderer
         if (trim($keyword) !== '') {
             $lines[] = '- 核心关键词：'.$keyword;
         }
-        if (trim($knowledgeContext) !== '') {
+        if (trim($knowledgeContext) !== '' && ! str_contains($prompt, $knowledgeContext)) {
             $lines[] = '- 参考知识：';
             $lines[] = $knowledgeContext;
         }
@@ -152,7 +162,7 @@ final class ArticleContentPromptRenderer
 
     private function appendKnowledgeContext(string $prompt, string $knowledgeContext): string
     {
-        if (trim($knowledgeContext) === '') {
+        if (trim($knowledgeContext) === '' || str_contains($prompt, $knowledgeContext)) {
             return trim($prompt);
         }
 

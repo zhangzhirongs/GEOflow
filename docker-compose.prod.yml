@@ -111,10 +111,14 @@ services:
       args:
         NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.27-alpine}
     container_name: geoflow-web-prod
+    environment:
+      AGENT_FRAMEWORK_UPSTREAM: "${AGENT_FRAMEWORK_UPSTREAM:-https://192.168.169.205:18788}"
+      AGENT_FRAMEWORK_TLS_NAME: "${AGENT_FRAMEWORK_TLS_NAME:-192.168.169.205}"
     ports:
       - "${WEB_PORT:-18080}:80"
     volumes:
       - ./storage:/var/www/html/storage:ro
+      - ./docker/nginx/agent-framework-ca.crt:/etc/nginx/agent-framework-ca.crt:ro
     depends_on:
       app:
         condition: service_started

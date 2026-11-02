@@ -44,6 +44,10 @@ return [
     // 后台入口路径前缀，如 /geo_admin（勿与前台路由冲突）
     'admin_base_path' => '/'.$adminBasePath,
 
+    // Agent Framework is exposed by the deployment proxy under this same-origin path.
+    'agent_framework_path' => trim((string) env('GEOFLOW_AGENT_FRAMEWORK_PATH', '/agent'), '/') ?: 'agent',
+    'agent_sso_secret' => env('GEOFLOW_AGENT_SSO_SECRET', ''),
+
     // 前台 Blade 使用的 Laravel 翻译 locale（与 APP_LOCALE、后台会话语言独立；对齐旧站中文导航）
     'public_locale' => env('GEOFLOW_PUBLIC_LOCALE', 'zh_CN'),
     // 默认前台主题；后台未显式选择主题时使用
@@ -130,7 +134,7 @@ return [
     'ai_visibility' => [
         'http_timeout_seconds' => max(5, (int) env('GEOFLOW_AI_VISIBILITY_HTTP_TIMEOUT', 60)),
         'http_connect_timeout_seconds' => max(1, (int) env('GEOFLOW_AI_VISIBILITY_CONNECT_TIMEOUT', 10)),
-        'http_retry_attempts' => max(1, (int) env('GEOFLOW_AI_VISIBILITY_HTTP_RETRY_ATTEMPTS', 2)),
+        'http_retry_attempts' => max(1, (int) env('GEOFLOW_AI_VISIBILITY_HTTP_RETRY_ATTEMPTS', 1)),
         'http_retry_sleep_ms' => max(0, (int) env('GEOFLOW_AI_VISIBILITY_HTTP_RETRY_SLEEP_MS', 300)),
         'doubao_search_endpoint' => env('GEOFLOW_DOUBAO_SEARCH_ENDPOINT', 'https://open.feedcoopapi.com/search_api/web_search'),
         'ark_responses_path' => env('GEOFLOW_ARK_RESPONSES_PATH', '/responses'),

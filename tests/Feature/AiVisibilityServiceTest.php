@@ -702,6 +702,25 @@ MARKDOWN;
         ], $overrides));
     }
 
+    public function test_ark_does_not_automatically_repeat_a_failed_paid_request_by_default(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://ark.cn-beijing.volces.com/api/v3/responses' => Http::response(['error' => ['message' => 'unavailable']], 503),
+        ]);
+        $model = $this->createAiModel([
+            'model_id' => 'doubao-seed-2-0-lite-260428',
+            'api_url' => 'https://ark.cn-beijing.volces.com/api/v3',
+        ]);
+        try {
+            app(AiVisibilityService::class)->runDoubaoArkResponses($model, 'GEOFlow');
+            $this->fail('Expected the failed response to throw.');
+        } catch (AiVisibilityRunException $exception) {
+            $this->assertSame(AiVisibilityRun::STATUS_FAILED, $exception->run->status);
+        }
+        Http::assertSentCount(1);
+    }
+
     private function createAiModel(array $overrides = []): AiModel
     {
         return AiModel::query()->create(array_merge([

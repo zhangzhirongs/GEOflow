@@ -20,7 +20,7 @@ class AdminAiSourceProvidersPageTest extends TestCase
     public function test_ai_configurator_links_to_search_source_configuration(): void
     {
         $response = $this->actingAs($this->createAdmin(), 'admin')
-            ->get(route('admin.ai.configurator'));
+            ->get(route('admin.ai.configurator.content'));
 
         $response->assertOk()
             ->assertSee(__('admin.ai_configurator.search_title'))
@@ -36,7 +36,7 @@ class AdminAiSourceProvidersPageTest extends TestCase
         $admin = $this->createAdmin();
 
         $this->actingAs($admin, 'admin')
-            ->get(route('admin.ai.configurator'))
+            ->get(route('admin.ai.configurator.content'))
             ->assertOk()
             ->assertSee(__('admin.ai_configurator.search_title'));
 

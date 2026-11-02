@@ -148,11 +148,21 @@ class LegacyController extends Controller
     public function aiConfigurator(WorkbenchStudioService $workbench): View
     {
         return view('admin.ai-configurator.index', [
-            'pageTitle' => __('admin.ai_configurator.page_title'),
-            'activeMenu' => 'ai_config',
+            'pageTitle' => __('admin.ai_configurator.content_title'),
+            'activeMenu' => 'ai_config_content',
             'adminSiteName' => AdminWeb::siteName(),
             'stats' => $this->loadAiConfiguratorStats(),
             'workbench' => $workbench->pageData(),
+        ]);
+    }
+
+    public function aiConfiguratorAgent(): View
+    {
+        return view('admin.ai-configurator.agent', [
+            'pageTitle' => __('admin.ai_configurator.page_title'),
+            'activeMenu' => 'ai_config',
+            'adminSiteName' => AdminWeb::siteName(),
+            'agentUrl' => '/'.trim((string) config('geoflow.agent_framework_path', 'agent'), '/').'/',
         ]);
     }
 

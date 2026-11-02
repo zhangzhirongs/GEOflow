@@ -2,12 +2,11 @@
 
 namespace App\Services\GeoFlow;
 
+use App\Ai\Agents\MarkdownContentWriterAgent;
 use App\Models\AiModel;
 use App\Support\GeoFlow\ApiKeyCrypto;
 use App\Support\GeoFlow\OpenAiRuntimeProvider;
 use Throwable;
-
-use function Laravel\Ai\agent;
 
 /**
  * 标题 AI 生成服务。
@@ -133,7 +132,13 @@ class TitleAiGenerationService
         $userPrompt .= "要求：\n1. 每个标题独占一行\n2. 标题要有吸引力和可读性\n3. 适合搜索引擎优化\n4. 不要添加序号或其他标记\n5. 直接输出标题内容";
 
         try {
-            $response = agent($systemPrompt)->prompt(
+            // Bound small title tasks instead of inheriting the provider's output default.
+            $maxTokens = min(8192, max(256, $count * 96 + 256));
+            if ((int) ($aiModel->max_tokens ?? 0) > 0) {
+                $maxTokens = min($maxTokens, (int) $aiModel->max_tokens);
+            }
+            $agent = new MarkdownContentWriterAgent(instructions: $systemPrompt, maxTokens: $maxTokens);
+            $response = $agent->prompt(
                 $userPrompt,
                 [],
                 $providerName,

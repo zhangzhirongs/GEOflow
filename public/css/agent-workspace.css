@@ -1,0 +1,43 @@
+:root {
+    color-scheme: light;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #334155;
+    background: #fff;
+}
+* { box-sizing: border-box; }
+body.agent-workspace {
+    margin: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.workspace-bar {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 20px;
+    min-height: 56px;
+    padding: 10px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+}
+.workspace-bar a { color: inherit; text-decoration: none; }
+.workspace-home { display: inline-flex; align-items: center; gap: 8px; min-width: 0; font-size: 14px; font-weight: 650; }
+.workspace-home span { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workspace-home svg { flex-shrink: 0; }
+.workspace-divider { width: 1px; height: 18px; background: #e2e8f0; }
+.workspace-bar h1 { margin: 0; font-size: 14px; font-weight: 500; white-space: nowrap; color: #64748b; }
+.workspace-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; font-size: 13px; white-space: nowrap; }
+.workspace-actions .workspace-back { border: 1px solid #e2e8f0; padding: 7px 12px; border-radius: 6px; }
+.workspace-bar a:hover { color: #2563eb; }
+.workspace-bar a:focus-visible { outline: 2px solid #2563eb; outline-offset: 4px; border-radius: 4px; }
+.workspace-canvas { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
+#agent-config-frame { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+@media (max-width: 640px) {
+    .workspace-bar { gap: 12px; padding: 10px 12px; flex-wrap: wrap; }
+    .workspace-home span { max-width: 140px; }
+    .workspace-actions { gap: 10px; }
+    .workspace-actions .workspace-back { display: none; }
+}
