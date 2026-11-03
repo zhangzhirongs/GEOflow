@@ -139,6 +139,7 @@ class AdminGrowthAiProbeTest extends TestCase
             'answer_excerpt' => '很多团队会先看 Ahrefs 的 GEO 研究。',
             'analysis_json' => [
                 'summary' => 'AI 回答未引用当前公司内容，已提取竞品来源。',
+                'answer_keywords' => ['过时的整句话关键词'],
                 'competitors' => [[
                     'name' => 'Ahrefs',
                     'domain' => 'ahrefs.com',
@@ -158,6 +159,8 @@ class AdminGrowthAiProbeTest extends TestCase
             ->assertSee('Ahrefs')
             ->assertSee('Ahrefs GEO research 2026')
             ->assertSee('research')
+            ->assertSee('data-growth-answer-keywords', false)
+            ->assertDontSee('过时的整句话关键词')
             ->assertSee(__('admin.analytics.overview.probe.channels.doubao_search_custom'));
     }
 

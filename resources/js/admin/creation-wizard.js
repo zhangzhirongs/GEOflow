@@ -25,8 +25,7 @@ function initCreationWizard(root) {
                 node.hidden = true;
                 return;
             }
-            const targetStep = node.querySelector('#task_name, #ai_model_id') ? 0
-                : node.querySelector('[name="publish_scope"]') ? 1 : 2;
+            const targetStep = node.querySelector('#task_name, #ai_model_id') ? 0 : 2;
             source(targetStep).append(node);
         });
     } else {
@@ -114,26 +113,39 @@ function initCreationWizard(root) {
 
     function updatePreview() {
         find('[data-wizard-preview-title]').textContent = topic.value;
-        const text = task
-            ? Array.from(form.querySelectorAll('#title_library_id, #ai_model_id, #article_limit, #publish_interval')).map((field) => {
+        let text = task
+            ? Array.from(form.querySelectorAll('#title_library_id, #ai_model_id')).map((field) => {
                 const label = form.querySelector(`label[for="${field.id}"]`)?.textContent.replace('*', '').trim() || field.id;
                 return `${label}：${field.selectedOptions?.[0]?.textContent.trim() || field.value}`;
             }).join('\n')
             : content();
+        if (task) {
+            const value = (selector) => form.querySelector(selector)?.value;
+            const checked = (selector) => Boolean(form.querySelector(selector)?.checked);
+            const needsReview = checked('#need_review');
+            const followUp = needsReview
+                ? '生成后保存为待人工审核草稿，审核通过并满足内容检查后继续处理。'
+                : `生成后通过内容检查的文章按每 ${value('#publish_interval') || 60} 分钟的频率处理。`;
+            text = [
+                `启动时间：${value('#status') === 'paused' ? '暂停创建，启用后由调度器安排执行。' : '创建后约 1 分钟进入可调度时间，实际开始取决于调度器与队列。'}`,
+                `生成数量：最多 ${value('#article_limit') || 10} 篇；未发布草稿最多保留 ${value('#draft_limit') || 10} 篇，达到草稿池上限时暂停补充。`,
+                `标题用尽：${checked('#is_loop') ? '允许重复使用标题，仍受文章总数上限限制。' : '不循环，不重复使用已用标题。'}`,
+                `后续动作：${followUp}`,
+                '平台发布：生成内容后，在内容管理中安排。',
+                text,
+            ].filter(Boolean).join('\n');
+        }
         find('[data-wizard-preview-content]').textContent = text || '尚未填写正文，请展开下方编辑器填写，或返回生成内容。';
         const tags = find('[data-wizard-preview-tags]');
         tags.replaceChildren();
-        const labels = task
-            ? Array.from(form.querySelectorAll('[data-distribution-channel-input]:checked:not(:disabled)')).map((input) => input.closest('label')?.innerText.trim())
-            : platform?.value ? [platform.selectedOptions[0].textContent] : [];
-        if (task && form.querySelector('[name="publish_scope"]:checked')?.value !== 'distribution_only') labels.unshift('本站');
+        const labels = [`发布渠道：${platform?.value ? platform.selectedOptions[0].textContent.trim() : '未选择（通用写法）'}`];
         labels.filter(Boolean).forEach((label) => {
             const tag = document.createElement('span');
             tag.textContent = label;
             tags.append(tag);
         });
         submit.textContent = task ? '确认创建任务' : form.querySelector('#status')?.value === 'published' ? '确认发布文章' : '确认保存文章';
-        find('[data-wizard-hint]').textContent = task ? '创建后按任务状态、审核要求与分发策略执行' : '文章按所选状态保存，发布仍需通过系统审核与内容检查';
+        find('[data-wizard-hint]').textContent = task ? '请确认启动时间、生成数量及后续动作，再创建任务。' : '文章按所选状态保存，发布仍需通过系统审核与内容检查';
     }
 
     function reveal(field) {

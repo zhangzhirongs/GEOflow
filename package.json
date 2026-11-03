@@ -7,7 +7,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test:analytics": "node --test tests/JavaScript/analytics.test.js"
+        "test:analytics": "node --test tests/JavaScript/analytics.test.js tests/JavaScript/overview-refresh.test.js"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

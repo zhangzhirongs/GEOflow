@@ -63,6 +63,42 @@ class AdminAiConfiguratorWorkbenchTest extends TestCase
         $this->assertStringNotContainsString(route('admin.admin-users.index'), $desktopNav);
     }
 
+    public function test_sidebar_keeps_content_shortcuts_visible_and_collapses_rare_sections(): void
+    {
+        $this->seedWorkbenchCatalog();
+
+        $html = (string) $this->actingAs($this->createAdmin(), 'admin')
+            ->get(route('admin.ai.configurator.content'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString(route('admin.dashboard'), $html);
+        $this->assertStringContainsString(route('admin.ai.configurator'), $html);
+        $this->assertStringContainsString(route('admin.tasks.index'), $html);
+        $this->assertStringContainsString(route('admin.articles.index'), $html);
+        $this->assertStringContainsString(route('admin.manual-publications.index'), $html);
+        $this->assertStringContainsString(route('admin.executor-nodes.index'), $html);
+        $this->assertStringNotContainsString('<details class="nav-group nav-group--collapsible" data-nav-group="1"', $html);
+        $this->assertMatchesRegularExpression('/data-nav-group="2"\s*>/', $html);
+        $this->assertMatchesRegularExpression('/data-nav-group="3"\s*>/', $html);
+        $this->assertMatchesRegularExpression('/data-nav-group="4"\s*>/', $html);
+        $this->assertStringContainsString('aria-current="page"', $html);
+    }
+
+    public function test_sidebar_expands_the_group_containing_the_current_page(): void
+    {
+        $this->seedWorkbenchCatalog();
+
+        $html = (string) $this->actingAs($this->createAdmin(), 'admin')
+            ->get(route('admin.ai-models.index'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertMatchesRegularExpression('/data-nav-group="3"[^>]*\bopen\b[^>]*>/', $html);
+        $this->assertMatchesRegularExpression('/data-nav-group="2"\s*>/', $html);
+        $this->assertMatchesRegularExpression('/data-nav-group="4"\s*>/', $html);
+    }
+
     public function test_agent_framework_is_embedded_for_authenticated_admins(): void
     {
         $this->actingAs($this->createAdmin(), 'admin')

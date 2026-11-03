@@ -30,6 +30,8 @@
         ],
         [
             'title' => __('admin.ai_configurator.groups.assets.title'),
+            'collapsible' => true,
+            'icon' => 'database',
             'items' => [
                 ['label' => __('admin.nav.materials'), 'icon' => 'database', 'route' => 'admin.materials.index', 'match' => ['admin.materials.']],
                 ['label' => __('admin.ai_configurator.groups.assets.knowledge'), 'icon' => 'brain', 'route' => 'admin.knowledge-bases.index', 'match' => ['admin.knowledge-bases.']],
@@ -43,6 +45,8 @@
         ],
         [
             'title' => __('admin.ai_configurator.groups.ai.title'),
+            'collapsible' => true,
+            'icon' => 'sparkles',
             'items' => [
                 ['label' => __('admin.ai_configurator.skills.models.title'), 'icon' => 'cpu', 'route' => 'admin.ai-models.index', 'match' => ['admin.ai-models.']],
                 ['label' => __('admin.ai_configurator.skills.prompts.title'), 'icon' => 'message-square-text', 'route' => 'admin.ai-prompts', 'match' => ['admin.ai-prompts']],
@@ -52,6 +56,8 @@
         ],
         [
             'title' => __('admin.ai_configurator.groups.system.title'),
+            'collapsible' => true,
+            'icon' => 'settings-2',
             'items' => [
                 ['label' => __('admin.nav.site_settings'), 'icon' => 'settings-2', 'route' => 'admin.site-settings.index', 'match' => ['admin.site-settings.']],
                 ['label' => __('admin.nav.security'), 'icon' => 'shield-check', 'route' => 'admin.site-settings.sensitive-words', 'match' => ['admin.site-settings.sensitive-words', 'admin.security-settings.']],
@@ -103,10 +109,20 @@
 
     <nav class="admin-sidebar__nav">
         @foreach ($navSections as $sIdx => $section)
-            <div class="nav-group">
-                @if (!empty($section['title']))
-                    <div class="nav-group-title">{{ $section['title'] }}</div>
-                @endif
+            @php $isActiveGroup = $sIdx === $activeSection; @endphp
+            @if (!empty($section['collapsible']))
+                @php $shouldOpen = $isActiveGroup; @endphp
+                <details class="nav-group nav-group--collapsible" data-nav-group="{{ $sIdx }}" @if($shouldOpen) open @endif>
+                    <summary class="nav-group-title" title="{{ $section['title'] }}">
+                        <span>{{ $section['title'] }}</span>
+                    </summary>
+                    <div class="nav-group-items">
+            @else
+                <div class="nav-group @if($sIdx === 0) nav-group--primary @elseif($sIdx === 1) nav-group--content @endif">
+                    @if (!empty($section['title']))
+                        <div class="nav-group-title">{{ $section['title'] }}</div>
+                    @endif
+            @endif
                 @foreach ($section['items'] as $iIdx => $item)
                     @php $isActive = $sIdx === $activeSection && $iIdx === $activeIndex; @endphp
                     <a href="{{ route($item['route']) }}"
@@ -117,7 +133,12 @@
                         <span class="nav-label">{{ $item['label'] }}</span>
                     </a>
                 @endforeach
-            </div>
+            @if (!empty($section['collapsible']))
+                    </div>
+                </details>
+            @else
+                </div>
+            @endif
         @endforeach
     </nav>
 

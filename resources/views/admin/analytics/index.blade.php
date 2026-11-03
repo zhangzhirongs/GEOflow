@@ -62,12 +62,33 @@
 @endphp
 
 @section('content')
-    <div class="px-4 sm:px-0" data-overview-refresh="30000">
+    <div class="growth-center growth-overview px-4 sm:px-0" data-overview-refresh="30000" data-overview-url="{{ route('admin.analytics') }}">
         @include('admin.analytics._page-header', [
             'title' => __('admin.analytics.overview.title'),
             'subtitle' => __('admin.analytics.overview.subtitle'),
         ])
 
+        <section class="growth-metrics grid grid-cols-1 gap-4 sm:grid-cols-2 {{ count($modules) === 4 ? 'xl:grid-cols-4' : 'xl:grid-cols-3' }}" aria-label="{{ __('admin.analytics.overview.modules_label') }}">
+            @foreach ($modules as $module)
+                <a href="{{ route($module['route']) }}" class="growth-metric" data-growth-metric="{{ $module['key'] }}">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="growth-metric-icon {{ $module['tone'] }}"><i data-lucide="{{ $module['icon'] }}" class="h-5 w-5"></i></span>
+                        <span class="growth-period">{{ $module['period'] }}</span>
+                    </div>
+                    <h2 class="mt-4 text-sm font-medium text-slate-500">{{ __('admin.analytics.pages.'.$module['key'].'.title') }}</h2>
+                    <div class="growth-metric-number">{{ $module['main'] }}</div>
+                    <p class="text-xs text-slate-500">{{ $module['main_label'] }}</p>
+                    <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+                        @foreach ($module['secondary'] as [$label, $value])
+                            <div class="min-w-0"><dt class="truncate text-xs text-slate-500">{{ $label }}</dt><dd class="mt-1 text-lg font-semibold tabular-nums text-slate-800">{{ $value }}</dd></div>
+                        @endforeach
+                    </dl>
+                    <span class="growth-metric-link">{{ __('admin.analytics.overview.view_analysis') }}<i data-lucide="arrow-up-right" class="h-4 w-4"></i></span>
+                </a>
+            @endforeach
+        </section>
+
+        <div data-growth-alert>
         @if ($alert)
             <aside class="mb-6 flex flex-col gap-4 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" data-analytics-priority-alert>
                 <div class="flex items-start gap-3">
@@ -85,44 +106,11 @@
                 </a>
             </aside>
         @endif
+        </div>
 
         @include('admin.analytics._growth-probe')
 
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2" aria-label="{{ __('admin.analytics.overview.modules_label') }}">
-            @foreach ($modules as $module)
-                <article class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div class="flex h-full flex-col">
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex min-w-0 items-center gap-3">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-white {{ $module['tone'] }}">
-                                    <i data-lucide="{{ $module['icon'] }}" class="h-5 w-5"></i>
-                                </span>
-                                <div class="min-w-0">
-                                    <h2 class="truncate text-base font-semibold text-gray-950">{{ __('admin.analytics.pages.'.$module['key'].'.title') }}</h2>
-                                    <p class="mt-0.5 text-xs text-gray-400">{{ $module['period'] }}</p>
-                                </div>
-                            </div>
-                            <div class="shrink-0 text-right">
-                                <p class="font-mono text-2xl font-semibold tabular-nums text-gray-950">{{ $module['main'] }}</p>
-                                <p class="mt-0.5 text-xs font-medium text-gray-500">{{ $module['main_label'] }}</p>
-                            </div>
-                        </div>
-                        <dl class="mt-5 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4">
-                            @foreach ($module['secondary'] as [$label, $value])
-                                <div class="flex items-baseline justify-between gap-2">
-                                    <dt class="truncate text-xs text-gray-500">{{ $label }}</dt>
-                                    <dd class="font-mono text-base font-semibold tabular-nums text-gray-900">{{ $value }}</dd>
-                                </div>
-                            @endforeach
-                        </dl>
-                        <a href="{{ route($module['route']) }}" class="mt-5 inline-flex min-h-10 items-center justify-center self-end rounded-md border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition duration-[120ms] motion-reduce:transition-none hover:border-blue-300 hover:text-blue-700 active:scale-[.98] motion-reduce:active:scale-100">
-                            {{ __('admin.analytics.overview.view_analysis') }}
-                            <i data-lucide="arrow-right" class="ml-2 h-4 w-4"></i>
-                        </a>
-                    </div>
-                </article>
-            @endforeach
-        </section>
+
 
     </div>
 @endsection

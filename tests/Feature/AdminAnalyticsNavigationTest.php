@@ -33,18 +33,24 @@ class AdminAnalyticsNavigationTest extends TestCase
             ->assertSee(route('admin.analytics.distribution'), false)
             ->assertDontSee('data-analytics-log-chart', false)
             ->assertDontSee('data-ai-visibility-series', false)
-            ->assertDontSee('data-analytics-health-grid', false);
+            ->assertDontSee('data-analytics-health-grid', false)
+            ->assertSee('data-overview-url="'.route('admin.analytics').'"', false)
+            ->assertSee('class="growth-heading mb-5"', false);
 
-        $this->assertSame(4, substr_count($response->getContent(), 'lg:col-span-6'));
+        $this->assertSame(4, substr_count($response->getContent(), 'data-growth-metric='));
+        $this->assertSame(1, substr_count($response->getContent(), 'data-growth-alert'));
+        $this->assertLessThan(strpos($response->getContent(), 'id="growth-ai-probe"'), strpos($response->getContent(), 'data-growth-metric='));
         $this->assertStringNotContainsString('lg:col-span-5', $response->getContent());
         $this->assertStringNotContainsString('lg:col-span-7', $response->getContent());
 
         foreach (['content', 'traffic', 'ai-visibility', 'leads', 'distribution'] as $page) {
-            $this->get(route("admin.analytics.{$page}"))->assertOk();
+            $this->get(route("admin.analytics.{$page}"))->assertOk()
+                ->assertSee('class="growth-center px-4 sm:px-0"', false)
+                ->assertSee('class="growth-heading mb-5"', false);
         }
     }
 
-    public function test_overview_shows_five_core_metrics_and_only_the_highest_priority_alert(): void
+    public function test_overview_shows_business_metrics_and_only_the_highest_priority_alert(): void
     {
         Carbon::setTestNow('2026-08-02 12:00:00');
         $form = LeadForm::query()->create([
@@ -75,11 +81,10 @@ class AdminAnalyticsNavigationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee(__('admin.analytics.overview.metrics.today_visits'))
-            ->assertSee(__('admin.analytics.overview.metrics.published_7d'))
-            ->assertSee(__('admin.analytics.overview.metrics.brand_visibility_60d'))
-            ->assertSee(__('admin.analytics.overview.metrics.new_leads'))
-            ->assertSee(__('admin.analytics.overview.metrics.pending_followups'))
+            ->assertSee(__('admin.analytics.overview.cards.content.main'))
+            ->assertSee(__('admin.analytics.overview.cards.ai_visibility.main'))
+            ->assertSee(__('admin.analytics.overview.cards.leads.main'))
+            ->assertSee(__('admin.analytics.overview.cards.distribution.main'))
             ->assertSee(__('admin.analytics.overview.alerts.new_leads.title', ['count' => 1]))
             ->assertDontSee(__('admin.analytics.overview.alerts.ai_unconfigured.title'));
 
@@ -91,13 +96,13 @@ class AdminAnalyticsNavigationTest extends TestCase
         $response = $this->actingAs($this->admin(), 'admin')
             ->get(route('admin.analytics.content'));
 
-        $response
-            ->assertOk()
-            ->assertDontSee('data-analytics-health-grid', false)
-            ->assertDontSee(__('admin.dashboard.task_health'))
-            ->assertDontSee(__('admin.dashboard.material_health'))
-            ->assertDontSee(__('admin.dashboard.ai_health'))
-            ->assertDontSee(__('admin.dashboard.url_import_health'));
+        $response->assertOk()->assertDontSee('data-analytics-health-grid', false);
+
+        // Sidebar links can share labels with dashboard cards; inspect the report itself.
+        $this->assertSame(1, preg_match('/<main\b[^>]*>(.*?)<\/main>/s', $response->getContent(), $main));
+        foreach (['task_health', 'material_health', 'ai_health', 'url_import_health'] as $key) {
+            $this->assertStringNotContainsString(__('admin.dashboard.'.$key), $main[1]);
+        }
     }
 
     public function test_regular_admin_can_open_business_reports_but_cannot_open_distribution_report(): void

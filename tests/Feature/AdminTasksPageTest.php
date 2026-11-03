@@ -87,6 +87,53 @@ class AdminTasksPageTest extends TestCase
         $this->assertSame('xiaohongshu', (string) $task->target_platform);
     }
 
+    public function test_task_creation_has_one_submit_and_safe_defaults(): void
+    {
+        $admin = $this->createTaskFormAdmin('task_safe_defaults');
+        $this->createTaskFormDependencies();
+        $html = $this->actingAs($admin, 'admin')->get(route('admin.tasks.create'))
+            ->assertOk()->getContent();
+
+        preg_match('/<form[^>]*action="'.preg_quote(route('admin.tasks.store'), '/').'"[^>]*>(.*?)<\/form>/s', $html, $matches);
+        $this->assertSame(1, preg_match_all('/<button[^>]*type="submit"/', $matches[1]));
+        $this->assertMatchesRegularExpression('/id="need_review"[^>]*checked/', $html);
+        $this->assertDoesNotMatchRegularExpression('/id="is_loop"[^>]*checked/', $html);
+        $this->assertStringContainsString('选择发布渠道（单选）', $html);
+        $this->assertStringContainsString('选择其他平台会替换当前选择', $html);
+        $this->assertStringContainsString('<input type="hidden" name="publish_scope" value="local_only">', $matches[1]);
+        $this->assertDoesNotMatchRegularExpression('/<input[^>]*name="distribution_channel_ids\[\]"/', $matches[1]);
+        $this->assertDoesNotMatchRegularExpression('/<input[^>]*type="radio"[^>]*name="publish_scope"/', $matches[1]);
+        $this->assertStringNotContainsString(__('admin.task_create.section.distribution_title'), $matches[1]);
+    }
+
+    public function test_task_creation_restores_explicit_review_and_loop_choices(): void
+    {
+        $admin = $this->createTaskFormAdmin('task_restored_choices');
+        $this->createTaskFormDependencies();
+        $html = $this->actingAs($admin, 'admin')
+            ->withSession(['_old_input' => ['need_review' => '0', 'is_loop' => '1']])
+            ->get(route('admin.tasks.create'))->assertOk()->getContent();
+
+        $this->assertDoesNotMatchRegularExpression('/id="need_review"[^>]*checked/', $html);
+        $this->assertMatchesRegularExpression('/id="is_loop"[^>]*checked/', $html);
+    }
+
+    public function test_task_review_and_loop_choices_are_saved(): void
+    {
+        $admin = $this->createTaskFormAdmin('task_saved_choices');
+        $dependencies = $this->createTaskFormDependencies();
+        foreach ([[1, 0], [0, 1]] as [$review, $loop]) {
+            $name = 'Task choices '.$review.'-'.$loop;
+            $this->actingAs($admin, 'admin')->post(route('admin.tasks.store'),
+                $this->validTaskPayload($dependencies, [
+                    'task_name' => $name, 'need_review' => $review, 'is_loop' => $loop,
+                ]))->assertRedirect(route('admin.tasks.index'))->assertSessionHasNoErrors();
+            $task = Task::query()->where('name', $name)->firstOrFail();
+            $this->assertSame($review, (int) $task->need_review);
+            $this->assertSame($loop, (int) $task->is_loop);
+        }
+    }
+
     public function test_task_create_and_edit_forms_use_full_admin_content_width(): void
     {
         $admin = Admin::query()->create([
@@ -152,14 +199,16 @@ class AdminTasksPageTest extends TestCase
             'status' => 'active',
         ]);
 
-        $this->actingAs($admin, 'admin')
+        $task = Task::query()->create(['name' => 'Existing task', 'status' => 'paused', 'draft_limit' => 5, 'article_limit' => 10, 'publish_interval' => 3600]);
+
+        $response = $this->actingAs($admin, 'admin')
             ->withSession([
                 '_old_input' => [
                     'publish_scope' => 'local_only',
                     'distribution_channel_ids' => ['1'],
                 ],
             ])
-            ->get(route('admin.tasks.create'))
+            ->get(route('admin.tasks.edit', ['taskId' => $task->id]))
             ->assertOk()
             ->assertSee('data-publish-scope-option', false)
             ->assertSee('data-distribution-channel-card', false)
@@ -168,8 +217,12 @@ class AdminTasksPageTest extends TestCase
             ->assertSee('syncDistributionChannelsByScope', false)
             ->assertSee('disabled data-distribution-channel-input', false)
             ->assertSee('disabled data-distribution-strategy-input', false)
-            ->assertSee('data-distribution-channel-count', false)
-            ->assertDontSee('value="1" checked', false);
+            ->assertSee('data-distribution-channel-count', false);
+
+        $this->assertDoesNotMatchRegularExpression(
+            '/<input\b(?=[^>]*data-distribution-channel-input)(?=[^>]*\bchecked\b)[^>]*>/',
+            $response->getContent()
+        );
     }
 
     public function test_task_form_collapses_distribution_channels_after_two_rows(): void
@@ -196,8 +249,10 @@ class AdminTasksPageTest extends TestCase
             ]);
         }
 
+        $task = Task::query()->create(['name' => 'Existing task', 'status' => 'paused', 'draft_limit' => 5, 'article_limit' => 10, 'publish_interval' => 3600]);
+
         $response = $this->actingAs($admin, 'admin')
-            ->get(route('admin.tasks.create'))
+            ->get(route('admin.tasks.edit', ['taskId' => $task->id]))
             ->assertOk()
             ->assertSee(__('admin.task_create.button.distribution_channel_expand_more', ['count' => 2]))
             ->assertSee(__('admin.task_create.button.distribution_channel_select_all'))

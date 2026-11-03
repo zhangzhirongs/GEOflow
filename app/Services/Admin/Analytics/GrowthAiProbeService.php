@@ -170,9 +170,11 @@ class GrowthAiProbeService
 
         $groups = [
             'AI分析｜自有内容关键词' => collect((array) ($analysis['owned_keywords'] ?? []))
+                ->filter(fn (mixed $item): bool => is_array($item) && ($item['in_answer'] ?? false))
                 ->map(fn (mixed $item): string => is_array($item) ? trim((string) ($item['term'] ?? '')) : trim((string) $item)),
             'AI分析｜回答关键词' => collect((array) ($analysis['answer_keywords'] ?? []))
                 ->map(fn (mixed $item): string => is_array($item) ? trim((string) ($item['term'] ?? '')) : trim((string) $item)),
+            'AI分析｜引用关键词' => collect((array) ($analysis['source_keywords'] ?? [])),
         ];
 
         foreach ($groups as $name => $terms) {
@@ -240,11 +242,22 @@ class GrowthAiProbeService
         foreach ($results as &$result) {
             $result['analysis'] = $this->safeAnalysis((array) ($result['analysis'] ?? []));
             $result['sources'] = $this->safeSources((array) ($result['sources'] ?? []));
+            if (($result['status'] ?? '') === AiVisibilityRun::STATUS_COMPLETED
+                && ($result['analysis']['keyword_extraction_version'] ?? 0) < 2) {
+                $result['analysis'] = $this->analyzer->refreshKeywords(
+                    $result['analysis'], $probe->question, (string) ($result['answer_text'] ?? ''), $result['sources']
+                );
+            }
         }
         unset($result);
         $preferred = collect($results)->firstWhere('uuid', $probe->visibilityRun?->uuid)
             ?? collect($results)->firstWhere('status', AiVisibilityRun::STATUS_COMPLETED)
             ?? [];
+        foreach (['answer_keywords', 'source_keywords', 'competitors', 'keyword_extraction_version'] as $key) {
+            if (array_key_exists($key, $preferred['analysis'] ?? [])) {
+                $analysis[$key] = $preferred['analysis'][$key];
+            }
+        }
         $analysis['results'] = $results;
 
         return [

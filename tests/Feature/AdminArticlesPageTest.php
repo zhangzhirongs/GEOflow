@@ -149,6 +149,8 @@ class AdminArticlesPageTest extends TestCase
             ->assertSee('data-creation-wizard data-kind="article"', false)
             ->assertSee('data-wizard-manual', false)
             ->assertSee('data-wizard-step="2"', false)
+            ->assertSee('选择发布渠道（单选）')
+            ->assertSee('选择其他平台会替换当前选择')
             ->assertSeeInOrder([
                 __('admin.article_create.section.content_title'),
                 __('admin.articles.quality_scorecard.title'),

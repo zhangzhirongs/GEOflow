@@ -18,6 +18,33 @@ class GrowthAiMentionAnalyzerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_it_keeps_brand_and_product_vocabulary_without_adding_question_only_terms(): void
+    {
+        config()->set('geoflow.site_name', '苍石科技');
+        $library = \App\Models\KeywordLibrary::query()->create(['name' => '品牌与产品']);
+        foreach (['自在科技', '自在云营销系统'] as $keyword) {
+            \App\Models\Keyword::query()->create(['library_id' => $library->id, 'keyword' => $keyword]);
+        }
+        $run = $this->completedRun('苍石科技推荐自在科技的自在云营销系统，能够提升品牌曝光。', []);
+        $analysis = app(GrowthAiMentionAnalyzer::class)->analyze('自在科技与不存在产品有哪些区别？', $run);
+        foreach (['苍石科技', '自在科技', '自在云营销系统', '品牌曝光'] as $term) {
+            $this->assertContains($term, $analysis['answer_keywords']);
+        }
+        $this->assertNotContains('不存在产品', $analysis['answer_keywords']);
+    }
+
+    public function test_source_only_terms_are_kept_separate_from_answer_terms(): void
+    {
+        $run = $this->completedRun('', [[
+            'title' => 'Ahrefs 产品研究', 'snippet' => '生成式引擎优化能够提升品牌曝光。',
+            'domain' => 'ahrefs.com', 'site_name' => 'Ahrefs', 'url' => 'https://ahrefs.com/blog/research', 'rank' => 1,
+        ]]);
+        $analysis = app(GrowthAiMentionAnalyzer::class)->analyze('有哪些 GEO 产品？', $run);
+        $this->assertSame([], $analysis['answer_keywords']);
+        $this->assertContains('Ahrefs', $analysis['source_keywords']);
+        $this->assertContains('生成式引擎优化', $analysis['source_keywords']);
+    }
+
     public function test_it_extracts_keywords_when_owned_articles_are_mentioned(): void
     {
         config()->set('geoflow.site_name', 'GEOFlow');

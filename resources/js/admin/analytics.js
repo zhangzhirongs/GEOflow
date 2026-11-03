@@ -1,3 +1,5 @@
+import { initializeOverviewRefresh } from './overview-refresh.js';
+
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 
 export const nearestTrendPointIndex = (clientX, bounds, viewBox, pointXs) => {
@@ -270,6 +272,7 @@ const initializeAnalyticsFilterForm = (form) => {
 };
 
 if (typeof document !== 'undefined') {
+    document.querySelectorAll('[data-overview-refresh]').forEach(initializeOverviewRefresh);
     document.querySelectorAll('[data-analytics-log-chart]').forEach(initializeLogChart);
     document.querySelectorAll('[data-analytics-trend]').forEach(initializeTrendChart);
     document.querySelectorAll('[data-analytics-filter-form], [data-analytics-auto-submit]').forEach(initializeAnalyticsFilterForm);

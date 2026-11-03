@@ -1,11 +1,12 @@
 <section id="growth-ai-probe" class="mb-6 rounded-lg border border-gray-200 bg-white shadow-sm" data-growth-probe>
-    <div class="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <div class="growth-probe-heading flex flex-col gap-3 border-b border-gray-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div class="flex items-center gap-3">
             <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-violet-50 text-violet-600">
                 <i data-lucide="message-circle-question" class="h-4.5 w-4.5"></i>
             </span>
             <div>
                 <h2 class="text-base font-semibold text-gray-950">{{ __('admin.analytics.overview.probe.title') }}</h2>
+                <p class="mt-1">{{ __('admin.analytics.overview.probe.subtitle') }}</p>
             </div>
         </div>
         @if (! $growthProbeConfigured)
@@ -20,22 +21,24 @@
         @endif
     </div>
 
-    <div class="px-5 py-4 sm:px-6">
+    <div class="growth-composer">
         @if (! $growthProbeConfigured)
             <p class="rounded-md border border-amber-100 bg-amber-50 px-3 py-2 text-sm text-amber-800">{{ __('admin.analytics.overview.probe.unconfigured') }}</p>
         @endif
 
         <form method="POST" action="{{ route('admin.analytics.ai-probes.store') }}" class="space-y-3">
             @csrf
-            <div class="flex flex-col gap-3 lg:flex-row lg:items-start">
+            <div>
                 <div class="flex-1">
                     <label for="growth-probe-question" class="mb-1 block text-xs font-medium text-gray-500">{{ __('admin.analytics.overview.probe.question_label') }}</label>
-                    <textarea id="growth-probe-question" name="question" rows="2" maxlength="2000" @disabled(! $growthProbeConfigured) class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="{{ __('admin.analytics.overview.probe.placeholder') }}">{{ old('question') }}</textarea>
+                    <textarea id="growth-probe-question" name="question" rows="3" required maxlength="2000" @disabled(! $growthProbeConfigured) class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="{{ __('admin.analytics.overview.probe.placeholder') }}">{{ old('question') }}</textarea>
                     @error('question')
                         <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
                     @enderror
                 </div>
-                <div class="flex shrink-0 items-end gap-2 lg:w-80">
+                <div class="growth-composer-actions">
+                    <p class="growth-composer-note">{{ __('growth.keyword_help') }}</p>
+                    <div class="flex w-full items-end gap-3 sm:w-auto sm:min-w-80">
                     <div class="flex-1">
                         <label for="growth-probe-provider" class="mb-1 block text-xs font-medium text-gray-500">{{ __('admin.analytics.overview.probe.model_label') }}</label>
                         <select id="growth-probe-provider" name="provider_type" @disabled(! $growthProbeConfigured) class="block min-h-10 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -49,14 +52,18 @@
                             <p class="mt-1 text-sm text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
-                    <button type="submit" @disabled(! $growthProbeConfigured) class="inline-flex min-h-10 items-center rounded-md bg-blue-600 px-4 text-sm font-semibold text-white transition duration-[120ms] hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300">
+                    <button type="submit" @disabled(! $growthProbeConfigured) class="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition duration-[120ms] hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300">
+                        <i data-lucide="sparkles" class="h-4 w-4" aria-hidden="true"></i>
                         {{ __('admin.analytics.overview.probe.submit') }}
                     </button>
+                    </div>
                 </div>
             </div>
         </form>
 
-        <form method="POST" action="{{ route('admin.analytics.ai-probes.schedule.update') }}" class="mt-4 rounded-md border border-gray-100 bg-gray-50 p-3" data-growth-probe-schedule>
+        <details class="growth-schedule" @if($growthAiSchedule['enabled'] ?? false) open @endif>
+            <summary>{{ __('growth.schedule_title') }} · {{ ($growthAiSchedule['enabled'] ?? false) ? __('growth.enabled') : __('growth.disabled') }}</summary>
+        <form method="POST" action="{{ route('admin.analytics.ai-probes.schedule.update') }}" class="mt-3 rounded-xl border border-gray-100 bg-gray-50 p-4" data-growth-probe-schedule>
             @csrf
             <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <label class="flex shrink-0 items-center gap-2 text-sm font-medium text-gray-700"><input type="checkbox" name="enabled" value="1" @checked(($growthAiSchedule['enabled'] ?? false)) class="h-4 w-4 rounded border-gray-300 text-blue-600"> 自动定时提问</label>
@@ -67,8 +74,10 @@
             </div>
             <p class="mt-2 text-xs text-gray-400">按分钟为周期自动提问，结果保留在本页。</p>
         </form>
+        </details>
     </div>
 
+    <div class="growth-history-heading"><h3>{{ __('growth.recent_title') }}</h3><span>{{ __('growth.recent_count', ['count' => $growthProbes->count()]) }}</span></div>
     <div class="space-y-4 px-5 pb-5 sm:px-6" data-growth-probe-list>
         @forelse ($growthProbes as $probe)
             @php
@@ -83,9 +92,9 @@
                 $competitors = $analysis['competitors'] ?? [];
             @endphp
             <article class="rounded-md border border-gray-200 bg-gray-50 p-4" data-growth-probe-item data-probe-uuid="{{ $probe->uuid }}" data-probe-status="{{ $probe->status }}">
-                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div class="growth-result-heading flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div class="min-w-0">
-                        <p class="truncate text-sm font-semibold text-gray-950">{{ $probe->question }}</p>
+                        <p class="growth-result-question text-sm font-semibold text-gray-950">{{ $probe->question }}</p>
                         <p class="mt-1 text-xs text-gray-500">{{ $probe->created_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') }} · {{ $probe->providerLabel() }}</p>
                     </div>
                     <span @class([
@@ -112,15 +121,33 @@
                     <p class="mt-3 text-sm text-amber-800">{{ __('admin.analytics.overview.probe.pending') }}</p>
                 @else
                     <p class="mt-3 line-clamp-3 text-sm leading-6 text-gray-700">{{ $analysis['summary'] ?? $answerText }}</p>
+                    <div class="growth-keyword-grid">
+                    <div class="growth-keyword-panel">
+                        <h3>{{ __('growth.answer_keywords') }}</h3>
+                        <div class="growth-keywords" data-growth-answer-keywords>
+                            @forelse (($analysis['answer_keywords'] ?? []) as $term)
+                                <span>{{ $term }}</span>
+                            @empty
+                                <p class="text-xs text-slate-500">{{ __('admin.analytics.overview.probe.no_keywords') }}</p>
+                            @endforelse
+                        </div>
+                    </div>
+                    @if (! empty($analysis['source_keywords']))
+                        <div class="growth-keyword-panel growth-keyword-panel--sources">
+                            <h3>{{ __('growth.source_keywords') }}</h3>
+                            <div class="growth-keywords">@foreach ($analysis['source_keywords'] as $term)<span>{{ $term }}</span>@endforeach</div>
+                        </div>
+                    @endif
+                    </div>
                     @if ($answerText)
-                        <details class="mt-2">
+                        <details class="growth-answer mt-2">
                             <summary class="cursor-pointer text-xs font-semibold text-gray-500 hover:text-gray-700">{{ __('admin.analytics.overview.probe.answer') }}</summary>
                             <p class="mt-2 max-h-72 overflow-y-auto whitespace-pre-wrap rounded-md bg-white p-3 text-sm leading-6 text-gray-600">{{ $answerText }}</p>
                         </details>
                     @endif
 
                     @if ($results !== [])
-                        <div class="mt-3">
+                        <div class="growth-platform-results mt-3">
                             <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('admin.analytics.overview.probe.platform_results') }}</h3>
                             <div class="space-y-2">
                             @foreach ($results as $result)
@@ -128,6 +155,9 @@
                                 <details class="rounded-md border border-gray-200 bg-white">
                                     <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-semibold text-gray-900"><span>{{ $result['provider_label'] ?? $result['provider_type'] ?? __('admin.analytics.overview.probe.unknown_platform') }}</span><span class="text-xs font-medium text-gray-500">{{ __('admin.analytics.overview.probe.status.'.($result['status'] ?? 'failed')) }}</span></summary>
                                     <div class="border-t border-gray-100 px-3 py-2">
+                                    @if (! empty($result['analysis']['answer_keywords']))
+                                        <div class="growth-keywords my-2">@foreach ($result['analysis']['answer_keywords'] as $term)<span>{{ $term }}</span>@endforeach</div>
+                                    @endif
                                     @if (! empty($result['error_message']))<p class="rounded bg-rose-50 px-2 py-1.5 text-sm text-rose-700">{{ $result['error_message'] }}</p>@endif
                                     @if (! empty($result['answer_text']))<p class="mt-2 max-h-72 overflow-y-auto whitespace-pre-wrap text-sm leading-6 text-gray-700">{{ $result['answer_text'] }}</p>@endif
                                     @if ($resultSources !== [])<div class="mt-2 border-t border-gray-100 pt-2"><h4 class="text-xs font-semibold text-gray-500">{{ __('admin.analytics.overview.probe.sources') }}</h4><ul class="mt-1.5 space-y-1.5">@foreach ($resultSources as $source)<li class="text-sm">@if (! empty($source['url']))<a href="{{ $source['url'] }}" target="_blank" rel="noopener noreferrer" class="font-medium text-blue-600 hover:underline">{{ $source['title'] ?? $source['url'] }}</a>@else<span class="font-medium text-gray-800">{{ $source['title'] ?? __('admin.analytics.overview.probe.untitled_source') }}</span>@endif <span class="ml-1 text-xs text-gray-500">{{ $source['site_name'] ?? $source['domain'] ?? '' }}{{ ! empty($source['citation_key']) ? ' · '.$source['citation_key'] : '' }}</span>@if (! empty($source['snippet']))<p class="mt-0.5 text-xs leading-5 text-gray-500">{{ $source['snippet'] }}</p>@endif</li>@endforeach</ul></div>@endif
@@ -226,70 +256,7 @@
                 @endif
             </article>
         @empty
-            <p class="rounded-md bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">{{ __('admin.analytics.overview.probe.empty') }}</p>
+            <div class="growth-empty"><i data-lucide="messages-square" class="h-7 w-7" aria-hidden="true"></i><p>{{ __('admin.analytics.overview.probe.empty') }}</p></div>
         @endforelse
     </div>
 </section>
-
-@if ($growthProbes->contains(fn ($probe) => $probe->isPending()))
-    @push('scripts')
-        <script>
-            (() => {
-                const endpoints = {
-                    @foreach ($growthProbes->filter(fn ($probe) => $probe->isPending()) as $pendingProbe)
-                        @json($pendingProbe->uuid): @json(route('admin.analytics.ai-probes.show', $pendingProbe)),
-                    @endforeach
-                };
-                const poll = async () => {
-                    for (const url of Object.values(endpoints)) {
-                        try {
-                            const response = await fetch(url, {
-                                headers: { 'Accept': 'application/json' },
-                                credentials: 'same-origin',
-                            });
-                            if (!response.ok) continue;
-                            const payload = await response.json();
-                            if (payload.status !== 'queued' && payload.status !== 'running') {
-                                window.location.reload();
-                                return;
-                            }
-                        } catch (error) {}
-                    }
-                    window.setTimeout(poll, 4000);
-                };
-                window.setTimeout(poll, 4000);
-            })();
-        </script>
-    @endpush
-@endif
-
-@push('scripts')
-    <script>
-        (() => {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('probe')) {
-                document.getElementById('growth-ai-probe')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
-            const root = document.querySelector('[data-overview-refresh]');
-            if (!root) return;
-            const interval = Math.max(5000, Number(root.getAttribute('data-overview-refresh') || 30000));
-            const question = document.getElementById('growth-probe-question');
-            const schedule = document.querySelector('[data-growth-probe-schedule]');
-            const shouldSkip = () => {
-                if (document.hidden) return true;
-                if (question && (document.activeElement === question || question.value !== question.defaultValue)) return true;
-                if (schedule && [...schedule.elements].some((field) => field.name && field.value !== field.defaultValue)) return true;
-                return Boolean(document.querySelector('[data-probe-status="queued"], [data-probe-status="running"]'));
-            };
-            const tick = () => {
-                if (!shouldSkip()) {
-                    window.location.reload();
-                    return;
-                }
-                window.setTimeout(tick, interval);
-            };
-            window.setTimeout(tick, interval);
-        })();
-    </script>
-@endpush

@@ -6,7 +6,7 @@
 @endphp
 
 @section('content')
-    <div class="px-4 sm:px-0">
+    <div class="growth-center px-4 sm:px-0">
         @include('admin.analytics._page-header', [
             'title' => __('admin.analytics.pages.leads.title'),
             'subtitle' => __('admin.analytics.pages.leads.subtitle'),

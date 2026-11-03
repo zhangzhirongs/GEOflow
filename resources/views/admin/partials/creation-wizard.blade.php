@@ -4,7 +4,7 @@
         <span class="creation-kind">{{ $kind === 'task' ? '创建任务' : '创建文章' }}</span>
     </header>
     <nav class="creation-steps" aria-label="创建进度">
-        @foreach (['想写什么', '给谁看', '确认发布'] as $label)
+        @foreach (['想写什么', '给谁看', $kind === 'task' ? '确认任务' : '确认保存'] as $label)
             <span data-wizard-indicator><span data-wizard-number>{{ $loop->iteration }}</span><span>{{ $label }}</span></span>
         @endforeach
     </nav>
@@ -26,10 +26,9 @@
         @endif
     </section>
     <section data-wizard-step="1" class="creation-body" hidden>
-        <h2 class="creation-label">想发到哪些平台？</h2>
-        <p class="creation-help">{{ $kind === 'task' ? '可多选分发渠道，按所选策略执行任务。' : '选择内容适配平台，保存文章后可继续安排分发。' }}</p>
+        <h2 class="creation-label">选择发布渠道（单选）</h2>
+        <p class="creation-help">按所选平台适配文章内容，选择其他平台会替换当前选择。不选则使用通用写法，生成后可在内容管理中安排平台发布。</p>
         <div data-wizard-platforms class="creation-platforms"></div>
-        <div data-wizard-source="1" class="creation-settings"></div>
         <h2 class="creation-label creation-tone-heading">希望文章是什么感觉？</h2>
         <p class="creation-help">选择已有写作模板，生成时应用对应风格。</p>
         <div data-wizard-tones class="creation-tones"></div>
@@ -54,6 +53,6 @@
             <button type="button" data-wizard-next>下一步</button>
             <button type="submit" data-wizard-submit hidden>{{ $kind === 'task' ? '确认创建任务' : '确认保存文章' }}</button>
         </div>
-        <p data-wizard-hint class="creation-help">写好后会先给你预览，确认满意才会提交</p>
+        <p data-wizard-hint class="creation-help">{{ $kind === 'task' ? '最后一步确认启动时间、生成数量及后续动作后再创建任务' : '写好后会先给你预览，确认满意才会提交' }}</p>
     </footer>
 </div>

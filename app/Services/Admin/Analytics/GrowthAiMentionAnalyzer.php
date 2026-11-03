@@ -6,12 +6,15 @@ use App\Models\AiGrowthProbe;
 use App\Models\AiVisibilityRun;
 use App\Models\AiVisibilitySource;
 use App\Models\Article;
+use App\Models\Keyword;
 use App\Models\SocialPublication;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class GrowthAiMentionAnalyzer
 {
+    public function __construct(private readonly GrowthKeywordExtractor $keywords) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -29,14 +32,16 @@ class GrowthAiMentionAnalyzer
         $ownedContentMentioned = $ownedArticles !== [] || $ownedPosts !== [];
 
         $ownedKeywords = $this->collectOwnedKeywords($ownedArticles, $ownedPosts, $answerText);
+        $vocabulary = $this->keywordVocabulary($question, $brandAliases, $sources, $ownedKeywords);
         $competitors = $ownedContentMentioned
             ? []
-            : $this->extractCompetitors($sources, $answerText, $ownedHosts, $brandAliases);
+            : $this->extractCompetitors($sources, $answerText, $ownedHosts, $brandAliases, $vocabulary);
 
         $verdict = $this->verdict($ownedContentMentioned, $brandMentioned, $competitors !== []);
 
         return [
             'question' => trim($question),
+            'keyword_extraction_version' => 2,
             'verdict' => $verdict,
             'brand_mentioned' => $brandMentioned,
             'owned_content_mentioned' => $ownedContentMentioned,
@@ -44,7 +49,10 @@ class GrowthAiMentionAnalyzer
             'owned_posts' => $ownedPosts,
             'owned_keywords' => $ownedKeywords,
             'competitors' => $competitors,
-            'answer_keywords' => $this->extractTerms($answerText, $brandAliases),
+            'answer_keywords' => $this->keywords->extract($answerText, $vocabulary),
+            'source_keywords' => $this->keywords->extract(implode("\n", array_map(
+                fn (array $source): string => ($source['title'] ?? '').' '.($source['snippet'] ?? ''), $sources
+            )), $vocabulary),
             'source_count' => count($sources),
             'sources' => $sources,
             'provider_type' => (string) $run->provider_type,
@@ -296,7 +304,7 @@ class GrowthAiMentionAnalyzer
      * @param  list<string>  $brandAliases
      * @return list<array<string, mixed>>
      */
-    private function extractCompetitors(array $sources, string $answerText, array $ownedHosts, array $brandAliases): array
+    private function extractCompetitors(array $sources, string $answerText, array $ownedHosts, array $brandAliases, array $vocabulary): array
     {
         $groups = [];
         foreach ($sources as $source) {
@@ -335,7 +343,7 @@ class GrowthAiMentionAnalyzer
             $text = trim($title.' '.(string) ($source['snippet'] ?? ''));
             $groups[$key]['keywords'] = array_values(array_unique(array_merge(
                 $groups[$key]['keywords'],
-                $this->extractTerms($text, $brandAliases),
+                $this->keywords->extract($text, $vocabulary),
             )));
         }
 
@@ -352,7 +360,7 @@ class GrowthAiMentionAnalyzer
                 'name' => $company,
                 'domain' => '',
                 'posts' => [],
-                'keywords' => $this->extractTerms($answerText, array_merge($brandAliases, [$company])),
+                'keywords' => $this->keywords->extract($this->companyContext($answerText, $company), $vocabulary),
             ];
         }
 
@@ -542,43 +550,50 @@ class GrowthAiMentionAnalyzer
         return array_values($names);
     }
 
-    /**
-     * @param  list<string>  $brandAliases
-     * @return list<string>
-     */
-    private function extractTerms(string $text, array $brandAliases): array
+    /** @return list<string> */
+    private function keywordVocabulary(string $question, array $brandAliases, array $sources, array $ownedKeywords): array
     {
-        $stopWords = [
-            'the', 'and', 'for', 'with', 'from', 'that', 'this', 'are', 'was', 'http', 'https', 'www', 'com', 'html',
-            '以及', '对应', '这个', '相关', '可以', '进行', '通过', '一个', '一些', '包括', '结果', '信息', '数据', '内容', '分析', '回答',
-        ];
-        $brandAliasSet = collect($brandAliases)->map(fn (string $alias): string => Str::lower($alias))->all();
+        $saved = once(fn (): array => Schema::hasTable('keywords') && Schema::hasTable('keyword_libraries')
+            ? Keyword::query()->whereHas('library', fn ($query) => $query->where('name', 'not like', 'AI分析｜%'))
+                ->orderByDesc('id')->limit(1000)->pluck('keyword')->all()
+            : []);
 
-        preg_match_all('/[A-Za-z][A-Za-z0-9_+-]{1,}|[\x{4e00}-\x{9fff}]{2,8}/u', $text, $matches);
-        $terms = $matches[0] ?? [];
+        return array_values(array_unique(array_merge(
+            $brandAliases, array_column($ownedKeywords, 'term'), array_column($sources, 'site_name'),
+            $saved, $this->keywords->extract($question),
+        )));
+    }
 
-        return collect($terms)
-            ->map(fn (string $term): string => trim($term))
-            ->filter(function (string $term) use ($stopWords, $brandAliasSet): bool {
-                if ($term === '' || in_array(Str::lower($term), $stopWords, true) || in_array($term, $stopWords, true)) {
-                    return false;
+    public function refreshKeywords(array $analysis, string $question, string $answer, array $sources): array
+    {
+        $vocabulary = $this->keywordVocabulary($question, $this->brandAliases(), $sources, (array) ($analysis['owned_keywords'] ?? []));
+        $analysis['answer_keywords'] = $this->keywords->extract($answer, $vocabulary);
+        $analysis['source_keywords'] = $this->keywords->extract(implode("\n", array_map(
+            fn (array $source): string => ($source['title'] ?? '').' '.($source['snippet'] ?? ''), $sources
+        )), $vocabulary);
+        foreach ($analysis['competitors'] ?? [] as $index => $competitor) {
+            $text = implode("\n", array_column((array) ($competitor['posts'] ?? []), 'title'));
+            foreach ($sources as $source) {
+                if (($competitor['domain'] ?? '') !== '' && ($source['domain'] ?? '') === $competitor['domain']) {
+                    $text .= "\n".($source['title'] ?? '').' '.($source['snippet'] ?? '');
                 }
-                if (mb_strlen($term) > 12) {
-                    return false;
-                }
-                foreach ($brandAliasSet as $alias) {
-                    if ($alias !== '' && Str::lower($term) === $alias) {
-                        return false;
-                    }
-                }
+            }
+            $analysis['competitors'][$index]['keywords'] = $this->keywords->extract(
+                trim($text) ?: $this->companyContext($answer, (string) ($competitor['name'] ?? '')), $vocabulary
+            );
+        }
+        $analysis['keyword_extraction_version'] = 2;
 
-                return true;
-            })
-            ->countBy(fn (string $term): string => Str::lower($term))
-            ->sortDesc()
-            ->keys()
-            ->take(12)
-            ->values()
-            ->all();
+        return $analysis;
+    }
+
+    private function companyContext(string $answer, string $company): string
+    {
+        if ($company === '') {
+            return '';
+        }
+
+        return implode("\n", array_filter(preg_split('/[。！？\n]+/u', $answer) ?: [],
+            fn (string $sentence): bool => mb_stripos($sentence, $company) !== false));
     }
 }
