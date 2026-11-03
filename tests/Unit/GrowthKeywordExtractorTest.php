@@ -7,6 +7,40 @@ use PHPUnit\Framework\TestCase;
 
 class GrowthKeywordExtractorTest extends TestCase
 {
+    public function test_it_separates_brand_and_mixed_product_names_from_narrative(): void
+    {
+        $terms = (new GrowthKeywordExtractor)->extract('苍石科技是一家专注智能营销的公司，推出AI营销助手，帮助企业提升品牌曝光。');
+        foreach (['苍石科技', '智能营销', 'AI营销助手', '品牌曝光'] as $term) {
+            $this->assertContains($term, $terms);
+        }
+        foreach (['苍石科技是一家', '推出AI', '营销助手', '帮助企业', '公司'] as $term) {
+            $this->assertNotContains($term, $terms);
+        }
+    }
+
+    public function test_longest_matching_product_wins_over_overlapping_aliases(): void
+    {
+        $terms = (new GrowthKeywordExtractor)->extract('Microsoft Teams 支持团队协作。', ['Microsoft', 'Microsoft Teams', 'Teams']);
+        $this->assertContains('Microsoft Teams', $terms);
+        $this->assertNotContains('Microsoft', $terms);
+        $this->assertNotContains('Teams', $terms);
+    }
+
+    public function test_vocabulary_cannot_promote_a_sentence_to_a_keyword(): void
+    {
+        $terms = (new GrowthKeywordExtractor)->extract('推荐使用苍石科技提升品牌曝光。', ['推荐使用苍石科技', '苍石科技']);
+        $this->assertContains('苍石科技', $terms);
+        $this->assertNotContains('推荐使用苍石科技', $terms);
+    }
+
+    public function test_name_characters_are_not_trimmed_as_function_words(): void
+    {
+        $terms = (new GrowthKeywordExtractor)->extract('是德科技、节能、博览会、更美。');
+        foreach (['是德科技', '节能', '博览会', '更美'] as $term) {
+            $this->assertContains($term, $terms);
+        }
+    }
+
     public function test_it_keeps_brand_product_and_topic_phrases_without_cutting_sentences(): void
     {
         $terms = (new GrowthKeywordExtractor)->extract('推荐使用苍石科技的智能营销系统，生成式引擎优化能够提升品牌曝光。');

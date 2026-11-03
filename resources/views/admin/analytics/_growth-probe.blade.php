@@ -78,7 +78,7 @@
     </div>
 
     <div class="growth-history-heading"><h3>{{ __('growth.recent_title') }}</h3><span>{{ __('growth.recent_count', ['count' => $growthProbes->count()]) }}</span></div>
-    <div class="space-y-4 px-5 pb-5 sm:px-6" data-growth-probe-list>
+    <div class="space-y-4 px-5 pb-5 sm:px-6" data-growth-probe-list data-results-version="{{ hash('sha256', json_encode($growthProbeData)) }}">
         @forelse ($growthProbes as $probe)
             @php
                 $probeView = $growthProbeData[$probe->uuid] ?? [];

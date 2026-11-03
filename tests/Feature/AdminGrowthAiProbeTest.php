@@ -27,6 +27,43 @@ class AdminGrowthAiProbeTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_version_two_platform_keywords_are_recomputed_from_each_platform_answer(): void
+    {
+        $probe = AiGrowthProbe::query()->create([
+            'admin_id' => $this->admin()->id,
+            'question' => '智能营销工具有哪些？',
+            'provider_type' => AiGrowthProbe::CHANNEL_AUTO,
+            'status' => AiGrowthProbe::STATUS_COMPLETED,
+            'analysis_json' => ['results' => [
+                [
+                    'uuid' => 'platform-a', 'status' => 'completed',
+                    'answer_text' => '苍石科技推出AI营销助手。', 'sources' => [],
+                    'analysis' => ['keyword_extraction_version' => 2, 'answer_keywords' => ['过时的整句话关键词']],
+                ],
+                [
+                    'uuid' => 'platform-b', 'status' => 'completed',
+                    'answer_text' => '华为云提供智能客服系统。', 'sources' => [],
+                    'analysis' => ['keyword_extraction_version' => 2, 'answer_keywords' => ['过时的整句话关键词']],
+                ],
+            ]],
+        ]);
+
+        $view = app(GrowthAiProbeService::class)->present($probe);
+        $first = $view['results'][0]['analysis'];
+        $second = $view['results'][1]['analysis'];
+        $this->assertContains('苍石科技', $first['answer_keywords']);
+        $this->assertContains('AI营销助手', $first['answer_keywords']);
+        $this->assertNotContains('华为云', $first['answer_keywords']);
+        $this->assertContains('华为云', $second['answer_keywords']);
+        $this->assertContains('智能客服系统', $second['answer_keywords']);
+        $this->assertNotContains('苍石科技', $second['answer_keywords']);
+        foreach ([$first, $second] as $analysis) {
+            $this->assertSame(3, $analysis['keyword_extraction_version']);
+            $this->assertNotContains('过时的整句话关键词', $analysis['answer_keywords']);
+        }
+        $this->assertSame(2, $probe->fresh()->analysis_json['results'][0]['analysis']['keyword_extraction_version']);
+    }
+
     public function test_overview_shows_the_ask_ai_workbench(): void
     {
         $this->actingAs($this->admin(), 'admin')
@@ -36,7 +73,7 @@ class AdminGrowthAiProbeTest extends TestCase
             ->assertSee(__('admin.analytics.overview.probe.submit'))
             ->assertSee(__('admin.analytics.overview.probe.unconfigured'))
             ->assertSee('data-growth-probe', false)
-            ->assertSee('data-overview-refresh="30000"', false);
+            ->assertSee('data-overview-refresh="pending"', false);
     }
 
     public function test_overview_shows_model_select_when_configured(): void
@@ -50,7 +87,7 @@ class AdminGrowthAiProbeTest extends TestCase
             ->assertSee(__('admin.analytics.overview.probe.channels.auto'))
             ->assertSee(__('admin.analytics.overview.probe.channels.doubao_search_custom'))
             ->assertSee('name="provider_type"', false)
-            ->assertSee('data-overview-refresh="30000"', false);
+            ->assertSee('data-overview-refresh="pending"', false);
     }
 
     public function test_guest_cannot_create_a_probe(): void
@@ -308,7 +345,7 @@ class AdminGrowthAiProbeTest extends TestCase
             ->assertSee('value="'.AiGrowthProbe::chatChannel((int) $model->id).'"', false)
             ->assertDontSee(__('admin.analytics.overview.probe.unconfigured'))
             ->assertSee('name="provider_type"', false)
-            ->assertSee('data-overview-refresh="30000"', false);
+            ->assertSee('data-overview-refresh="pending"', false);
     }
 
     public function test_admin_can_queue_a_probe_with_a_selected_chat_model(): void

@@ -62,7 +62,7 @@
 @endphp
 
 @section('content')
-    <div class="growth-center growth-overview px-4 sm:px-0" data-overview-refresh="30000" data-overview-url="{{ route('admin.analytics') }}">
+    <div class="growth-center growth-overview px-4 sm:px-0" data-overview-refresh="pending" data-overview-url="{{ route('admin.analytics') }}">
         @include('admin.analytics._page-header', [
             'title' => __('admin.analytics.overview.title'),
             'subtitle' => __('admin.analytics.overview.subtitle'),

@@ -243,7 +243,7 @@ class GrowthAiProbeService
             $result['analysis'] = $this->safeAnalysis((array) ($result['analysis'] ?? []));
             $result['sources'] = $this->safeSources((array) ($result['sources'] ?? []));
             if (($result['status'] ?? '') === AiVisibilityRun::STATUS_COMPLETED
-                && ($result['analysis']['keyword_extraction_version'] ?? 0) < 2) {
+                && ($result['analysis']['keyword_extraction_version'] ?? 0) < GrowthKeywordExtractor::VERSION) {
                 $result['analysis'] = $this->analyzer->refreshKeywords(
                     $result['analysis'], $probe->question, (string) ($result['answer_text'] ?? ''), $result['sources']
                 );

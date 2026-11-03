@@ -41,7 +41,7 @@ class GrowthAiMentionAnalyzer
 
         return [
             'question' => trim($question),
-            'keyword_extraction_version' => 2,
+            'keyword_extraction_version' => GrowthKeywordExtractor::VERSION,
             'verdict' => $verdict,
             'brand_mentioned' => $brandMentioned,
             'owned_content_mentioned' => $ownedContentMentioned,
@@ -559,7 +559,7 @@ class GrowthAiMentionAnalyzer
             : []);
 
         return array_values(array_unique(array_merge(
-            $brandAliases, array_column($ownedKeywords, 'term'), array_column($sources, 'site_name'),
+            $brandAliases, array_column($ownedKeywords, 'term'),
             $saved, $this->keywords->extract($question),
         )));
     }
@@ -582,7 +582,7 @@ class GrowthAiMentionAnalyzer
                 trim($text) ?: $this->companyContext($answer, (string) ($competitor['name'] ?? '')), $vocabulary
             );
         }
-        $analysis['keyword_extraction_version'] = 2;
+        $analysis['keyword_extraction_version'] = GrowthKeywordExtractor::VERSION;
 
         return $analysis;
     }

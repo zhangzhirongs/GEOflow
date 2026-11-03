@@ -1,4 +1,4 @@
-export const overviewRefreshDelay = (root) => root.querySelector('[data-probe-status="queued"], [data-probe-status="running"]') ? 4000 : 30000;
+export const overviewRefreshDelay = (root) => root.querySelector('[data-probe-status="queued"], [data-probe-status="running"]') ? 4000 : null;
 
 export const shouldPauseOverviewRefresh = (root, doc = document) => {
     if (doc.hidden) return true;
@@ -7,7 +7,7 @@ export const shouldPauseOverviewRefresh = (root, doc = document) => {
     return Boolean(selection && !selection.isCollapsed && root.contains(selection.anchorNode));
 };
 
-export async function refreshOverview(root, { fetchPage = fetch, parsePage = (html) => new DOMParser().parseFromString(html, 'text/html') } = {}) {
+export async function refreshOverview(root, { background = false, fetchPage = fetch, parsePage = (html) => new DOMParser().parseFromString(html, 'text/html') } = {}) {
     const response = await fetchPage(root.dataset.overviewUrl, {
         credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'text/html' }, signal: AbortSignal.timeout(15000),
     });
@@ -17,11 +17,15 @@ export async function refreshOverview(root, { fetchPage = fetch, parsePage = (ht
     if (!incoming) return false;
     // The user may start reading or interacting while the request is in flight.
     if (root.ownerDocument && shouldPauseOverviewRefresh(root, root.ownerDocument)) return false;
-    const selectors = ['.growth-metrics', '[data-growth-alert]', '.growth-history-heading', '[data-growth-probe-list]'];
+    const selectors = background ? ['.growth-history-heading', '[data-growth-probe-list]']
+        : ['.growth-metrics', '[data-growth-alert]', '.growth-history-heading', '[data-growth-probe-list]'];
     for (const selector of selectors) {
         const current = root.querySelector(selector);
         const updated = incoming.querySelector(selector);
         if (!current || !updated || current.contains(root.ownerDocument?.activeElement)) continue;
+        if (selector === '[data-growth-probe-list]' && current.dataset?.resultsVersion === updated.dataset?.resultsVersion
+            && current.dataset?.resultsVersion) continue;
+        if (current.isEqualNode?.(updated)) continue;
         if (selector === '[data-growth-probe-list]') {
             const opened = Array.from(current.querySelectorAll('details[open]')).map((detail) => {
                 const item = detail.closest('[data-probe-uuid]');
@@ -41,25 +45,29 @@ export async function refreshOverview(root, { fetchPage = fetch, parsePage = (ht
 export function initializeOverviewRefresh(root) {
     let busy = false;
     const button = root.querySelector('[data-analytics-refresh]');
-    const update = async () => {
+    const update = async (background = false) => {
         if (busy) return;
         busy = true;
         if (button) button.disabled = true;
         try {
-            await refreshOverview(root);
+            await refreshOverview(root, { background });
         } catch { /* A temporary network failure must not interrupt editing. */ }
         finally {
             busy = false;
             if (button) button.disabled = false;
         }
     };
-    button?.addEventListener('click', update);
+    button?.addEventListener('click', () => update());
+    const schedule = () => {
+        const delay = overviewRefreshDelay(root);
+        if (delay !== null) window.setTimeout(tick, delay);
+    };
     const tick = async () => {
         if (!root.isConnected) return;
-        if (!shouldPauseOverviewRefresh(root)) await update();
-        window.setTimeout(tick, overviewRefreshDelay(root));
+        if (!shouldPauseOverviewRefresh(root)) await update(true);
+        schedule();
     };
-    window.setTimeout(tick, overviewRefreshDelay(root));
+    schedule();
     if (new URLSearchParams(window.location.search).get('probe')) {
         root.querySelector('[data-growth-probe]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
